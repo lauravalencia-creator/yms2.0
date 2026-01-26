@@ -17,6 +17,14 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
+import {
+  Download,
+  RefreshCcw,
+  Filter,
+  Maximize2
+} from "lucide-react";
+
+
 interface TablesSectionProps {
   locationId: string | null;
   dockGroupId: string | null;
@@ -396,7 +404,7 @@ export function TablesSection({ locationId, dockGroupId }: TablesSectionProps) {
               className="data-[state=active]:bg-yms-primary data-[state=active]:text-white rounded-[0.75rem] px-4 py-2 gap-2"
             >
               <CalendarIcon className="w-4 h-4" />
-              <span className="font-medium">Appointments</span>
+              <span className="font-medium">Consulta de citas</span>
               <Badge
                 variant="secondary"
                 className="ml-1 bg-yms-secondary/20 text-yms-secondary text-[10px]"
@@ -409,7 +417,7 @@ export function TablesSection({ locationId, dockGroupId }: TablesSectionProps) {
               className="data-[state=active]:bg-yms-primary data-[state=active]:text-white rounded-[0.75rem] px-4 py-2 gap-2"
             >
               <TruckIcon className="w-4 h-4" />
-              <span className="font-medium">Carriers</span>
+              <span className="font-medium">Torre de Control</span>
               <Badge
                 variant="secondary"
                 className="ml-1 bg-yms-cyan/20 text-yms-cyan text-[10px]"
@@ -422,7 +430,7 @@ export function TablesSection({ locationId, dockGroupId }: TablesSectionProps) {
               className="data-[state=active]:bg-yms-primary data-[state=active]:text-white rounded-[0.75rem] px-4 py-2 gap-2"
             >
               <CubeIcon className="w-4 h-4" />
-              <span className="font-medium">Inventory</span>
+              <span className="font-medium">Editar Información</span>
               <Badge
                 variant="secondary"
                 className="ml-1 bg-yms-primary/20 text-yms-primary text-[10px]"
@@ -433,19 +441,41 @@ export function TablesSection({ locationId, dockGroupId }: TablesSectionProps) {
           </TabsList>
 
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yms-gray" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-64 rounded-[1.25rem] border-yms-border focus:border-yms-cyan focus:ring-yms-cyan"
-              />
-            </div>
-            <Button className="bg-yms-secondary hover:bg-yms-secondary/90 text-white rounded-[0.75rem] gap-2">
+           <Button className="bg-yms-secondary hover:bg-yms-secondary/90 text-white rounded-[0.75rem] gap-2">
               <PlusIcon className="w-4 h-4" />
               New Entry
             </Button>
+            <div className="w-px h-8 bg-yms-border mx-1" />
+
+        {/* Action icon buttons */}
+        <button
+          title="Exportar Excel"
+          className="w-10 h-10 flex items-center justify-center rounded-xl border border-yms-border bg-white hover:bg-yms-primary/5 active:scale-95 transition-all"
+        >
+          <Download className="w-4 h-4 text-yms-primary" />
+        </button>
+
+        <button
+          title="Recargar"
+          className="w-10 h-10 flex items-center justify-center rounded-xl border border-yms-border bg-white hover:bg-yms-primary/5 active:scale-95 transition-all"
+        >
+          <RefreshCcw className="w-4 h-4 text-yms-primary" />
+        </button>
+
+        <button
+          title="Filtrar"
+          className="w-10 h-10 flex items-center justify-center rounded-xl border border-yms-border bg-white hover:bg-yms-primary/5 active:scale-95 transition-all"
+        >
+          <Filter className="w-4 h-4 text-yms-primary" />
+        </button>
+
+        <button
+          title="Pantalla completa"
+          className="w-10 h-10 flex items-center justify-center rounded-xl border border-yms-border bg-white hover:bg-yms-primary/5 active:scale-95 transition-all"
+        >
+          <Maximize2 className="w-4 h-4 text-yms-primary" />
+        </button>
+           
           </div>
         </div>
 

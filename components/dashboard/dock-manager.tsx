@@ -345,78 +345,85 @@ function DockSlot({
       onDragLeave={onDragLeave}
       onDrop={handleDrop}
       className={cn(
-        "relative border-2 rounded-[1rem] p-3 min-h-[120px] transition-all",
+        "relative border-2 rounded-xl p-2.5 w-32 h-40 transition-all flex flex-col",
         getDockStatusStyle(dock.status),
-        isDropTarget && dock.status === "available" && "border-yms-cyan border-dashed bg-yms-cyan/10 scale-[1.02]",
-        dock.status === "available" && "hover:border-yms-cyan/50"
+        isDropTarget && dock.status === "available" && "border-yms-cyan border-dashed bg-yms-cyan/10 scale-105",
+        dock.status === "available" && "hover:border-yms-cyan/50 cursor-pointer"
       )}
     >
       {/* Dock Header */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-2">
-          <span className="font-serif font-bold text-sm text-yms-primary">
-            {dock.name}
-          </span>
-          <Badge
-            variant="outline"
-            className={cn(
-              "text-[10px] px-1.5 py-0",
-              dock.type === "inbound" && "border-yms-cyan text-yms-cyan",
-              dock.type === "outbound" && "border-yms-secondary text-yms-secondary",
-              dock.type === "both" && "border-yms-primary text-yms-primary"
-            )}
-          >
-            {dock.type === "both" ? "IN/OUT" : dock.type.toUpperCase()}
-          </Badge>
-        </div>
+      <div className="flex items-center justify-between gap-1 mb-1.5">
+        <span className="font-serif font-bold text-xs text-yms-primary truncate">
+          {dock.name}
+        </span>
         {dock.status === "maintenance" && (
-          <WrenchIcon className="w-4 h-4 text-yms-secondary" />
+          <WrenchIcon className="w-3.5 h-3.5 text-yms-secondary shrink-0" />
         )}
       </div>
 
+      <Badge
+        variant="outline"
+        className={cn(
+          "text-[9px] px-1.5 py-0.5 w-fit mb-2",
+          dock.type === "inbound" && "border-yms-cyan text-yms-cyan",
+          dock.type === "outbound" && "border-yms-secondary text-yms-secondary",
+          dock.type === "both" && "border-yms-primary text-yms-primary"
+        )}
+      >
+        {dock.type === "both" ? "IN/OUT" : dock.type.toUpperCase()}
+      </Badge>
+
       {/* Dock Content */}
-      {dock.status === "available" && (
-        <div className="flex flex-col items-center justify-center h-[60px] text-yms-gray/60">
-          <div className="w-8 h-8 rounded-full border-2 border-dashed border-yms-border flex items-center justify-center mb-1">
-            <TruckIcon className="w-4 h-4" />
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        {dock.status === "available" && (
+          <div className="flex flex-col items-center justify-center text-yms-gray/50">
+            <div className="w-8 h-8 rounded-full border-2 border-dashed border-yms-border flex items-center justify-center mb-1">
+              <TruckIcon className="w-5 h-5" />
+            </div>
+            <span className="text-[10px] text-yms-gray/60">Disponible</span>
           </div>
-          <span className="text-xs">Drop to assign</span>
-        </div>
-      )}
+        )}
 
-      {dock.status === "maintenance" && (
-        <div className="flex flex-col items-center justify-center h-[60px] text-yms-secondary">
-          <span className="text-xs font-medium">Under Maintenance</span>
-        </div>
-      )}
+        {dock.status === "maintenance" && (
+          <div className="flex flex-col items-center justify-center text-yms-secondary">
+            <WrenchIcon className="w-6 h-6 mb-1" />
+            <span className="text-[10px] font-medium text-center">Mantenimiento</span>
+          </div>
+        )}
 
-      {dock.currentAppointment && (
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            {dock.currentAppointment.type === "inbound" ? (
-              <ArrowDownIcon className="w-4 h-4 text-yms-cyan" />
-            ) : (
-              <ArrowUpIcon className="w-4 h-4 text-yms-secondary" />
-            )}
-            <span className="font-medium text-sm text-yms-primary truncate">
-              {dock.currentAppointment.carrier}
-            </span>
+        {dock.currentAppointment && (
+          <div className="w-full space-y-1 overflow-hidden">
+            <div className="flex items-center gap-1">
+              {dock.currentAppointment.type === "inbound" ? (
+                <ArrowDownIcon className="w-3.5 h-3.5 text-yms-cyan shrink-0" />
+              ) : (
+                <ArrowUpIcon className="w-3.5 h-3.5 text-yms-secondary shrink-0" />
+              )}
+              <span className="font-medium text-[11px] text-yms-primary truncate">
+                {dock.currentAppointment.carrier}
+              </span>
+            </div>
+            <div className="text-[10px] text-yms-gray truncate">
+              {dock.currentAppointment.truckId}
+            </div>
+            <div className="text-[10px] text-yms-gray flex items-center gap-1">
+              <ClockIcon className="w-3 h-3" />
+              {dock.currentAppointment.time}
+            </div>
+            <Badge
+              className={cn(
+                "text-[9px] px-1.5 py-0.5 mt-1",
+                getStatusColor(dock.currentAppointment.status)
+              )}
+            >
+              {dock.currentAppointment.status === "in-progress" ? "En Proceso" :
+               dock.currentAppointment.status === "delayed" ? "Retrasado" :
+               dock.currentAppointment.status === "scheduled" ? "Agendado" : 
+               dock.currentAppointment.status}
+            </Badge>
           </div>
-          <div className="flex items-center gap-2 text-xs text-yms-gray">
-            <span>{dock.currentAppointment.truckId}</span>
-            <span className="text-yms-border">|</span>
-            <span>{dock.currentAppointment.time}</span>
-          </div>
-          <Badge
-            className={cn(
-              "text-[10px] mt-1",
-              getStatusColor(dock.currentAppointment.status)
-            )}
-          >
-            {dock.currentAppointment.status}
-          </Badge>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -443,6 +450,8 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
   const [allAppointmentsState, setAllAppointmentsState] = useState(allPendingAppointments);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
   // Filter docks based on location and dock group
   const filteredDocks = useMemo(() => {
@@ -454,15 +463,24 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
     return filtered;
   }, [allDocksState, locationId, dockGroupId]);
 
-  // Filter appointments based on location and dock group
+  // Filter appointments based on location, dock group, and search query
   const filteredAppointments = useMemo(() => {
     if (!locationId) return [];
     let filtered = allAppointmentsState.filter((apt) => apt.locationId === locationId);
     if (dockGroupId && dockGroupId !== "all") {
       filtered = filtered.filter((apt) => apt.dockGroupId === dockGroupId);
     }
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((apt) => 
+        apt.carrier.toLowerCase().includes(query) ||
+        apt.truckId.toLowerCase().includes(query) ||
+        apt.id.toLowerCase().includes(query)
+      );
+    }
     return filtered;
-  }, [allAppointmentsState, locationId, dockGroupId]);
+  }, [allAppointmentsState, locationId, dockGroupId, searchQuery]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -491,6 +509,7 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
     setAllAppointmentsState((prev) => prev.filter((a) => a.id !== appointmentId));
     setDraggingId(null);
     setDropTargetId(null);
+    setSelectedAppointment(null);
   };
 
   // Empty state when no location is selected
@@ -520,71 +539,234 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
     );
   }
 
-  return (
-    <div className="h-full flex flex-col p-4 gap-4 overflow-hidden">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-serif font-bold text-xl text-yms-primary">
-            Gestor de Muelles
-          </h2>
-          <p className="text-sm text-yms-gray">
-            Arrastra las citas para asignarlas a los muelles disponibles
-          </p>
-        </div>
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5 bg-yms-cyan/10 px-3 py-1.5 rounded-full">
-            <div className="w-3 h-3 rounded-full bg-yms-cyan" />
-            <span className="text-yms-cyan font-medium">Disponible ({stats.available})</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-yms-primary/10 px-3 py-1.5 rounded-full">
-            <div className="w-3 h-3 rounded-full bg-yms-primary" />
-            <span className="text-yms-primary font-medium">Ocupado ({stats.occupied})</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-yms-secondary/10 px-3 py-1.5 rounded-full">
-            <div className="w-3 h-3 rounded-full bg-yms-secondary" />
-            <span className="text-yms-secondary font-medium">Mantenimiento ({stats.maintenance})</span>
-          </div>
-        </div>
-      </div>
+return (
+  <div className="h-full flex flex-col p-4 gap-3 overflow-hidden">
 
-      <div className="flex-1 flex gap-4 overflow-hidden">
-        {/* Pending Appointments Queue */}
-        <div className="w-64 shrink-0 flex flex-col">
-          <div className="bg-yms-primary rounded-t-[1rem] px-4 py-2">
-            <h3 className="font-serif font-bold text-sm text-white">
-              Cola de Espera
-            </h3>
-            <span className="text-xs text-white/60">
-              {filteredAppointments.length} citas pendientes
-            </span>
-          </div>
-          <div className="flex-1 bg-white border border-t-0 border-yms-border rounded-b-[1rem] p-3 overflow-y-auto space-y-2">
-            {filteredAppointments.map((appointment) => (
-              <AppointmentCard
-                key={appointment.id}
-                appointment={appointment}
-                isDragging={draggingId === appointment.id}
-                onDragStart={() => setDraggingId(appointment.id)}
+    <div className="flex-1 flex gap-4 overflow-hidden min-h-0">
+      {/* Pending Appointments Queue */}
+      <div className="w-72 shrink-0 flex flex-col min-h-0">
+
+        {/* Header */}
+        <div className="bg-yms-primary rounded-t-[1rem] px-4 py-2.5 flex-shrink-0">
+          <h3 className="font-serif font-bold text-sm text-white">
+            Asignaciones
+          </h3>
+        </div>
+
+        {/* Search Box (debajo del título) */}
+        {!selectedAppointment && (
+          <div className="bg-white border-x border-b border-yms-border px-3 py-2.5 flex-shrink-0">
+            <div className="relative">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yms-gray/60"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+
+              <input
+                type="text"
+                placeholder="Buscar orden de compra..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-8 py-2 text-sm border border-yms-border rounded-lg outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all"
               />
-            ))}
-            {filteredAppointments.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-yms-gray/60 text-sm py-8">
-                <TruckIcon className="w-8 h-8 mb-2 opacity-40" />
-                <p>Sin citas pendientes</p>
+
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-yms-gray/60 hover:text-yms-primary transition-colors"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+          
+         
+
+          <div className="flex-1 bg-white border border-t-0 border-yms-border rounded-b-[1rem] p-3 overflow-y-auto min-h-0">
+            {selectedAppointment ? (
+              // Vista detallada
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                {/* Botón de regresar */}
+                <button
+                  onClick={() => setSelectedAppointment(null)}
+                  className="flex items-center gap-2 text-yms-primary hover:text-yms-cyan transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Volver a la lista
+                </button>
+
+                {/* Detalles de la orden */}
+                <div className="bg-gradient-to-br from-yms-primary to-yms-primary/80 rounded-xl p-4 text-white shadow-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    {selectedAppointment.type === "inbound" ? (
+                      <ArrowDownIcon className="w-5 h-5" />
+                    ) : (
+                      <ArrowUpIcon className="w-5 h-5" />
+                    )}
+                    <h4 className="font-serif font-bold text-lg">
+                      {selectedAppointment.carrier}
+                    </h4>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 opacity-70" viewBox="0 0 24 24" fill="currentColor">
+                        <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z" clipRule="evenodd" />
+                        <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
+                      </svg>
+                      <span className="opacity-80">Orden de Compra:</span>
+                      <span className="font-bold">{selectedAppointment.id}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <TruckIcon className="w-4 h-4 opacity-70" />
+                      <span className="opacity-80">Vehículo:</span>
+                      <span className="font-bold">{selectedAppointment.truckId}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ClockIcon className="w-4 h-4 opacity-70" />
+                      <span className="opacity-80">Hora programada:</span>
+                      <span className="font-bold">{selectedAppointment.time}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Información adicional */}
+                <div className="space-y-3">
+                  <div className="bg-gray-50 rounded-lg p-3 border border-yms-border">
+                    <p className="text-xs font-bold text-yms-gray mb-1 uppercase tracking-wide">Conductor</p>
+                    <p className="text-sm text-yms-primary font-medium">Juan Carlos Pérez</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-3 border border-yms-border">
+                    <p className="text-xs font-bold text-yms-gray mb-1 uppercase tracking-wide">Tipo de Producto</p>
+                    <p className="text-sm text-yms-primary font-medium">Mercancía General</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-3 border border-yms-border">
+                    <p className="text-xs font-bold text-yms-gray mb-1 uppercase tracking-wide">Estado</p>
+                    <Badge className={cn("text-xs", getStatusColor(selectedAppointment.status))}>
+                      {selectedAppointment.status === "scheduled" ? "Programada" :
+                       selectedAppointment.status === "pending" ? "Pendiente" :
+                       selectedAppointment.status}
+                    </Badge>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-3 border border-yms-border">
+                    <p className="text-xs font-bold text-yms-gray mb-1 uppercase tracking-wide">Tipo de Operación</p>
+                    <div className="flex items-center gap-2">
+                      {selectedAppointment.type === "inbound" ? (
+                        <>
+                          <ArrowDownIcon className="w-4 h-4 text-yms-cyan" />
+                          <span className="text-sm text-yms-primary font-medium">Recepción / Entrada</span>
+                        </>
+                      ) : (
+                        <>
+                          <ArrowUpIcon className="w-4 h-4 text-yms-secondary" />
+                          <span className="text-sm text-yms-primary font-medium">Despacho / Salida</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Instrucciones de arrastre */}
+                <div className="bg-yms-cyan/10 border border-yms-cyan/30 rounded-lg p-3 flex items-start gap-2">
+                  <svg className="w-5 h-5 text-yms-cyan shrink-0 mt-0.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-xs text-yms-primary">
+                    Arrastra esta cita desde la lista hacia un muelle disponible para asignarla
+                  </p>
+                </div>
+              </div>
+            ) : (
+              // Vista de lista
+              <div className="space-y-2">
+                {filteredAppointments.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    onClick={() => setSelectedAppointment(appointment)}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("appointmentId", appointment.id);
+                      setDraggingId(appointment.id);
+                    }}
+                    className={cn(
+                      "bg-white border border-yms-border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md hover:border-yms-cyan",
+                      draggingId === appointment.id && "opacity-50 scale-95"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        {appointment.type === "inbound" ? (
+                          <ArrowDownIcon className="w-4 h-4 text-yms-cyan" />
+                        ) : (
+                          <ArrowUpIcon className="w-4 h-4 text-yms-secondary" />
+                        )}
+                        <span className="font-medium text-sm text-yms-primary">
+                          {appointment.carrier}
+                        </span>
+                      </div>
+                      <Badge className={cn("text-xs", getStatusColor(appointment.status))}>
+                        {appointment.status}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs text-yms-gray">
+                      <span className="flex items-center gap-1">
+                        <TruckIcon className="w-3.5 h-3.5" />
+                        {appointment.truckId}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="w-3.5 h-3.5" />
+                        {appointment.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+                {filteredAppointments.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-yms-gray/60 text-sm py-8">
+                    <TruckIcon className="w-8 h-8 mb-2 opacity-40" />
+                    {searchQuery ? (
+                      <p>No se encontraron resultados</p>
+                    ) : (
+                      <p>Sin citas pendientes</p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
         </div>
 
         {/* Docks Grid */}
-        <div className="flex-1 bg-white border border-yms-border rounded-[1.5rem] p-4 overflow-y-auto">
+        <div className="flex-1 bg-white border border-yms-border rounded-[1.5rem] p-2 overflow-y-auto min-h-0">
           {filteredDocks.length > 0 ? (
-            <div className={cn(
-              "grid gap-3",
-              filteredDocks.length <= 4 ? "grid-cols-2" : 
-              filteredDocks.length <= 6 ? "grid-cols-3" : 
-              "grid-cols-4"
-            )}>
+            <div className="flex flex-wrap gap-1.5">
               {filteredDocks.map((dock) => (
                 <DockSlot
                   key={dock.id}

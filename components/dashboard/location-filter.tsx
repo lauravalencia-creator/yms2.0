@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+        import { Search, BarChart3, ClipboardList, Users, Upload } from 'lucide-react';
 
 // Icons
 function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -264,28 +265,56 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
 
-        {/* Selected Info Badge */}
-        {isLoaded && selectedLocation && (
-          <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
-            <Badge
-              className="bg-yms-primary/10 text-yms-primary border border-yms-primary/20 rounded-full px-3 py-1"
-            >
-              <BuildingIcon className="w-3.5 h-3.5 mr-1.5" />
-              {selectedLocation.name}
-            </Badge>
-            {selectedDockGroup && selectedDockGroupId !== "all" && (
-              <Badge
-                className={cn(
-                  "rounded-full px-3 py-1 border",
-                  getDockTypeColor(selectedDockGroup.type)
-                )}
-              >
-                <LayersIcon className="w-3.5 h-3.5 mr-1.5" />
-                {selectedDockGroup.name}
-              </Badge>
-            )}
-          </div>
-        )}
+
+
+{/* Action Buttons */}
+{isLoaded && selectedLocation && (
+  <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+    {/* Barra de búsqueda */}
+    <div className="relative group">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yms-gray group-focus-within:text-yms-cyan transition-colors pointer-events-none" />
+      <input
+        type="text"
+        placeholder="Buscar..."
+        className="pl-9 pr-4 py-2 h-10 w-48 bg-white border border-yms-border rounded-xl text-sm outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all"
+      />
+    </div>
+
+    <div className="w-px h-8 bg-yms-border" />
+
+    {/* Botón Reportes */}
+    <button
+      title="Reportes"
+      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+    >
+      <BarChart3 size={18} />
+    </button>
+
+    {/* Botón Registros */}
+    <button
+      title="Registros"
+      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+    >
+      <ClipboardList size={18} />
+    </button>
+
+    {/* Botón Usuarios */}
+    <button
+      title="Usuarios"
+      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+    >
+      <Users size={18} />
+    </button>
+
+    {/* Botón Carga de Archivos */}
+    <button
+      title="Carga de Archivos"
+      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+    >
+      <Upload size={18} />
+    </button>
+  </div>
+)}
       </div>
 
       {/* Empty state hint */}
