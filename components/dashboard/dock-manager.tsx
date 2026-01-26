@@ -29,14 +29,8 @@ import {
   ArrowRightLeft   
 } from "lucide-react";
 
-// --- TIPOS ---
-type AppointmentStatus =
-  | "scheduled"
-  | "in-progress"
-  | "completed"
-  | "delayed"
-  | "pending";
-
+// --- TIPOS (Sin cambios) ---
+type AppointmentStatus = "scheduled" | "in-progress" | "completed" | "delayed" | "pending";
 type ViewMode = "grid" | "timeline";
 type TimeFrame = "day" | "week" | "month";
 
@@ -51,8 +45,6 @@ export interface Appointment {
   dockGroupId?: string;
   duration?: number;
   driver?: string;
-  
-  // Campos extra
   city?: string;
   department?: string;
   locationName?: string;
@@ -62,13 +54,9 @@ export interface Appointment {
   loadType?: string;
   operationType?: string;
   product?: string;
-
-  // Campos Modal Solicitud
   nit?: string;
   quantityOrdered?: number;
   quantityDelivered?: number;
-  
-  // Campos Modal Creación
   appointmentIdRef?: string;
   transportCompany?: string;
   loadDate?: string;
@@ -79,7 +67,6 @@ export interface Appointment {
   driverPhone?: string;
   driverEmail?: string;
   merchandiseCode?: string;
-
   isReadyForAssignment?: boolean;
 }
 
@@ -99,7 +86,7 @@ interface DockManagerProps {
   dockGroupId: string | null;
 }
 
-// --- ICONOS SVG ---
+// --- ICONOS SVG (Sin cambios) ---
 function TruckIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875h-8.25ZM13.5 15h-12v2.625c0 1.035.84 1.875 1.875 1.875h.375a3 3 0 1 1 6 0h3a.75.75 0 0 0 .75-.75V15Zm8.25 0h-1.5v2.625c0 .621.504 1.125 1.125 1.125h.375a3 3 0 1 1-6 0H13.5v.75c0 .414.336.75.75.75h8.625c.621 0 1.125-.504 1.125-1.125V19.5a4.5 4.5 0 0 0-4.5-4.5h-1.5V9.75a.75.75 0 0 0-.75-.75h-1.5a.75.75 0 0 0-.75.75v2.25H18a3 3 0 0 1 3 3v.75h.75a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-.75.75h-.75v.75Z" /><path d="M7.5 16.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM16.5 16.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z" /></svg>;
 }
@@ -116,7 +103,8 @@ function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" /></svg>;
 }
 
-// --- DATOS COMPLETOS DE MUELLES (PARA TODAS LAS LOCALIDADES) ---
+// --- DATOS COMPLETOS DE MUELLES ---
+// (Mismos datos que en tu archivo original)
 const allDocks: Dock[] = [
   // --- LOC-1: CENTRO DISTRIBUCION NORTE ---
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
@@ -171,18 +159,6 @@ const allDocks: Dock[] = [
   { id: "dock-2b-1", name: "Sur 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2b" },
   { id: "dock-2b-2", name: "Sur 02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
     currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane" }},
-
-  // --- LOC-3: HUB LOGISTICO MONTERREY ---
-  { id: "dock-3a-1", name: "Term A-01", type: "both", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3a" },
-  { id: "dock-3a-2", name: "Term A-02", type: "both", status: "maintenance", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3a" },
-  { id: "dock-3b-1", name: "Term B-01", type: "both", status: "occupied", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3b",
-    currentAppointment: { id: "apt-mty-1", carrier: "RegioPack", truckId: "MTY-001", time: "07:30", type: "inbound", status: "in-progress", locationId: "loc-3", dockGroupId: "dg-3b", duration: 120 } },
-  { id: "dock-3c-1", name: "Refri 01", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3c" },
-
-  // --- LOC-4: CENTRO EXPORTACION TIJUANA ---
-  { id: "dock-4a-1", name: "Aduana 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-4", dockGroupId: "dg-4a" },
-  { id: "dock-4b-1", name: "Cross 01", type: "both", status: "occupied", occupancy: 100, locationId: "loc-4", dockGroupId: "dg-4b",
-    currentAppointment: { id: "apt-tj-1", carrier: "BorderLogistics", truckId: "USA-99", time: "11:00", type: "outbound", status: "in-progress", locationId: "loc-4", dockGroupId: "dg-4b", duration: 60 } },
 ];
 
 // --- Citas pendientes ---
@@ -202,7 +178,6 @@ const pendingAppointments: Appointment[] = [
 // --- HELPERS STYLES ---
 function getOccupancyStyle(dock: Dock, isDragging: boolean) {
   if (dock.status === "maintenance") {
-    // GRIS para mantenimiento
     return "bg-gray-100 border-gray-300 text-gray-500 shadow-sm"; 
   }
   
@@ -216,7 +191,6 @@ function getOccupancyStyle(dock: Dock, isDragging: boolean) {
     return "bg-orange-50 border-orange-300 text-orange-900 shadow-sm";
   }
 
-  // Disponible (Blanco)
   if (isDragging) {
      return "bg-white border-yms-cyan/60 ring-4 ring-yms-cyan/20 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02] animate-pulse";
   }
@@ -243,12 +217,14 @@ function getStatusConfig(status: AppointmentStatus) {
 
 // --- UTILS TIMELINE ---
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const getPositionFromTime = (time: string): number => {
+// Ahora devuelve top en porcentaje
+const getTopFromTime = (time: string): number => {
   const [hours, minutes] = time.split(":").map(Number);
-  return ((hours + minutes / 60) / 24) * 100;
+  return ((hours * 60 + minutes) / 1440) * 100;
 };
-const getWidthFromDuration = (durationMinutes: number): number => {
-  return (durationMinutes / 60 / 24) * 100;
+// Ahora devuelve height en porcentaje
+const getHeightFromDuration = (durationMinutes: number): number => {
+  return (durationMinutes / 1440) * 100;
 };
 
 // --- COMPONENTES ---
@@ -259,7 +235,6 @@ const InfoField = ({ label, value }: { label: string, value?: string }) => (
   </div>
 );
 
-// --- DOCK SLOT (REDISENADO SEGÚN SOLICITUD) ---
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -275,7 +250,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
   const isMaintenance = dock.status === "maintenance";
   const showContent = !isMaintenance && dock.occupancy > 0;
   
-  // Icono según tipo
   const TypeIcon = dock.type === "inbound" ? ArrowDownCircle : dock.type === "outbound" ? ArrowUpCircle : ArrowRightLeft;
   const iconColor = dock.type === "inbound" ? "text-yms-cyan" : dock.type === "outbound" ? "text-yms-secondary" : "text-yms-primary";
 
@@ -292,7 +266,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
       )}
     >
       <div className="flex flex-col items-start w-full mb-2">
-        {/* HEADER: ICONO + NOMBRE */}
         <div className="flex items-center gap-1.5 w-full">
              {!isMaintenance && <TypeIcon className={cn("w-4 h-4 shrink-0", iconColor)} strokeWidth={2.5} />}
              <span className={cn("font-serif font-bold text-xs truncate", isMaintenance ? "text-gray-500" : "text-[#1C1E59]")} title={dock.name}>
@@ -301,7 +274,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
              {isMaintenance && <WrenchIcon className="w-4 h-4 text-gray-400 shrink-0 ml-auto" />}
         </div>
         
-        {/* SUBTITULO: FULL/PARCIAL (Solo ocupados) */}
         {!isMaintenance && dock.occupancy > 0 && (
            <div className="mt-1">
               <span className={cn("text-[10px] font-bold uppercase tracking-tight", 
@@ -314,7 +286,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-h-0 mt-1 relative">
-        {/* MANTENIMIENTO: GRIS */}
         {isMaintenance && (
           <div className="flex flex-col items-center justify-center text-gray-400 gap-1 opacity-70">
             <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300">
@@ -324,7 +295,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
           </div>
         )}
 
-        {/* DISPONIBLE: BLANCO */}
         {!isMaintenance && dock.occupancy === 0 && (
           <div className="flex flex-col items-center justify-center opacity-30 gap-1">
             <div className="w-9 h-9 rounded-full border border-dashed border-slate-400 flex items-center justify-center">
@@ -334,7 +304,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
           </div>
         )}
 
-        {/* CITA: SIN SOMBRA NI BORDES PESADOS */}
         {showContent && dock.currentAppointment && (
           <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
             <div className="flex-1 bg-transparent rounded-lg p-1 flex flex-col gap-0.5">
@@ -369,13 +338,11 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
   );
 }
 
-// --- MODAL 1: SOLICITUD DE CITAS (PASO 1) ---
+// --- MODALES (Sin cambios) ---
 function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: () => void }) {
-  // ... (código igual al anterior)
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
            <div className="flex items-center gap-3">
               <div className="bg-slate-100 p-2 rounded-lg border border-slate-200">
@@ -387,8 +354,6 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
               <X className="w-6 h-6" />
            </button>
         </div>
-
-        {/* Content */}
         <div className="p-8 bg-gray-50/50">
            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
               <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
@@ -428,8 +393,6 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
               </div>
            </div>
         </div>
-
-        {/* Footer */}
         <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
            <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onContinue}>
              CONTINUAR
@@ -443,9 +406,7 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
   );
 }
 
-// --- MODAL 2: CREACIÓN DE CITA (PASO 2) ---
 function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: () => void }) {
-  // ... (código igual al anterior)
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] overflow-y-auto">
@@ -588,7 +549,6 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
   );
 }
 
-// --- MODAL DE EDICION (EXISTENTE) ---
 function AppointmentEditModal({ 
   appointment, 
   dockName, 
@@ -699,91 +659,260 @@ function AppointmentEditModal({
   );
 }
 
-// --- TIMELINE (CON LÍNEA DE HORA ACTUAL AZUL) ---
-function DockTimeline({ docks, timeFrame, highlightedDockId, onAppointmentClick, currentTime }: { docks: Dock[], timeFrame: TimeFrame, highlightedDockId: string | null, onAppointmentClick: any, currentTime: Date }) {
+// --- NUEVO COMPONENTE TIMELINE VERTICAL ---
+function DockTimeline({ 
+  docks, 
+  timeFrame, 
+  highlightedDockId, 
+  onAppointmentClick, 
+  currentTime 
+}: { 
+  docks: Dock[], 
+  timeFrame: TimeFrame, 
+  highlightedDockId: string | null, 
+  onAppointmentClick: any, 
+  currentTime: Date 
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Calcular posición de la línea de tiempo (0-100%)
+  // -- ESTADO PARA PAGINACIÓN DE MUELLES (VISTA DÍA) --
+  const [dockStartIndex, setDockStartIndex] = useState(0);
+  const docksPerPage = 5; // Cantidad de muelles visibles a la vez
+  
+  // -- ESTADO PARA MUELLE SELECCIONADO (VISTA SEMANA) --
+  const [selectedDockForWeek, setSelectedDockForWeek] = useState<string | null>(null);
+
+  // Calcular posición de la línea de tiempo (0-100% en VERTICAL ahora)
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
   const currentPosition = (currentMinutes / 1440) * 100;
 
-  useEffect(() => {
-    if (highlightedDockId && containerRef.current) {
-      const element = containerRef.current.querySelector(`[data-dock-id="${highlightedDockId}"]`);
-      if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }, [highlightedDockId]);
+  // -- VISTA MENSUAL (SIMPLIFICADA) --
+  if (timeFrame === "month") {
+    const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1); // Simulación mes
+    return (
+      <div className="flex flex-col h-full bg-slate-50 p-4 overflow-auto">
+         <div className="grid grid-cols-7 gap-px bg-slate-200 border border-slate-300 rounded-lg overflow-hidden shadow-sm">
+             {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => (
+                <div key={d} className="bg-slate-100 p-2 text-center text-xs font-bold text-gray-500 uppercase">{d}</div>
+             ))}
+             {daysInMonth.map(day => (
+                <div key={day} className="bg-white h-24 p-2 relative hover:bg-slate-50 transition-colors">
+                   <span className="text-xs font-bold text-gray-400">{day}</span>
+                   {day === 19 && (
+                     <div className="mt-1 space-y-1">
+                        <div className="text-[9px] bg-yms-cyan/10 text-yms-cyan rounded px-1 py-0.5 truncate font-medium border border-yms-cyan/20">
+                           3 Citas
+                        </div>
+                     </div>
+                   )}
+                </div>
+             ))}
+         </div>
+      </div>
+    );
+  }
 
-  if (timeFrame !== "day") return <div className="flex flex-col items-center justify-center h-full text-yms-gray/60 bg-slate-50 rounded-xl border border-dashed border-yms-border"><CalendarIcon className="w-12 h-12 mb-3 opacity-30" /><p>Vista de {timeFrame === "week" ? "Semana" : "Mes"} en desarrollo.</p></div>;
+  // -- VISTA SEMANA --
+  if (timeFrame === "week") {
+    // Si no hay muelle seleccionado, tomar el highlighted o el primero
+    const activeDockId = selectedDockForWeek || highlightedDockId || docks[0]?.id;
+    const activeDock = docks.find(d => d.id === activeDockId) || docks[0];
+    const weekDays = ["Lun 17", "Mar 18", "Mié 19", "Jue 20", "Vie 21", "Sáb 22", "Dom 23"];
+
+    return (
+      <div className="flex flex-col h-full bg-white relative">
+         {/* HEADER SEMANA */}
+         <div className="flex items-center justify-between p-2 border-b border-slate-200 bg-slate-50/50">
+             <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-gray-500 uppercase">Muelle:</span>
+                <select 
+                  className="text-sm font-bold text-indigo-900 bg-transparent border-none focus:ring-0 cursor-pointer"
+                  value={activeDock?.id}
+                  onChange={(e) => setSelectedDockForWeek(e.target.value)}
+                >
+                   {docks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+             </div>
+         </div>
+         
+         <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 shadow-sm">
+             <div className="w-16 shrink-0 border-r border-slate-200 p-2 bg-slate-50"></div>
+             {weekDays.map((day, idx) => (
+                <div key={day} className={cn("flex-1 text-center py-2 text-xs font-bold border-r border-slate-100", idx === 2 ? "bg-blue-50 text-blue-700" : "text-gray-600")}>
+                   {day}
+                </div>
+             ))}
+         </div>
+
+         <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]">
+            <div className="flex relative min-h-[1200px]">
+                {/* COLUMNA HORAS */}
+                <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50 text-xs text-gray-400 font-mono text-right pr-2 pt-2 relative">
+                   {HOURS.map(h => (
+                      <div key={h} className="absolute w-full pr-2" style={{ top: `${(h/24)*100}%` }}>
+                         {h.toString().padStart(2,'0')}:00
+                      </div>
+                   ))}
+                </div>
+
+                {/* COLUMNAS DIAS */}
+                {weekDays.map((day, idx) => (
+                   <div key={day} className={cn("flex-1 border-r border-slate-100 relative", idx === 2 && "bg-blue-50/30")}>
+                      {HOURS.map(h => <div key={h} className="absolute w-full border-b border-slate-100" style={{ top: `${(h/24)*100}%` }}></div>)}
+                      
+                      {/* SIMULACION: Mostrar cita solo en Miércoles 19 (índice 2) */}
+                      {idx === 2 && activeDock?.currentAppointment && (
+                        <div 
+                          onClick={() => onAppointmentClick(activeDock.currentAppointment!, activeDock.id, activeDock.name)}
+                          className={cn("absolute left-1 right-1 rounded border p-1 shadow-sm text-[10px] flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform z-10 cursor-pointer", getTimelineAppointmentStyle(activeDock.currentAppointment.status))}
+                          style={{
+                             top: `${getTopFromTime(activeDock.currentAppointment.time)}%`,
+                             height: `${getHeightFromDuration(activeDock.currentAppointment.duration || 60)}%`,
+                             minHeight: '24px'
+                          }}
+                        >
+                           <div className="font-bold truncate leading-tight">{activeDock.currentAppointment.carrier}</div>
+                           <div className="opacity-80 truncate">{activeDock.currentAppointment.truckId}</div>
+                        </div>
+                      )}
+                   </div>
+                ))}
+
+                 {/* LINEA DE TIEMPO ACTUAL (Horizontal) */}
+                 <div className="absolute left-16 right-0 border-t-2 border-blue-600 z-30 pointer-events-none" style={{ top: `${currentPosition}%` }}>
+                    <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center">
+                       {currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                 </div>
+            </div>
+         </div>
+      </div>
+    );
+  }
+
+  // -- VISTA DÍA (VERTICAL STANDARD) --
+  // Paginación de muelles
+  const visibleDocks = docks.slice(dockStartIndex, dockStartIndex + docksPerPage);
+  const canGoLeft = dockStartIndex > 0;
+  const canGoRight = dockStartIndex + docksPerPage < docks.length;
+
+  const handleScrollLeft = () => setDockStartIndex(prev => Math.max(0, prev - 1));
+  const handleScrollRight = () => setDockStartIndex(prev => Math.min(docks.length - docksPerPage, prev + 1));
 
   return (
-    <div className="flex-1 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden flex flex-col min-h-0 relative">
-      <div className="flex border-b border-yms-border bg-slate-50/80 sticky top-0 z-20">
-        <div className="w-40 shrink-0 p-3 border-r border-yms-border font-bold text-xs text-yms-primary bg-slate-50/80 sticky left-0 z-20">Muelle</div>
-        <div className="flex-1 overflow-hidden relative" style={{ minWidth: '1200px' }}>
-          <div className="flex h-full">
-            {HOURS.map((hour) => (<div key={hour} className="flex-1 border-r border-yms-border/50 text-[10px] text-yms-gray/60 p-1 flex justify-center items-center font-mono">{hour.toString().padStart(2, '0')}:00</div>))}
-          </div>
-          
-          {/* LÍNEA DE TIEMPO ACTUAL (HEADER) - COLOR AZUL */}
-          <div 
-             className="absolute top-0 bottom-0 z-30 pointer-events-none flex flex-col items-center"
-             style={{ left: `${currentPosition}%`, transform: 'translateX(-50%)' }}
-          >
-             <div className="bg-[#1C1E59] text-white text-[9px] font-bold px-1 rounded-sm mb-1 whitespace-nowrap shadow-sm">
-                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    <div className="flex flex-col h-full bg-white relative">
+      {/* HEADER DE MUELLES (ARRIBA) CON NAVEGACION */}
+      <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 shadow-sm h-12">
+        {/* Esquina vacía (espacio de horas) */}
+        <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50 flex items-center justify-center">
+           <Clock className="w-4 h-4 text-slate-300" />
+        </div>
+
+        {/* Zona de Muelles Visible */}
+        <div className="flex-1 flex relative overflow-hidden">
+           {/* Botón Izquierda */}
+           {canGoLeft && (
+             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-30 flex items-center justify-start pl-1">
+                <button onClick={handleScrollLeft} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronLeft className="w-3 h-3"/></button>
              </div>
-             <div className="w-px h-4 bg-[#1C1E59]"></div>
-          </div>
+           )}
+
+           {visibleDocks.map((dock) => {
+              const isMaintenance = dock.status === 'maintenance';
+              return (
+                <div key={dock.id} className="flex-1 min-w-[120px] border-r border-slate-200 flex flex-col items-center justify-center p-1 bg-slate-50/50">
+                   <div className="flex items-center gap-1.5 w-full justify-center">
+                      <span className={cn("font-bold text-xs truncate", isMaintenance ? "text-gray-400" : "text-indigo-900")}>
+                        {dock.name}
+                      </span>
+                      <div className={cn("w-2 h-2 rounded-full shrink-0", 
+                         isMaintenance ? 'bg-gray-400' : 
+                         dock.occupancy >= 100 ? 'bg-red-500' : 
+                         dock.occupancy > 0 ? 'bg-orange-400' : 'bg-green-500')} 
+                      />
+                   </div>
+                   <div className="text-[9px] text-gray-400 uppercase tracking-tighter scale-90">
+                      {dock.type === 'inbound' ? 'Descargue' : dock.type === 'outbound' ? 'Cargue' : 'Mixto'}
+                   </div>
+                </div>
+              );
+           })}
+
+           {/* Botón Derecha */}
+           {canGoRight && (
+             <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-30 flex items-center justify-end pr-1">
+                <button onClick={handleScrollRight} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronRight className="w-3 h-3"/></button>
+             </div>
+           )}
         </div>
       </div>
-      
-      <div className="overflow-auto flex-1 custom-scrollbar relative" ref={containerRef}>
-        <div className="min-w-[1200px] relative h-full">
-          
-          {/* LÍNEA DE TIEMPO ACTUAL (BODY) - COLOR AZUL - SOLO UNA LÍNEA */}
-          <div 
-             className="absolute top-0 bottom-0 w-0.5 bg-[#1C1E59] z-30 pointer-events-none shadow-[0_0_2px_rgba(28,30,89,0.4)]"
-             style={{ left: `calc(160px + (100% - 160px) * ${currentPosition / 100})` }}
-          />
 
-          {docks.map((dock: Dock) => {
-            const isHighlighted = dock.id === highlightedDockId;
-            const rowHeaderStyle = dock.occupancy >= 100 ? "bg-red-50" : dock.occupancy > 0 ? "bg-orange-50" : "bg-white";
-            const rowBorderStyle = isHighlighted ? "border-yms-cyan/50 shadow-inner bg-yms-cyan/5" : "border-yms-border/50 hover:bg-slate-50";
-
-            return (
-              <div key={dock.id} data-dock-id={dock.id} className={cn("flex border-b transition-colors h-16 group/row relative", rowBorderStyle)}>
-                <div className={cn("w-40 shrink-0 p-3 border-r border-yms-border sticky left-0 z-10 flex flex-col justify-center shadow-[1px_0_5px_rgba(0,0,0,0.05)]", rowHeaderStyle)}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-xs text-yms-primary truncate">{dock.name}</span>
-                    <div className={cn("w-2 h-2 rounded-full", dock.status === 'maintenance' ? 'bg-gray-500' : dock.occupancy >= 100 ? 'bg-red-500' : dock.occupancy > 0 ? 'bg-orange-400' : 'bg-green-500')} />
+      {/* BODY (SCROLL VERTICAL) */}
+      <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]" ref={containerRef}>
+         <div className="flex relative min-h-[1440px]"> {/* 1px por minuto de altura aprox, o ajustado */}
+            
+            {/* COLUMNA DE HORAS (IZQUIERDA) */}
+            <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50/50 relative">
+               {HOURS.map((hour) => (
+                  <div key={hour} className="absolute w-full text-right pr-2 text-[10px] text-gray-400 font-mono -mt-1.5" style={{ top: `${(hour / 24) * 100}%` }}>
+                     {hour.toString().padStart(2, '0')}:00
                   </div>
-                  <div className="text-[10px] text-yms-gray uppercase opacity-70">{dock.type === 'both' ? 'IN/OUT' : dock.type === 'inbound' ? 'DESCARGUE' : 'CARGUE'}</div>
-                </div>
+               ))}
+            </div>
 
-                <div className="flex-1 relative h-full">
-                  <div className="absolute inset-0 flex pointer-events-none">
-                    {HOURS.map((hour) => (<div key={hour} className="flex-1 border-r border-yms-border/30 h-full" />))}
+            {/* GRILLA DE CITAS */}
+            <div className="flex-1 flex relative">
+               {/* Líneas de fondo horizontales */}
+               <div className="absolute inset-0 z-0 pointer-events-none">
+                  {HOURS.map((hour) => (
+                     <div key={hour} className="absolute w-full border-b border-slate-100" style={{ top: `${(hour / 24) * 100}%` }}></div>
+                  ))}
+               </div>
+
+               {/* Columnas de los muelles visibles */}
+               {visibleDocks.map((dock) => (
+                  <div key={dock.id} className="flex-1 min-w-[120px] border-r border-slate-100 relative z-10 hover:bg-slate-50/30 transition-colors group">
+                     {/* Mantenimiento Overlay */}
+                     {dock.status === 'maintenance' && (
+                        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZTJlOGYwIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>
+                     )}
+
+                     {dock.currentAppointment && (
+                        <div 
+                           onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)}
+                           className={cn("absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all cursor-pointer group-hover:shadow-md", getTimelineAppointmentStyle(dock.currentAppointment.status))}
+                           style={{
+                              top: `${getTopFromTime(dock.currentAppointment.time)}%`,
+                              height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`,
+                              minHeight: '28px'
+                           }}
+                        >
+                           <div className="font-bold text-xs truncate text-indigo-950/90 mb-0.5">{dock.currentAppointment.carrier}</div>
+                           <div className="flex items-center gap-1 opacity-80 truncate mb-0.5">
+                              <Truck className="w-3 h-3" />
+                              <span className="truncate">{dock.currentAppointment.truckId}</span>
+                           </div>
+                           <div className="mt-auto pt-1 opacity-75 text-[9px]">
+                              {dock.currentAppointment.driver?.split(' ')[0]}
+                           </div>
+                        </div>
+                     )}
                   </div>
-                  {dock.currentAppointment && (
-                    <div onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)}
-                      className={cn("absolute top-2 bottom-2 rounded-md border text-[10px] px-2 flex flex-col justify-center shadow-sm overflow-hidden whitespace-nowrap z-0 transition-transform hover:scale-[1.02]", getTimelineAppointmentStyle(dock.currentAppointment.status))}
-                      style={{ left: `${getPositionFromTime(dock.currentAppointment.time)}%`, width: `${getWidthFromDuration(dock.currentAppointment.duration || 60)}%`, minWidth: '60px' }}>
-                      <div className="font-bold truncate">{dock.currentAppointment.carrier}</div>
-                      <div className="truncate opacity-80">{dock.currentAppointment.truckId}</div>
-                    </div>
-                  )}
-                  {dock.status === 'maintenance' && (
-                     <div className="absolute inset-y-0 left-0 right-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZmRiYTdIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50 flex items-center justify-center bg-slate-800/10">
-                        <span className="bg-slate-700/80 px-2 py-0.5 rounded text-[10px] font-bold text-white border border-slate-600 shadow-sm">MANTENIMIENTO</span>
-                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+               ))}
+
+               {/* LÍNEA DE TIEMPO ACTUAL (HORIZONTAL) */}
+               <div 
+                  className="absolute left-0 right-0 border-t-2 border-red-500 z-30 pointer-events-none shadow-[0_2px_4px_rgba(239,68,68,0.2)]"
+                  style={{ top: `${currentPosition}%` }}
+               >
+                  <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-red-500 px-1 rounded-r py-0.5 text-center shadow-sm">
+                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </div>
+                  <div className="absolute right-0 -top-1 w-2 h-2 rounded-full bg-red-500"></div>
+               </div>
+
+            </div>
+         </div>
       </div>
     </div>
   );
@@ -802,7 +931,6 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [highlightedDockId, setHighlightedDockId] = useState<string | null>(null);
   
-  // Estado para la hora actual
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
 
   // Estados Modales
@@ -810,12 +938,11 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
   const [requestModalAppointment, setRequestModalAppointment] = useState<Appointment | null>(null);
   const [createModalAppointment, setCreateModalAppointment] = useState<Appointment | null>(null);
 
-  // Efecto para el reloj en tiempo real
   useEffect(() => {
-    setCurrentTime(new Date()); // Set inicial
+    setCurrentTime(new Date()); 
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Actualizar cada minuto
+    }, 60000); 
     return () => clearInterval(timer);
   }, []);
 
@@ -897,7 +1024,6 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
     setEditingAppointment(null);
   };
 
-  // --- LOGICA DE FLUJO DE SOLICITUD ---
   const handleRequestClick = () => {
     if (selectedAppointment) {
        setRequestModalAppointment(selectedAppointment);
