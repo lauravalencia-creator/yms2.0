@@ -510,28 +510,28 @@ export function TablesSection({ locationId, dockGroupId }: TablesSectionProps) {
               <TableHeader>
                 <TableRow className="bg-yms-primary/5 hover:bg-yms-primary/5">
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    ID
+                    ID Cita
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Carrier
+                   Hora Cita
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Driver
+                    Proveedor
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Truck ID
+                    ID Proveedor
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Dock
+                    Transportista
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Scheduled
+                    Gen
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Type
+                   Estado de Solicitud
                   </TableHead>
                   <TableHead className="font-serif font-bold text-yms-primary">
-                    Status
+                    CEDI Cita
                   </TableHead>
                 </TableRow>
               </TableHeader>

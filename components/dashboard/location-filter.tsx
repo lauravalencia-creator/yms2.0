@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react"
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -10,53 +8,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button"; // Asegúrate de tener este componente
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-        import { Search, BarChart3, ClipboardList, Users, Upload } from 'lucide-react';
+import { 
+  Search, 
+  BarChart3, 
+  ClipboardList, 
+  Users, 
+  Upload, 
+  Calendar as CalendarIcon 
+} from 'lucide-react';
 
-// Icons
+// --- ICONS ---
 function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        d="M11.54 22.351l.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-        clipRule="evenodd"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
     </svg>
   );
 }
 
 function BuildingIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
-      <path
-        fillRule="evenodd"
-        d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15a.75.75 0 0 0 0-1.5h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z"
-        clipRule="evenodd"
-      />
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 0 0 0 1.5v16.5h-.75a.75.75 0 0 0 0 1.5h16.5a.75.75 0 0 0 0-1.5h-.75V3.75a.75.75 0 0 0 0-1.5h-15ZM9 6a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm-.75 3.75A.75.75 0 0 1 9 9h1.5a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM9 12a.75.75 0 0 0 0 1.5h1.5a.75.75 0 0 0 0-1.5H9Zm3.75-5.25A.75.75 0 0 1 13.5 6H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM13.5 9a.75.75 0 0 0 0 1.5H15a.75.75 0 0 0 0-1.5h-1.5Zm-.75 3.75a.75.75 0 0 1 .75-.75H15a.75.75 0 0 1 0 1.5h-1.5a.75.75 0 0 1-.75-.75ZM9 19.5v-2.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 9 19.5Z" clipRule="evenodd" />
     </svg>
   );
 }
 
 function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      {...props}
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
       <path d="M11.644 1.59a.75.75 0 0 1 .712 0l9.75 5.25a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.712 0l-9.75-5.25a.75.75 0 0 1 0-1.32l9.75-5.25Z" />
       <path d="m3.265 10.602 7.668 4.129a2.25 2.25 0 0 0 2.134 0l7.668-4.13 1.37.739a.75.75 0 0 1 0 1.32l-9.75 5.25a.75.75 0 0 1-.71 0l-9.75-5.25a.75.75 0 0 1 0-1.32l1.37-.738Z" />
       <path d="m10.933 19.231-7.668-4.13-1.37.739a.75.75 0 0 0 0 1.32l9.75 5.25c.221.12.489.12.71 0l9.75-5.25a.75.75 0 0 0 0-1.32l-1.37-.738-7.668 4.13a2.25 2.25 0 0 1-2.134-.001Z" />
@@ -64,7 +55,29 @@ function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-// Types
+// --- COMPONENTES AUXILIARES PARA EL MODAL ---
+
+// Label personalizado para el modal (texto pequeño y gris)
+const FilterLabel = ({ children }: { children: React.ReactNode }) => (
+  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 block font-sans">
+    {children}
+  </label>
+);
+
+// Input con icono a la derecha (para las fechas)
+const InputWithIcon = ({ icon: Icon, ...props }: any) => (
+  <div className="relative">
+    <Input 
+      {...props} 
+      className="pr-10 h-11 rounded-xl border-gray-200 focus:border-yms-cyan focus:ring-yms-cyan/20 text-sm" 
+    />
+    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+      <Icon size={18} />
+    </div>
+  </div>
+);
+
+// --- TYPES & DATA ORIGINALES ---
 export interface Location {
   id: string;
   name: string;
@@ -79,7 +92,7 @@ export interface DockGroup {
   type: "inbound" | "outbound" | "mixed";
 }
 
-// Sample data - locations with dock groups
+// Sample data - locations with dock groups (DATOS COMPLETOS ORIGINALES)
 const locationsData: Location[] = [
   {
     id: "loc-1",
@@ -132,9 +145,6 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   const selectedLocation = locationsData.find((loc) => loc.id === selectedLocationId);
-  const selectedDockGroup = selectedLocation?.dockGroups.find(
-    (dg) => dg.id === selectedDockGroupId
-  );
 
   useEffect(() => {
     onFilterChange(selectedLocationId, selectedDockGroupId);
@@ -265,56 +275,141 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
 
+        {/* Action Buttons */}
+        {isLoaded && selectedLocation && (
+          <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+            {/* Barra de búsqueda */}
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yms-gray group-focus-within:text-yms-cyan transition-colors pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Buscar..."
+                className="pl-9 pr-4 py-2 h-10 w-48 bg-white border border-yms-border rounded-xl text-sm outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all"
+              />
+            </div>
 
+            <div className="w-px h-8 bg-yms-border" />
 
-{/* Action Buttons */}
-{isLoaded && selectedLocation && (
-  <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
-    {/* Barra de búsqueda */}
-    <div className="relative group">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yms-gray group-focus-within:text-yms-cyan transition-colors pointer-events-none" />
-      <input
-        type="text"
-        placeholder="Buscar..."
-        className="pl-9 pr-4 py-2 h-10 w-48 bg-white border border-yms-border rounded-xl text-sm outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all"
-      />
-    </div>
+            {/* === INICIO MODAL REPORTES === */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <button
+                  title="Reportes"
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+                >
+                  <BarChart3 size={18} />
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl p-8 bg-white rounded-[2rem] sm:rounded-[2rem] border-0 shadow-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-center text-[#1e2b58] text-2xl font-black uppercase tracking-wide mb-2">
+                    Filtros de Búsqueda
+                  </DialogTitle>
+                </DialogHeader>
 
-    <div className="w-px h-8 bg-yms-border" />
+                <div className="space-y-6 pt-2">
+                  {/* Fila 1: Filtro General */}
+                  <div>
+                    <FilterLabel>Filtros de búsqueda</FilterLabel>
+                    <Select>
+                      <SelectTrigger className="w-full h-11 rounded-xl border-gray-200 text-gray-700 focus:ring-yms-cyan/20">
+                        <SelectValue placeholder="Seleccionar filtro" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="op1">Opción 1</SelectItem>
+                        <SelectItem value="op2">Opción 2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <hr className="border-gray-100" />
 
-    {/* Botón Reportes */}
-    <button
-      title="Reportes"
-      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
-    >
-      <BarChart3 size={18} />
-    </button>
+                  {/* Fila 2: Fechas */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <FilterLabel>Fecha Inicial</FilterLabel>
+                      <InputWithIcon placeholder="dd/mm/aaaa" icon={CalendarIcon} />
+                    </div>
+                    <div>
+                      <FilterLabel>Fecha Final</FilterLabel>
+                      <InputWithIcon placeholder="dd/mm/aaaa" icon={CalendarIcon} />
+                    </div>
+                  </div>
 
-    {/* Botón Registros */}
-    <button
-      title="Registros"
-      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
-    >
-      <ClipboardList size={18} />
-    </button>
+                  {/* Fila 3: Localidad y Proveedor */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <FilterLabel>Localidad</FilterLabel>
+                      <Input placeholder="Ej: CEDI Norte" className="h-11 rounded-xl border-gray-200 text-sm" />
+                    </div>
+                    <div>
+                      <FilterLabel>Proveedor</FilterLabel>
+                      <Input placeholder="Nombre del Proveedor" className="h-11 rounded-xl border-gray-200 text-sm" />
+                    </div>
+                  </div>
 
-    {/* Botón Usuarios */}
-    <button
-      title="Usuarios"
-      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
-    >
-      <Users size={18} />
-    </button>
+                  {/* Fila 4: Estado y Gen */}
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <FilterLabel>Estado</FilterLabel>
+                      <Select>
+                        <SelectTrigger className="w-full h-11 rounded-xl border-gray-200 text-gray-700">
+                          <SelectValue placeholder="Cualquiera" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="any">Cualquiera</SelectItem>
+                          <SelectItem value="active">Activo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <FilterLabel>Gen</FilterLabel>
+                      <Input placeholder="Código Gen" className="h-11 rounded-xl border-gray-200 text-sm" />
+                    </div>
+                  </div>
 
-    {/* Botón Carga de Archivos */}
-    <button
-      title="Carga de Archivos"
-      className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
-    >
-      <Upload size={18} />
-    </button>
-  </div>
-)}
+                  {/* Fila 5: Subdirección */}
+                  <div>
+                    <FilterLabel>Subdirección</FilterLabel>
+                    <Input placeholder="Área encargada" className="h-11 rounded-xl border-gray-200 text-sm" />
+                  </div>
+
+                  {/* Botón Buscar */}
+                  <div className="flex justify-end mt-4">
+                    <Button className="bg-[#ff6b00] hover:bg-[#ff6b00]/90 text-white font-black uppercase tracking-wider px-10 py-6 h-auto rounded-2xl text-base shadow-lg hover:shadow-xl transition-all w-48 border-none">
+                      Buscar
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            {/* === FIN MODAL REPORTES === */}
+
+            {/* Botón Registros */}
+            <button
+              title="Registros"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+            >
+              <ClipboardList size={18} />
+            </button>
+
+            {/* Botón Usuarios */}
+            <button
+              title="Usuarios"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+            >
+              <Users size={18} />
+            </button>
+
+            {/* Botón Carga de Archivos */}
+            <button
+              title="Carga de Archivos"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+            >
+              <Upload size={18} />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Empty state hint */}
