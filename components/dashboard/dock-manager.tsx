@@ -104,58 +104,42 @@ function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 // --- DATOS COMPLETOS DE MUELLES ---
-// (Mismos datos que en tu archivo original)
 const allDocks: Dock[] = [
-  // --- LOC-1: CENTRO DISTRIBUCION NORTE ---
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-1", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
     driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue" }},
-  
   { id: "dock-1a-2", name: "Muelle A-02", type: "inbound", status: "available", occupancy: 20, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-gray-1", carrier: "TransFuturo", truckId: "FUT-2026", time: "14:00", type: "inbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1a", duration: 60,
     driver: "Esteban Quito", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Planta Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue" }},
-
   { id: "dock-1a-3", name: "Muelle A-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1a" },
-  
   { id: "dock-1a-4", name: "Muelle A-04", type: "inbound", status: "available", occupancy: 15, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-completed-1", carrier: "Historic Logistics", truckId: "TRK-OLD", time: "05:00", type: "inbound", status: "completed", locationId: "loc-1", dockGroupId: "dg-1a", duration: 120, 
     driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue" }
   },
-  
   { id: "dock-1b-1", name: "Muelle B-01", type: "inbound", status: "occupied", occupancy: 50, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-2", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
     driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue" }},
-  
   { id: "dock-1b-2", name: "Muelle B-02", type: "inbound", status: "available", occupancy: 10, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-gray-2", carrier: "Andina Carga", truckId: "AND-99", time: "16:30", type: "inbound", status: "pending", locationId: "loc-1", dockGroupId: "dg-1b", duration: 90,
     driver: "Julian Alvarez", city: "CALI", department: "VALLE", locationName: "Bodega B", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue" }},
-
   { id: "dock-1b-3", name: "Muelle B-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1b" },
-  
   { id: "dock-1b-4", name: "Muelle B-04", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-3", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
     driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue" }},
-  
   { id: "dock-1c-1", name: "Despacho 01", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-4", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue" }},
-  
   { id: "dock-1c-2", name: "Despacho 02", type: "outbound", status: "maintenance", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c" },
-  
   { id: "dock-1c-3", name: "Despacho 03", type: "outbound", status: "available", occupancy: 35, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-gray-3", carrier: "Envía Ya", truckId: "ENV-001", time: "11:00", type: "outbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Pedro Picapiedra", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Despachos", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Sencillo", loadType: "Paqueteo", operationType: "Cargue" } },
-
   { id: "dock-1d-1", name: "Mixto 01", type: "both", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1d" },
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
     currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane" } },
-
-  // --- LOC-2: ALMACEN CENTRAL GUADALAJARA ---
   { id: "dock-2a-1", name: "Norte 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
     currentAppointment: { id: "apt-5", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola" }},
   { id: "dock-2a-2", name: "Norte 02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
   { id: "dock-2a-3", name: "Norte 03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
-  
   { id: "dock-2b-1", name: "Sur 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2b" },
   { id: "dock-2b-2", name: "Sur 02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
     currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane" }},
@@ -177,24 +161,19 @@ const pendingAppointments: Appointment[] = [
 
 // --- HELPERS STYLES ---
 function getOccupancyStyle(dock: Dock, isDragging: boolean) {
-  if (dock.status === "maintenance") {
-    return "bg-gray-100 border-gray-300 text-gray-500 shadow-sm"; 
-  }
-  
-  const occupancy = dock.occupancy || 0;
-
-  if (occupancy >= 100) {
-    return "bg-red-50 border-red-300 text-red-900 shadow-sm"; 
-  }
-  
-  if (occupancy > 0) {
-    return "bg-orange-50 border-orange-300 text-orange-900 shadow-sm";
-  }
-
-  if (isDragging) {
-     return "bg-white border-yms-cyan/60 ring-4 ring-yms-cyan/20 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02] animate-pulse";
-  }
+  if (dock.status === "maintenance") return "bg-gray-100 border-gray-300 text-gray-500 shadow-sm"; 
+  if (dock.occupancy >= 100) return "bg-red-50 border-red-300 text-red-900 shadow-sm"; 
+  if (dock.occupancy > 0) return "bg-orange-50 border-orange-300 text-orange-900 shadow-sm";
+  if (isDragging) return "bg-white border-yms-cyan/60 ring-4 ring-yms-cyan/20 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02] animate-pulse";
   return "bg-white border-slate-200 text-yms-primary hover:border-yms-primary/30";
+}
+
+// NUEVO: Ayudante para color de columna en agenda
+function getTimelineColumnColor(dock: Dock) {
+  if (dock.status === "maintenance") return "bg-gray-100/40";
+  if (dock.occupancy >= 100) return "bg-red-50/50";
+  if (dock.occupancy > 0) return "bg-orange-50/50";
+  return "bg-transparent";
 }
 
 function getTimelineAppointmentStyle(status: AppointmentStatus) {
@@ -217,12 +196,10 @@ function getStatusConfig(status: AppointmentStatus) {
 
 // --- UTILS TIMELINE ---
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
-// Ahora devuelve top en porcentaje
 const getTopFromTime = (time: string): number => {
   const [hours, minutes] = time.split(":").map(Number);
   return ((hours * 60 + minutes) / 1440) * 100;
 };
-// Ahora devuelve height en porcentaje
 const getHeightFromDuration = (durationMinutes: number): number => {
   return (durationMinutes / 1440) * 100;
 };
@@ -236,100 +213,34 @@ const InfoField = ({ label, value }: { label: string, value?: string }) => (
 );
 
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    if (dock.status !== "maintenance" && dock.occupancy < 100) onDragOver();
-  };
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const appointmentId = e.dataTransfer.getData("appointmentId");
-    if (appointmentId && dock.status !== "maintenance" && dock.occupancy < 100) onDrop(appointmentId, dock.id);
-    onDragLeave();
-  };
-
+  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); if (dock.status !== "maintenance" && dock.occupancy < 100) onDragOver(); };
+  const handleDrop = (e: React.DragEvent) => { e.preventDefault(); const appointmentId = e.dataTransfer.getData("appointmentId"); if (appointmentId && dock.status !== "maintenance" && dock.occupancy < 100) onDrop(appointmentId, dock.id); onDragLeave(); };
   const isMaintenance = dock.status === "maintenance";
   const showContent = !isMaintenance && dock.occupancy > 0;
-  
   const TypeIcon = dock.type === "inbound" ? ArrowDownCircle : dock.type === "outbound" ? ArrowUpCircle : ArrowRightLeft;
   const iconColor = dock.type === "inbound" ? "text-yms-cyan" : dock.type === "outbound" ? "text-yms-secondary" : "text-yms-primary";
 
   return (
-    <div
-      onClick={onClick}
-      onDragOver={handleDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={handleDrop}
-      className={cn(
-        "relative border rounded-xl p-2.5 w-36 h-44 flex flex-col cursor-pointer transition-all shadow-sm hover:shadow-md",
-        getOccupancyStyle(dock, isDragging),
-        isDropTarget && "scale-105 ring-2 ring-yms-cyan ring-offset-2 z-10"
-      )}
-    >
+    <div onClick={onClick} onDragOver={handleDragOver} onDragLeave={onDragLeave} onDrop={handleDrop} className={cn("relative border rounded-xl p-2.5 w-36 h-44 flex flex-col cursor-pointer transition-all shadow-sm hover:shadow-md", getOccupancyStyle(dock, isDragging), isDropTarget && "scale-105 ring-2 ring-yms-cyan ring-offset-2 z-10")}>
       <div className="flex flex-col items-start w-full mb-2">
         <div className="flex items-center gap-1.5 w-full">
              {!isMaintenance && <TypeIcon className={cn("w-4 h-4 shrink-0", iconColor)} strokeWidth={2.5} />}
-             <span className={cn("font-serif font-bold text-xs truncate", isMaintenance ? "text-gray-500" : "text-[#1C1E59]")} title={dock.name}>
-                {dock.name}
-             </span>
+             <span className={cn("font-serif font-bold text-xs truncate", isMaintenance ? "text-gray-500" : "text-[#1C1E59]")} title={dock.name}>{dock.name}</span>
              {isMaintenance && <WrenchIcon className="w-4 h-4 text-gray-400 shrink-0 ml-auto" />}
         </div>
-        
         {!isMaintenance && dock.occupancy > 0 && (
-           <div className="mt-1">
-              <span className={cn("text-[10px] font-bold uppercase tracking-tight", 
-                  dock.occupancy >= 100 ? "text-red-700" : "text-orange-700"
-              )}>
-                  {dock.occupancy >= 100 ? "FULL 100%" : `PARCIAL ${dock.occupancy}%`}
-              </span>
-           </div>
+           <div className="mt-1"><span className={cn("text-[10px] font-bold uppercase tracking-tight", dock.occupancy >= 100 ? "text-red-700" : "text-orange-700")}>{dock.occupancy >= 100 ? "FULL 100%" : `PARCIAL ${dock.occupancy}%`}</span></div>
         )}
       </div>
-
       <div className="flex-1 flex flex-col justify-center min-h-0 mt-1 relative">
-        {isMaintenance && (
-          <div className="flex flex-col items-center justify-center text-gray-400 gap-1 opacity-70">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300">
-               <AlertTriangle className="w-5 h-5 text-gray-500" />
-            </div>
-            <span className="text-[10px] font-bold text-center uppercase tracking-wider text-gray-500">En Mantenimiento</span>
-          </div>
-        )}
-
-        {!isMaintenance && dock.occupancy === 0 && (
-          <div className="flex flex-col items-center justify-center opacity-30 gap-1">
-            <div className="w-9 h-9 rounded-full border border-dashed border-slate-400 flex items-center justify-center">
-               <TruckIcon className="w-4 h-4 text-slate-400" />
-            </div>
-            <span className="text-[10px] text-slate-500 font-medium">Disponible</span>
-          </div>
-        )}
-
+        {isMaintenance && (<div className="flex flex-col items-center justify-center text-gray-400 gap-1 opacity-70"><div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300"><AlertTriangle className="w-5 h-5 text-gray-500" /></div><span className="text-[10px] font-bold text-center uppercase tracking-wider text-gray-500">En Mantenimiento</span></div>)}
+        {!isMaintenance && dock.occupancy === 0 && (<div className="flex flex-col items-center justify-center opacity-30 gap-1"><div className="w-9 h-9 rounded-full border border-dashed border-slate-400 flex items-center justify-center"><TruckIcon className="w-4 h-4 text-slate-400" /></div><span className="text-[10px] text-slate-500 font-medium">Disponible</span></div>)}
         {showContent && dock.currentAppointment && (
           <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
             <div className="flex-1 bg-transparent rounded-lg p-1 flex flex-col gap-0.5">
-                <div className="flex items-center gap-1.5 pb-1 mb-1 border-b border-black/5">
-                  {dock.currentAppointment.type === "inbound" ? 
-                     <ArrowDownIcon className="w-3 h-3 text-yms-cyan shrink-0" /> : 
-                     <ArrowUpIcon className="w-3 h-3 text-yms-secondary shrink-0" />
-                  }
-                  <span className="font-bold text-[10px] leading-tight truncate text-gray-800" title={dock.currentAppointment.carrier}>
-                     {dock.currentAppointment.carrier}
-                  </span>
-                </div>
-                <div className="space-y-0.5">
-                   <div className="text-[9px] text-gray-600 truncate font-mono">
-                      {dock.currentAppointment.truckId}
-                   </div>
-                   <div className="flex items-center gap-1 text-[9px] text-gray-600 font-bold">
-                      <ClockIcon className="w-2.5 h-2.5 opacity-70" /> {dock.currentAppointment.time}
-                   </div>
-                </div>
-                <div className="mt-auto pt-1">
-                   {(() => {
-                      const { label, className } = getStatusConfig(dock.currentAppointment.status);
-                      return <div className={className}>{label}</div>;
-                   })()}
-                </div>
+                <div className="flex items-center gap-1.5 pb-1 mb-1 border-b border-black/5">{dock.currentAppointment.type === "inbound" ? <ArrowDownIcon className="w-3 h-3 text-yms-cyan shrink-0" /> : <ArrowUpIcon className="w-3 h-3 text-yms-secondary shrink-0" />}<span className="font-bold text-[10px] leading-tight truncate text-gray-800" title={dock.currentAppointment.carrier}>{dock.currentAppointment.carrier}</span></div>
+                <div className="space-y-0.5"><div className="text-[9px] text-gray-600 truncate font-mono">{dock.currentAppointment.truckId}</div><div className="flex items-center gap-1 text-[9px] text-gray-600 font-bold"><ClockIcon className="w-2.5 h-2.5 opacity-70" /> {dock.currentAppointment.time}</div></div>
+                <div className="mt-auto pt-1">{(() => { const { label, className } = getStatusConfig(dock.currentAppointment.status); return <div className={className}>{label}</div>; })()}</div>
             </div>
           </div>
         )}
@@ -338,68 +249,32 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
   );
 }
 
-// --- MODALES (Sin cambios) ---
+// --- MODALES (Restaurados) ---
 function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: () => void }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b">
-           <div className="flex items-center gap-3">
-              <div className="bg-slate-100 p-2 rounded-lg border border-slate-200">
-                <ClipboardList className="w-6 h-6 text-indigo-900" />
-              </div>
-              <h3 className="text-lg font-bold text-indigo-900">SOLICITUD DE CITAS</h3>
-           </div>
-           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-              <X className="w-6 h-6" />
-           </button>
+           <div className="flex items-center gap-3"><div className="bg-slate-100 p-2 rounded-lg border border-slate-200"><ClipboardList className="w-6 h-6 text-indigo-900" /></div><h3 className="text-lg font-bold text-indigo-900 uppercase">SOLICITUD DE CITAS</h3></div>
+           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
         </div>
         <div className="p-8 bg-gray-50/50">
            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
-              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
-                 <h4 className="text-sm font-bold text-indigo-900">Detalles de entrega</h4>
-              </div>
+              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-indigo-900 uppercase">Detalles de entrega</h4></div>
               <div className="grid grid-cols-2 text-sm">
-                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Orden de compra</span>
-                    <span className="font-medium text-slate-900">{appointment.id}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Proveedor</span>
-                    <span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4">
-                    <span className="font-semibold text-slate-600">Cantidad ordenada</span>
-                    <span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">NIT</span>
-                    <span className="font-medium text-slate-900">{appointment.nit || '---'}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4">
-                    <span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span>
-                    <span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span>
-                 </div>
-                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Lugar</span>
-                    <span className="font-medium text-slate-900">{appointment.locationName}</span>
-                 </div>
-                 <div className="px-4 py-3 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50">
-                    <span className="font-semibold text-slate-600">Cantidad por entregar</span>
-                    <span className="font-bold text-orange-600 text-right">
-                       {(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}
-                    </span>
-                 </div>
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
+                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
+                 <div className="px-4 py-3 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50"><span className="font-semibold text-slate-600 px-4">CANTIDAD POR ENTREGAR</span><span className="font-bold text-orange-600 text-right px-4">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span></div>
               </div>
            </div>
         </div>
         <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
-           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onContinue}>
-             CONTINUAR
-           </Button>
-           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>
-             CANCELAR
-           </button>
+           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onContinue}>CONTINUAR</Button>
+           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>CANCELAR</button>
         </div>
       </div>
     </div>
@@ -549,6 +424,7 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
   );
 }
 
+
 function AppointmentEditModal({ 
   appointment, 
   dockName, 
@@ -659,7 +535,6 @@ function AppointmentEditModal({
   );
 }
 
-// --- NUEVO COMPONENTE TIMELINE VERTICAL ---
 function DockTimeline({ 
   docks, 
   timeFrame, 
@@ -674,21 +549,24 @@ function DockTimeline({
   currentTime: Date 
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // -- ESTADO PARA PAGINACIÓN DE MUELLES (VISTA DÍA) --
   const [dockStartIndex, setDockStartIndex] = useState(0);
-  const docksPerPage = 5; // Cantidad de muelles visibles a la vez
-  
-  // -- ESTADO PARA MUELLE SELECCIONADO (VISTA SEMANA) --
+  const docksPerPage = 5;
   const [selectedDockForWeek, setSelectedDockForWeek] = useState<string | null>(null);
 
-  // Calcular posición de la línea de tiempo (0-100% en VERTICAL ahora)
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
   const currentPosition = (currentMinutes / 1440) * 100;
 
-  // -- VISTA MENSUAL (SIMPLIFICADA) --
+  // --- AYUDANTE PARA COLORES DE FONDO DE COLUMNA ---
+  const getTimelineColumnColor = (dock: Dock) => {
+    if (dock.status === "maintenance") return "bg-gray-100/40";
+    if (dock.occupancy >= 100) return "bg-red-50/50";
+    if (dock.occupancy > 0) return "bg-orange-50/50";
+    return "bg-transparent";
+  };
+
+  // -- VISTA MENSUAL (Sin cambios) --
   if (timeFrame === "month") {
-    const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1); // Simulación mes
+    const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1);
     return (
       <div className="flex flex-col h-full bg-slate-50 p-4 overflow-auto">
          <div className="grid grid-cols-7 gap-px bg-slate-200 border border-slate-300 rounded-lg overflow-hidden shadow-sm">
@@ -700,9 +578,7 @@ function DockTimeline({
                    <span className="text-xs font-bold text-gray-400">{day}</span>
                    {day === 19 && (
                      <div className="mt-1 space-y-1">
-                        <div className="text-[9px] bg-yms-cyan/10 text-yms-cyan rounded px-1 py-0.5 truncate font-medium border border-yms-cyan/20">
-                           3 Citas
-                        </div>
+                        <div className="text-[9px] bg-yms-cyan/10 text-yms-cyan rounded px-1 py-0.5 truncate font-medium border border-yms-cyan/20">3 Citas</div>
                      </div>
                    )}
                 </div>
@@ -712,77 +588,46 @@ function DockTimeline({
     );
   }
 
-  // -- VISTA SEMANA --
+  // -- VISTA SEMANA (Con color de fondo) --
   if (timeFrame === "week") {
-    // Si no hay muelle seleccionado, tomar el highlighted o el primero
     const activeDockId = selectedDockForWeek || highlightedDockId || docks[0]?.id;
     const activeDock = docks.find(d => d.id === activeDockId) || docks[0];
     const weekDays = ["Lun 17", "Mar 18", "Mié 19", "Jue 20", "Vie 21", "Sáb 22", "Dom 23"];
 
     return (
       <div className="flex flex-col h-full bg-white relative">
-         {/* HEADER SEMANA */}
          <div className="flex items-center justify-between p-2 border-b border-slate-200 bg-slate-50/50">
              <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-gray-500 uppercase">Muelle:</span>
-                <select 
-                  className="text-sm font-bold text-indigo-900 bg-transparent border-none focus:ring-0 cursor-pointer"
-                  value={activeDock?.id}
-                  onChange={(e) => setSelectedDockForWeek(e.target.value)}
-                >
+                <select className="text-sm font-bold text-indigo-900 bg-transparent border-none focus:ring-0 cursor-pointer" value={activeDock?.id} onChange={(e) => setSelectedDockForWeek(e.target.value)}>
                    {docks.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                 </select>
              </div>
          </div>
-         
          <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 shadow-sm">
              <div className="w-16 shrink-0 border-r border-slate-200 p-2 bg-slate-50"></div>
              {weekDays.map((day, idx) => (
-                <div key={day} className={cn("flex-1 text-center py-2 text-xs font-bold border-r border-slate-100", idx === 2 ? "bg-blue-50 text-blue-700" : "text-gray-600")}>
-                   {day}
-                </div>
+                <div key={day} className={cn("flex-1 text-center py-2 text-xs font-bold border-r border-slate-100", idx === 2 ? "bg-blue-50 text-blue-700" : "text-gray-600")}>{day}</div>
              ))}
          </div>
-
          <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]">
             <div className="flex relative min-h-[1200px]">
-                {/* COLUMNA HORAS */}
                 <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50 text-xs text-gray-400 font-mono text-right pr-2 pt-2 relative">
-                   {HOURS.map(h => (
-                      <div key={h} className="absolute w-full pr-2" style={{ top: `${(h/24)*100}%` }}>
-                         {h.toString().padStart(2,'0')}:00
-                      </div>
-                   ))}
+                   {HOURS.map(h => (<div key={h} className="absolute w-full pr-2" style={{ top: `${(h/24)*100}%` }}>{h.toString().padStart(2,'0')}:00</div>))}
                 </div>
-
-                {/* COLUMNAS DIAS */}
                 {weekDays.map((day, idx) => (
-                   <div key={day} className={cn("flex-1 border-r border-slate-100 relative", idx === 2 && "bg-blue-50/30")}>
+                   <div key={day} className={cn("flex-1 border-r border-slate-100 relative", idx === 2 ? "bg-blue-50/30" : getTimelineColumnColor(activeDock))}>
                       {HOURS.map(h => <div key={h} className="absolute w-full border-b border-slate-100" style={{ top: `${(h/24)*100}%` }}></div>)}
-                      
-                      {/* SIMULACION: Mostrar cita solo en Miércoles 19 (índice 2) */}
                       {idx === 2 && activeDock?.currentAppointment && (
-                        <div 
-                          onClick={() => onAppointmentClick(activeDock.currentAppointment!, activeDock.id, activeDock.name)}
-                          className={cn("absolute left-1 right-1 rounded border p-1 shadow-sm text-[10px] flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform z-10 cursor-pointer", getTimelineAppointmentStyle(activeDock.currentAppointment.status))}
-                          style={{
-                             top: `${getTopFromTime(activeDock.currentAppointment.time)}%`,
-                             height: `${getHeightFromDuration(activeDock.currentAppointment.duration || 60)}%`,
-                             minHeight: '24px'
-                          }}
-                        >
+                        <div onClick={() => onAppointmentClick(activeDock.currentAppointment!, activeDock.id, activeDock.name)} className={cn("absolute left-1 right-1 rounded border p-1 shadow-sm text-[10px] flex flex-col justify-center overflow-hidden hover:scale-[1.02] transition-transform z-10 cursor-pointer", getTimelineAppointmentStyle(activeDock.currentAppointment.status))} style={{ top: `${getTopFromTime(activeDock.currentAppointment.time)}%`, height: `${getHeightFromDuration(activeDock.currentAppointment.duration || 60)}%`, minHeight: '24px' }}>
                            <div className="font-bold truncate leading-tight">{activeDock.currentAppointment.carrier}</div>
                            <div className="opacity-80 truncate">{activeDock.currentAppointment.truckId}</div>
                         </div>
                       )}
                    </div>
                 ))}
-
-                 {/* LINEA DE TIEMPO ACTUAL (Horizontal) */}
                  <div className="absolute left-16 right-0 border-t-2 border-blue-600 z-30 pointer-events-none" style={{ top: `${currentPosition}%` }}>
-                    <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center">
-                       {currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </div>
+                    <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center">{currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                  </div>
             </div>
          </div>
@@ -790,30 +635,22 @@ function DockTimeline({
     );
   }
 
-  // -- VISTA DÍA (VERTICAL STANDARD) --
-  // Paginación de muelles
+  // -- VISTA DÍA (VERTICAL) --
   const visibleDocks = docks.slice(dockStartIndex, dockStartIndex + docksPerPage);
   const canGoLeft = dockStartIndex > 0;
   const canGoRight = dockStartIndex + docksPerPage < docks.length;
 
-  const handleScrollLeft = () => setDockStartIndex(prev => Math.max(0, prev - 1));
-  const handleScrollRight = () => setDockStartIndex(prev => Math.min(docks.length - docksPerPage, prev + 1));
-
   return (
     <div className="flex flex-col h-full bg-white relative">
-      {/* HEADER DE MUELLES (ARRIBA) CON NAVEGACION */}
-      <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 shadow-sm h-12">
-        {/* Esquina vacía (espacio de horas) */}
+      <div className="flex border-b border-slate-200 sticky top-0 bg-white z-20 shadow-sm h-14">
         <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50 flex items-center justify-center">
            <Clock className="w-4 h-4 text-slate-300" />
         </div>
 
-        {/* Zona de Muelles Visible */}
         <div className="flex-1 flex relative overflow-hidden">
-           {/* Botón Izquierda */}
            {canGoLeft && (
              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-30 flex items-center justify-start pl-1">
-                <button onClick={handleScrollLeft} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronLeft className="w-3 h-3"/></button>
+                <button onClick={() => setDockStartIndex(prev => Math.max(0, prev - 1))} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronLeft className="w-3 h-3"/></button>
              </div>
            )}
 
@@ -822,95 +659,59 @@ function DockTimeline({
               return (
                 <div key={dock.id} className="flex-1 min-w-[120px] border-r border-slate-200 flex flex-col items-center justify-center p-1 bg-slate-50/50">
                    <div className="flex items-center gap-1.5 w-full justify-center">
-                      <span className={cn("font-bold text-xs truncate", isMaintenance ? "text-gray-400" : "text-indigo-900")}>
-                        {dock.name}
-                      </span>
-                      <div className={cn("w-2 h-2 rounded-full shrink-0", 
-                         isMaintenance ? 'bg-gray-400' : 
-                         dock.occupancy >= 100 ? 'bg-red-500' : 
-                         dock.occupancy > 0 ? 'bg-orange-400' : 'bg-green-500')} 
-                      />
+                      <span className={cn("font-bold text-xs truncate", isMaintenance ? "text-gray-400" : "text-indigo-900")}>{dock.name}</span>
+                      <div className={cn("w-2 h-2 rounded-full shrink-0", isMaintenance ? 'bg-gray-400' : dock.occupancy >= 100 ? 'bg-red-500' : dock.occupancy > 0 ? 'bg-orange-400' : 'bg-green-500')} />
                    </div>
-                   <div className="text-[9px] text-gray-400 uppercase tracking-tighter scale-90">
-                      {dock.type === 'inbound' ? 'Descargue' : dock.type === 'outbound' ? 'Cargue' : 'Mixto'}
+                   {/* NUEVO AJUSTE: Etiquetas de estado dinámicas */}
+                   <div className={cn("text-[9px] font-bold uppercase tracking-tighter", 
+                      isMaintenance ? "text-gray-500" : 
+                      dock.occupancy >= 100 ? "text-red-600" : 
+                      dock.occupancy > 0 ? "text-orange-600" : "text-green-600")}>
+                      {isMaintenance ? "Mantenimiento" : dock.occupancy >= 100 ? "FULL 100%" : dock.occupancy > 0 ? `PARCIAL ${dock.occupancy}%` : "Disponible"}
                    </div>
                 </div>
               );
            })}
 
-           {/* Botón Derecha */}
            {canGoRight && (
              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-30 flex items-center justify-end pr-1">
-                <button onClick={handleScrollRight} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronRight className="w-3 h-3"/></button>
+                <button onClick={() => setDockStartIndex(prev => Math.min(docks.length - docksPerPage, prev + 1))} className="bg-white shadow border rounded-full p-1 hover:bg-slate-50 text-slate-600"><ChevronRight className="w-3 h-3"/></button>
              </div>
            )}
         </div>
       </div>
 
-      {/* BODY (SCROLL VERTICAL) */}
       <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]" ref={containerRef}>
-         <div className="flex relative min-h-[1440px]"> {/* 1px por minuto de altura aprox, o ajustado */}
-            
-            {/* COLUMNA DE HORAS (IZQUIERDA) */}
+         <div className="flex relative min-h-[1440px]"> 
             <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50/50 relative">
                {HOURS.map((hour) => (
-                  <div key={hour} className="absolute w-full text-right pr-2 text-[10px] text-gray-400 font-mono -mt-1.5" style={{ top: `${(hour / 24) * 100}%` }}>
-                     {hour.toString().padStart(2, '0')}:00
-                  </div>
+                  <div key={hour} className="absolute w-full text-right pr-2 text-[10px] text-gray-400 font-mono -mt-1.5" style={{ top: `${(hour / 24) * 100}%` }}>{hour.toString().padStart(2, '0')}:00</div>
                ))}
             </div>
 
-            {/* GRILLA DE CITAS */}
             <div className="flex-1 flex relative">
-               {/* Líneas de fondo horizontales */}
                <div className="absolute inset-0 z-0 pointer-events-none">
-                  {HOURS.map((hour) => (
-                     <div key={hour} className="absolute w-full border-b border-slate-100" style={{ top: `${(hour / 24) * 100}%` }}></div>
-                  ))}
+                  {HOURS.map((hour) => (<div key={hour} className="absolute w-full border-b border-slate-100" style={{ top: `${(hour / 24) * 100}%` }}></div>))}
                </div>
 
-               {/* Columnas de los muelles visibles */}
+               {/* AJUSTE: Columnas coloreadas según ocupación */}
                {visibleDocks.map((dock) => (
-                  <div key={dock.id} className="flex-1 min-w-[120px] border-r border-slate-100 relative z-10 hover:bg-slate-50/30 transition-colors group">
-                     {/* Mantenimiento Overlay */}
-                     {dock.status === 'maintenance' && (
-                        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZTJlOGYwIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>
-                     )}
-
+                  <div key={dock.id} className={cn("flex-1 min-w-[120px] border-r border-slate-100 relative z-10 transition-colors group", getTimelineColumnColor(dock))}>
+                     {dock.status === 'maintenance' && (<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZTJlOGYwIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>)}
                      {dock.currentAppointment && (
-                        <div 
-                           onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)}
-                           className={cn("absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all cursor-pointer group-hover:shadow-md", getTimelineAppointmentStyle(dock.currentAppointment.status))}
-                           style={{
-                              top: `${getTopFromTime(dock.currentAppointment.time)}%`,
-                              height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`,
-                              minHeight: '28px'
-                           }}
-                        >
+                        <div onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)} className={cn("absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all cursor-pointer group-hover:shadow-md", getTimelineAppointmentStyle(dock.currentAppointment.status))} style={{ top: `${getTopFromTime(dock.currentAppointment.time)}%`, height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`, minHeight: '28px' }}>
                            <div className="font-bold text-xs truncate text-indigo-950/90 mb-0.5">{dock.currentAppointment.carrier}</div>
-                           <div className="flex items-center gap-1 opacity-80 truncate mb-0.5">
-                              <Truck className="w-3 h-3" />
-                              <span className="truncate">{dock.currentAppointment.truckId}</span>
-                           </div>
-                           <div className="mt-auto pt-1 opacity-75 text-[9px]">
-                              {dock.currentAppointment.driver?.split(' ')[0]}
-                           </div>
+                           <div className="flex items-center gap-1 opacity-80 truncate mb-0.5"><Truck className="w-3 h-3" /><span className="truncate">{dock.currentAppointment.truckId}</span></div>
                         </div>
                      )}
                   </div>
                ))}
 
-               {/* LÍNEA DE TIEMPO ACTUAL (HORIZONTAL) */}
-               <div 
-                  className="absolute left-0 right-0 border-t-2 border-red-500 z-30 pointer-events-none shadow-[0_2px_4px_rgba(239,68,68,0.2)]"
-                  style={{ top: `${currentPosition}%` }}
-               >
-                  <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-red-500 px-1 rounded-r py-0.5 text-center shadow-sm">
-                     {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                  <div className="absolute right-0 -top-1 w-2 h-2 rounded-full bg-red-500"></div>
+               {/* AJUSTE: LÍNEA DE TIEMPO ACTUAL AZUL */}
+               <div className="absolute left-0 right-0 border-t-2 border-blue-600 z-30 pointer-events-none shadow-[0_2px_4px_rgba(37,99,235,0.2)]" style={{ top: `${currentPosition}%` }}>
+                  <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center shadow-sm">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                  <div className="absolute right-0 -top-1 w-2 h-2 rounded-full bg-blue-600"></div>
                </div>
-
             </div>
          </div>
       </div>
@@ -918,33 +719,28 @@ function DockTimeline({
   );
 }
 
+
+
+
 // --- MAIN COMPONENT ---
 export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
   const [allDocksState, setAllDocksState] = useState(allDocks);
   const [allAppointmentsState, setAllAppointmentsState] = useState(pendingAppointments);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("day");
   const [isExpanded, setIsExpanded] = useState(false);
   const [highlightedDockId, setHighlightedDockId] = useState<string | null>(null);
-  
-  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  // Estados Modales
-  const [editingAppointment, setEditingAppointment] = useState<{apt: Appointment, dockId: string, dockName: string} | null>(null);
-  const [requestModalAppointment, setRequestModalAppointment] = useState<Appointment | null>(null);
-  const [createModalAppointment, setCreateModalAppointment] = useState<Appointment | null>(null);
+  const [editingAppointment, setEditingAppointment] = useState<any>(null);
+  const [requestModalAppointment, setRequestModalAppointment] = useState<any>(null);
+  const [createModalAppointment, setCreateModalAppointment] = useState<any>(null);
 
-  useEffect(() => {
-    setCurrentTime(new Date()); 
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 60000); 
-    return () => clearInterval(timer);
-  }, []);
+  useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
   const filteredDocks = useMemo(() => {
     if (!locationId) return [];
@@ -956,228 +752,112 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
   const filteredAppointments = useMemo(() => {
     if (!locationId) return [];
     let filtered = allAppointmentsState.filter((apt) => apt.locationId === locationId);
-    if (dockGroupId && dockGroupId !== "all") filtered = filtered.filter((apt) => apt.dockGroupId === dockGroupId);
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((apt) => apt.carrier.toLowerCase().includes(query) || apt.truckId.toLowerCase().includes(query) || apt.id.toLowerCase().includes(query));
+      filtered = filtered.filter((apt) => apt.carrier.toLowerCase().includes(query) || apt.id.toLowerCase().includes(query));
     }
     return filtered;
-  }, [allAppointmentsState, locationId, dockGroupId, searchQuery]);
+  }, [allAppointmentsState, locationId, searchQuery]);
 
   const handleDrop = (appointmentId: string, dockId: string) => {
-    const appointment = allAppointmentsState.find((a) => a.id === appointmentId);
-    if (!appointment) return;
-    setAllDocksState((prev) =>
-      prev.map((dock) =>
-        dock.id === dockId ? { ...dock, status: "occupied" as const, occupancy: 100, currentAppointment: { ...appointment, status: "in-progress" as const, duration: 60 } } : dock
-      )
-    );
-    setAllAppointmentsState((prev) => prev.filter((a) => a.id !== appointmentId));
-    setDraggingId(null);
-    setDropTargetId(null);
-    setSelectedAppointment(null);
+    const apt = allAppointmentsState.find((a) => a.id === appointmentId);
+    if (!apt) return;
+    setAllDocksState(prev => prev.map(d => d.id === dockId ? { ...d, status: "occupied", occupancy: 100, currentAppointment: { ...apt, status: "in-progress", duration: 60 } } as any : d));
+    setAllAppointmentsState(prev => prev.filter(a => a.id !== appointmentId));
+    setDraggingId(null); setDropTargetId(null); setSelectedAppointment(null);
   };
 
-  const handleDockClick = (dockId: string) => {
-    setHighlightedDockId(dockId);
-    setViewMode("timeline");
-    setTimeFrame("day");
-  };
-
-  const handleAppointmentClick = (apt: Appointment, dockId: string, dockName: string) => {
-    setEditingAppointment({ apt, dockId, dockName });
-  };
+  const handleDockClick = (dockId: string) => { setHighlightedDockId(dockId); setViewMode("timeline"); setTimeFrame("day"); };
+  const handleAppointmentClick = (apt: Appointment, dockId: string, dockName: string) => { setEditingAppointment({ apt, dockId, dockName }); };
 
   const handleSaveAppointment = (appointmentId: string, newTime: string, newDockId: string) => {
     if (!editingAppointment) return;
-    if (newDockId === editingAppointment.dockId) {
-      setAllDocksState((prev) => 
-        prev.map((dock) => dock.id === editingAppointment.dockId && dock.currentAppointment?.id === appointmentId ? { ...dock, currentAppointment: { ...dock.currentAppointment, time: newTime } } as Dock : dock)
-      );
-    } else {
-      setAllDocksState((prev) => {
-        const sourceDock = prev.find(d => d.id === editingAppointment.dockId);
-        const appointmentToMove = sourceDock?.currentAppointment;
-        if (!appointmentToMove) return prev;
-        const updatedAppointment = { ...appointmentToMove, time: newTime };
-        return prev.map((dock) => {
-          if (dock.id === editingAppointment.dockId) return { ...dock, status: "available", occupancy: 0, currentAppointment: undefined } as Dock;
-          if (dock.id === newDockId) return { ...dock, status: "occupied", occupancy: 100, currentAppointment: updatedAppointment } as Dock;
-          return dock;
-        });
-      });
-    }
+    setAllDocksState((prev) => prev.map((dock) => (dock.id === editingAppointment.dockId && dock.currentAppointment?.id === appointmentId ? { ...dock, currentAppointment: { ...dock.currentAppointment, time: newTime } } as Dock : dock)));
     setEditingAppointment(null);
   };
 
   const handleDeleteAppointment = (appointmentId: string) => {
     if (!editingAppointment) return;
-    setAllDocksState((prev) => 
-      prev.map((dock) => {
-        if (dock.id === editingAppointment.dockId) {
-           if (dock.currentAppointment) setAllAppointmentsState(prevAppts => [...prevAppts, { ...dock.currentAppointment!, status: 'pending', isReadyForAssignment: false }]);
-           return { ...dock, status: "available", occupancy: 0, currentAppointment: undefined } as Dock;
-        }
-        return dock;
-      })
-    );
+    setAllDocksState((prev) => prev.map((dock) => {
+      if (dock.id === editingAppointment.dockId) {
+         if (dock.currentAppointment) setAllAppointmentsState(p => [...p, { ...dock.currentAppointment!, status: 'pending', isReadyForAssignment: false }]);
+         return { ...dock, status: "available", occupancy: 0, currentAppointment: undefined } as Dock;
+      }
+      return dock;
+    }));
     setEditingAppointment(null);
   };
 
-  const handleRequestClick = () => {
-    if (selectedAppointment) {
-       setRequestModalAppointment(selectedAppointment);
-    }
-  };
+  if (!locationId) return (
+    <div className="h-full flex flex-col items-center justify-center p-8 text-center">
+      <div className="w-20 h-20 rounded-full bg-yms-primary/10 flex items-center justify-center mb-4"><LayoutGrid className="w-10 h-10 text-yms-primary" /></div>
+      <h3 className="font-serif font-bold text-xl text-yms-primary mb-2 uppercase">Selecciona una Localidad</h3>
+    </div>
+  );
 
-  const handleContinueToStep2 = () => {
-    if (requestModalAppointment) {
-      setCreateModalAppointment(requestModalAppointment);
-      setRequestModalAppointment(null);
-    }
-  };
-
-  const handleCreateAppointment = () => {
-    if (!createModalAppointment) return;
-    setAllAppointmentsState(prev => prev.map(a => 
-       a.id === createModalAppointment.id 
-          ? { ...a, isReadyForAssignment: true, status: 'scheduled' } 
-          : a
-    ));
-    if (selectedAppointment?.id === createModalAppointment.id) {
-       setSelectedAppointment(prev => prev ? { ...prev, isReadyForAssignment: true, status: 'scheduled' } : null);
-    }
-    setCreateModalAppointment(null);
-  };
-
-  if (!locationId) return <div className="h-full flex flex-col items-center justify-center p-8 text-center"><div className="w-20 h-20 rounded-full bg-yms-primary/10 flex items-center justify-center mb-4"><LayoutGrid className="w-10 h-10 text-yms-primary" /></div><h3 className="font-serif font-bold text-xl text-yms-primary mb-2">Selecciona una Localidad</h3></div>;
-
-  const expandedClasses = isExpanded ? "fixed inset-0 z-50 bg-white" : "h-full flex flex-col p-4 gap-3 overflow-hidden";
+  // AJUSTE: Scroll en vista expandida
+  const expandedClasses = isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-4 gap-3 overflow-hidden";
 
   return (
     <div className={expandedClasses}>
-      {/* Modales */}
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
-      {requestModalAppointment && <RequestAppointmentModal appointment={requestModalAppointment} onClose={() => setRequestModalAppointment(null)} onContinue={handleContinueToStep2} />}
-      {createModalAppointment && <CreateAppointmentModal appointment={createModalAppointment} onClose={() => setCreateModalAppointment(null)} onConfirm={handleCreateAppointment} />}
+      {requestModalAppointment && <RequestAppointmentModal appointment={requestModalAppointment} onClose={() => setRequestModalAppointment(null)} onContinue={() => { setCreateModalAppointment(requestModalAppointment); setRequestModalAppointment(null); }} />}
+      {createModalAppointment && <CreateAppointmentModal appointment={createModalAppointment} onClose={() => setCreateModalAppointment(null)} onConfirm={() => { setAllAppointmentsState(prev => prev.map(a => a.id === createModalAppointment.id ? {...a, isReadyForAssignment: true} : a)); setCreateModalAppointment(null); setSelectedAppointment(prev => prev ? {...prev, isReadyForAssignment: true} : null); }} />}
 
       {isExpanded && <div className="p-2 border-b flex justify-end"><Button variant="ghost" size="sm" onClick={() => setIsExpanded(false)}><Minimize2 className="mr-2 w-4 h-4"/> Salir de pantalla completa</Button></div>}
       
-      <div className={cn("flex-1 flex gap-4 overflow-hidden min-h-0", isExpanded && "p-4")}>
-        {/* LEFT COLUMN */}
+      <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
+        {/* PANEL ASIGNACIONES (Con NIT y detalles originales) */}
         <div className="w-72 shrink-0 flex flex-col min-h-0">
-          <div className="bg-yms-primary rounded-t-[1rem] px-4 py-2.5 flex-shrink-0">
-            <h3 className="font-serif font-bold text-sm text-white">Asignaciones</h3>
-          </div>
-          {!selectedAppointment && (
-            <div className="bg-white border-x border-b border-yms-border px-3 py-2.5 flex-shrink-0">
-              <div className="relative">
-                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-yms-gray/60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <input type="text" placeholder="Buscar orden de compra..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-8 py-2 text-sm border border-yms-border rounded-lg outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
-              </div>
-            </div>
-          )}
-          <div className="flex-1 bg-white border border-t-0 border-yms-border rounded-b-[1rem] p-3 overflow-y-auto min-h-0">
+          <div className="bg-yms-primary rounded-t-[1rem] p-3 text-white font-serif font-bold text-sm uppercase tracking-wide">Asignaciones</div>
+          {!selectedAppointment && (<div className="bg-white border-x border-b p-3 flex-shrink-0"><div className="relative"><svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" placeholder="Buscar orden..." className="w-full pl-10 pr-4 py-2 text-sm border rounded-lg" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /></div></div>)}
+          <div className="flex-1 bg-white border border-t-0 rounded-b-[1rem] p-3 overflow-y-auto">
             {selectedAppointment ? (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                <button onClick={() => setSelectedAppointment(null)} className="flex items-center gap-2 text-yms-primary hover:text-yms-cyan transition-colors text-sm font-medium">
-                  <ChevronLeft className="w-4 h-4" /> Volver a la lista
-                </button>
-                <div className="bg-[#1C1E59] rounded-xl p-4 text-white shadow-lg">
-                  <div className="flex items-center gap-2 mb-3"><FileText className="w-5 h-5 text-orange-400" /><h4 className="font-bold text-base">{selectedAppointment.id}</h4></div>
+              <div className="space-y-4">
+                <button onClick={() => setSelectedAppointment(null)} className="flex items-center gap-2 text-yms-primary text-sm font-medium"><ChevronLeft className="w-4 h-4" /> Volver</button>
+                <div className="bg-[#1C1E59] rounded-xl p-4 text-white shadow-lg space-y-2">
+                  <div className="flex items-center gap-2 border-b border-white/10 pb-2 mb-2"><FileText className="w-5 h-5 text-orange-400" /><h4 className="font-bold">{selectedAppointment.id}</h4></div>
                   <div className="space-y-2 text-xs">
-                    <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Producto:</span><span className="font-bold">{selectedAppointment.product || '---'}</span></div>
+                 
+                      <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Producto:</span><span className="font-bold">{selectedAppointment.product || '---'}</span></div>
                     <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Remolque:</span><span className="font-bold">{selectedAppointment.truckId}</span></div>
                     <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Conductor:</span><span className="font-bold">{selectedAppointment.driver}</span></div>
                   </div>
                 </div>
-                {!selectedAppointment.isReadyForAssignment ? (
-                   <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold h-10 shadow-md animate-pulse" onClick={handleRequestClick}>SOLICITAR CITA</Button>
-                ) : (
-                   <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex flex-col gap-2">
-                      <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm"><CheckCircle2 className="w-5 h-5" /> Cita Solicitada</div>
-                      <p className="text-xs text-emerald-600">Ya puedes arrastrar esta orden hacia un muelle disponible en la cuadrícula.</p>
-                      <div draggable onDragStart={(e) => { e.dataTransfer.setData("appointmentId", selectedAppointment.id); setDraggingId(selectedAppointment.id); }} className="bg-white border-2 border-dashed border-emerald-400 rounded p-2 text-center text-xs text-emerald-600 font-medium cursor-grab active:cursor-grabbing hover:bg-emerald-50 transition-colors">::: Arrástrame al Muelle :::</div>
-                   </div>
-                )}
+                {!selectedAppointment.isReadyForAssignment ? <Button className="w-full bg-orange-500 text-white font-bold h-10 shadow-md uppercase" onClick={() => setRequestModalAppointment(selectedAppointment)}>Solicitar Cita</Button> : <div draggable onDragStart={(e) => { e.dataTransfer.setData("appointmentId", selectedAppointment.id); setDraggingId(selectedAppointment.id); }} className="p-4 border-2 border-dashed border-emerald-400 rounded-lg text-center text-xs text-emerald-600 font-bold bg-emerald-50 cursor-grab uppercase">::: Arrástrame al Muelle :::</div>}
               </div>
-            ) : (
-              <div className="space-y-2">
-                {filteredAppointments.map((appointment) => (
-                  <div key={appointment.id} onClick={() => setSelectedAppointment(appointment)} draggable={false} className={cn("bg-white border border-yms-border rounded-lg p-3 cursor-pointer transition-all hover:shadow-md hover:border-yms-cyan group relative overflow-hidden", appointment.isReadyForAssignment && "border-l-4 border-l-emerald-500")}>
-                    {appointment.isReadyForAssignment && <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-bl font-bold">LISTA</div>}
-                    <div className="flex items-start justify-between gap-2 mb-2"><span className="font-medium text-sm text-yms-primary truncate">{appointment.carrier}</span></div>
-                    <div className="flex items-center gap-3 text-xs text-yms-gray"><span className="font-mono text-xs text-slate-500">OC: {appointment.id}</span></div>
-                  </div>
-                ))}
-                {filteredAppointments.length === 0 && <div className="flex flex-col items-center justify-center h-full text-yms-gray/60 text-sm py-8"><TruckIcon className="w-8 h-8 mb-2 opacity-40" /><p>Sin citas pendientes</p></div>}
+            ) : filteredAppointments.map(apt => (
+              <div key={apt.id} onClick={() => setSelectedAppointment(apt)} className={cn("p-3 border rounded-lg cursor-pointer hover:border-yms-cyan mb-2 relative overflow-hidden", apt.isReadyForAssignment && "border-l-4 border-l-emerald-500")}>
+                {apt.isReadyForAssignment && <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-bl font-bold uppercase">Lista</div>}
+                <div className="font-bold text-xs truncate uppercase tracking-tight">{apt.carrier}</div>
+                <div className="text-[10px] text-gray-500">OC: {apt.id}</div>
               </div>
-            )}
+            ))}
           </div>
         </div>
 
-        {/* RIGHT COLUMN */}
-        <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden">
-           <div className="flex items-center justify-between p-3 border-b border-yms-border">
-              <div className="flex items-center gap-2"><Badge variant="outline" className="bg-slate-50 text-yms-gray">{filteredDocks.length} Muelles</Badge></div>
+        {/* PANEL DERECHO */}
+        <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">
+           <div className="p-3 border-b flex justify-between items-center">
+              <Badge variant="outline" className="bg-slate-50 text-slate-600 font-bold">{filteredDocks.length} Muelles</Badge>
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 bg-slate-50 border border-yms-border rounded-lg p-0.5">
-                  <Button size="icon" variant="ghost" className="h-7 w-7"><ChevronLeft className="w-4 h-4" /></Button>
-                  <span className="font-bold text-xs text-yms-primary px-2 min-w-[30px] text-center">Hoy</span>
-                  <Button size="icon" variant="ghost" className="h-7 w-7"><ChevronRight className="w-4 h-4" /></Button>
-                </div>
-                
-                {/* INDICADOR EN VIVO (HORA ACTUAL) */}
-                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-1 animate-in fade-in">
-                   <div className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                   </div>
-                   <div className="flex flex-col leading-none">
-                      <span className="text-[9px] font-black text-emerald-700 tracking-wide">EN VIVO</span>
-                      <span className="text-[10px] font-mono text-emerald-600 font-medium">
-                         {currentTime ? currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                      </span>
-                   </div>
-                </div>
-
-                <div className="w-px h-6 bg-yms-border" />
-
-                {viewMode === 'timeline' && (
-                  <>
-                    <div className="flex bg-slate-50 rounded-lg p-0.5 border border-yms-border">{(['day', 'week', 'month'] as const).map((tf) => (<button key={tf} onClick={() => setTimeFrame(tf)} className={cn("px-3 py-1 text-[10px] font-medium rounded-md transition-all", timeFrame === tf ? "bg-white text-yms-primary shadow-sm" : "text-yms-gray hover:text-yms-primary")}>{tf === 'day' ? 'Día' : tf === 'week' ? 'Semana' : 'Mes'}</button>))}</div>
-                    <div className="w-px h-6 bg-yms-border" />
-                  </>
-                )}
+                <div className="flex items-center gap-1 bg-slate-50 border rounded-lg p-0.5"><Button size="icon" variant="ghost" className="h-7 w-7"><ChevronLeft className="w-4 h-4" /></Button><span className="font-bold text-xs px-2 text-yms-primary">Hoy</span><Button size="icon" variant="ghost" className="h-7 w-7"><ChevronRight className="w-4 h-4" /></Button></div>
+                <div className="flex items-center gap-2 bg-emerald-50 border rounded-lg px-3 py-2"><div className="relative flex h-2 w-2 "><span className="animate-ping absolute inline-flex h-full w-full  rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full  h-2 w-2 bg-emerald-500"></span></div><div className="flex flex-col leading-none"><span className="text-[9px] font-black text-emerald-700 tracking-wide uppercase">EN VIVO</span><span className="text-[10px] font-mono text-emerald-600 font-medium">{currentTime ? currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</span></div></div>
+                {viewMode === 'timeline' && <div className="flex bg-slate-50 rounded-lg p-0.5 border py-1">{(['day', 'week', 'month'] as const).map(tf => <button key={tf} onClick={() => setTimeFrame(tf)} className={cn("px-3 py-1 text-[10px] font-medium rounded-md transition-all", timeFrame === tf ? "bg-white text-yms-primary shadow-sm" : "text-slate-400 hover:text-yms-primary")}>{tf === 'day' ? 'Día' : tf === 'week' ? 'Semana' : 'Mes'}</button>)}</div>}
                 <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                  <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7 rounded-md", viewMode === 'grid' ? "bg-white text-yms-primary shadow-sm hover:bg-white" : "text-yms-gray hover:text-yms-primary")} onClick={() => setViewMode('grid')}><LayoutGrid className="w-4 h-4" /></Button>
-                  <Button variant={viewMode === 'timeline' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7 rounded-md", viewMode === 'timeline' ? "bg-white text-yms-primary shadow-sm hover:bg-white" : "text-yms-gray hover:text-yms-primary")} onClick={() => setViewMode('timeline')}><CalendarIcon className="w-4 h-4" /></Button>
-                  <div className="w-px h-4 bg-slate-300 mx-1"></div>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-yms-gray hover:text-yms-primary hover:bg-white" onClick={() => setIsExpanded(!isExpanded)}>{isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}</Button>
+                  <Button variant={viewMode === 'grid' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7", viewMode === 'grid' ? "bg-white text-yms-primary shadow-sm" : "text-slate-500")} onClick={() => setViewMode('grid')}><LayoutGrid className="w-4 h-4" /></Button>
+                  <Button variant={viewMode === 'timeline' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7", viewMode === 'timeline' ? "bg-white text-yms-primary shadow-sm" : "text-slate-500")} onClick={() => setViewMode('timeline')}><CalendarIcon className="w-4 h-4" /></Button>
+                  <div className="w-px h-4 bg-slate-300 mx-1" />
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:bg-white" onClick={() => setIsExpanded(!isExpanded)}>{isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}</Button>
                 </div>
               </div>
            </div>
-
-           <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+           <div className="flex-1 overflow-hidden">
              {viewMode === 'grid' ? (
-                <div className="flex-1 p-4 overflow-y-auto min-h-0 bg-slate-50/50">
-                  {filteredDocks.length > 0 ? (
-                    <div className="flex flex-wrap gap-4 content-start">
-                      {filteredDocks.map((dock) => (
-                        <DockSlot key={dock.id} dock={dock} isDragging={!!draggingId} onClick={() => handleDockClick(dock.id)} onDrop={handleDrop} isDropTarget={dropTargetId === dock.id} onDragOver={() => setDropTargetId(dock.id)} onDragLeave={() => setDropTargetId(null)} />
-                      ))}
-                    </div>
-                  ) : (<div className="flex flex-col items-center justify-center h-full text-yms-gray/60"><p>No hay muelles en este grupo</p></div>)}
+                <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/50">
+                  {filteredDocks.map(dock => <DockSlot key={dock.id} dock={dock} isDragging={!!draggingId} onDrop={handleDrop} onDragOver={() => setDropTargetId(dock.id)} onDragLeave={() => setDropTargetId(null)} isDropTarget={dropTargetId === dock.id} onClick={() => handleDockClick(dock.id)} />)}
                 </div>
-             ) : (
-                <DockTimeline 
-                   docks={filteredDocks} 
-                   timeFrame={timeFrame} 
-                   highlightedDockId={highlightedDockId} 
-                   onAppointmentClick={handleAppointmentClick} 
-                   currentTime={currentTime || new Date()} 
-                />
-             )}
+             ) : (<DockTimeline docks={filteredDocks} timeFrame={timeFrame} highlightedDockId={highlightedDockId} onAppointmentClick={handleAppointmentClick} currentTime={currentTime || new Date()} />)}
            </div>
         </div>
       </div>
