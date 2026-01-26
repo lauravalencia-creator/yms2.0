@@ -24,9 +24,9 @@ import {
   CheckCircle2,
   Filter,
   Activity,
-  ArrowDownCircle, // Icono Descargue
-  ArrowUpCircle,   // Icono Cargue
-  ArrowRightLeft   // Icono Mixto
+  ArrowDownCircle, 
+  ArrowUpCircle,   
+  ArrowRightLeft   
 } from "lucide-react";
 
 // --- TIPOS ---
@@ -116,9 +116,9 @@ function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" /></svg>;
 }
 
-// --- DATOS MOCK EXPANDIDOS ---
+// --- DATOS COMPLETOS DE MUELLES (PARA TODAS LAS LOCALIDADES) ---
 const allDocks: Dock[] = [
-  // --- GRUPO A (RECEPCIÓN) ---
+  // --- LOC-1: CENTRO DISTRIBUCION NORTE ---
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-1", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
     driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue" }},
@@ -134,7 +134,6 @@ const allDocks: Dock[] = [
     driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue" }
   },
   
-  // --- GRUPO B (RECEPCIÓN) ---
   { id: "dock-1b-1", name: "Muelle B-01", type: "inbound", status: "occupied", occupancy: 50, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-2", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
     driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue" }},
@@ -149,7 +148,6 @@ const allDocks: Dock[] = [
     currentAppointment: { id: "apt-3", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
     driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue" }},
   
-  // --- GRUPO C (DESPACHO) ---
   { id: "dock-1c-1", name: "Despacho 01", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-4", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue" }},
@@ -160,10 +158,31 @@ const allDocks: Dock[] = [
     currentAppointment: { id: "apt-gray-3", carrier: "Envía Ya", truckId: "ENV-001", time: "11:00", type: "outbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Pedro Picapiedra", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Despachos", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Sencillo", loadType: "Paqueteo", operationType: "Cargue" } },
 
-  // --- GRUPO D (MIXTO) ---
   { id: "dock-1d-1", name: "Mixto 01", type: "both", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1d" },
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
-    currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane" } }
+    currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane" } },
+
+  // --- LOC-2: ALMACEN CENTRAL GUADALAJARA ---
+  { id: "dock-2a-1", name: "Norte 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
+    currentAppointment: { id: "apt-5", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola" }},
+  { id: "dock-2a-2", name: "Norte 02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
+  { id: "dock-2a-3", name: "Norte 03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
+  
+  { id: "dock-2b-1", name: "Sur 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2b" },
+  { id: "dock-2b-2", name: "Sur 02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
+    currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane" }},
+
+  // --- LOC-3: HUB LOGISTICO MONTERREY ---
+  { id: "dock-3a-1", name: "Term A-01", type: "both", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3a" },
+  { id: "dock-3a-2", name: "Term A-02", type: "both", status: "maintenance", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3a" },
+  { id: "dock-3b-1", name: "Term B-01", type: "both", status: "occupied", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3b",
+    currentAppointment: { id: "apt-mty-1", carrier: "RegioPack", truckId: "MTY-001", time: "07:30", type: "inbound", status: "in-progress", locationId: "loc-3", dockGroupId: "dg-3b", duration: 120 } },
+  { id: "dock-3c-1", name: "Refri 01", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3c" },
+
+  // --- LOC-4: CENTRO EXPORTACION TIJUANA ---
+  { id: "dock-4a-1", name: "Aduana 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-4", dockGroupId: "dg-4a" },
+  { id: "dock-4b-1", name: "Cross 01", type: "both", status: "occupied", occupancy: 100, locationId: "loc-4", dockGroupId: "dg-4b",
+    currentAppointment: { id: "apt-tj-1", carrier: "BorderLogistics", truckId: "USA-99", time: "11:00", type: "outbound", status: "in-progress", locationId: "loc-4", dockGroupId: "dg-4b", duration: 60 } },
 ];
 
 // --- Citas pendientes ---
@@ -183,12 +202,24 @@ const pendingAppointments: Appointment[] = [
 // --- HELPERS STYLES ---
 function getOccupancyStyle(dock: Dock, isDragging: boolean) {
   if (dock.status === "maintenance") {
-    return "bg-gray-800 border-gray-700 text-gray-200 shadow-inner";
+    // GRIS para mantenimiento
+    return "bg-gray-100 border-gray-300 text-gray-500 shadow-sm"; 
   }
+  
   const occupancy = dock.occupancy || 0;
-  if (occupancy >= 100) return "bg-red-50 border-red-300 text-red-900 shadow-sm"; 
-  if (occupancy > 0) return "bg-orange-50 border-orange-300 text-orange-900 shadow-sm";
-  if (isDragging) return "bg-white border-yms-cyan/60 ring-4 ring-yms-cyan/20 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02] animate-pulse";
+
+  if (occupancy >= 100) {
+    return "bg-red-50 border-red-300 text-red-900 shadow-sm"; 
+  }
+  
+  if (occupancy > 0) {
+    return "bg-orange-50 border-orange-300 text-orange-900 shadow-sm";
+  }
+
+  // Disponible (Blanco)
+  if (isDragging) {
+     return "bg-white border-yms-cyan/60 ring-4 ring-yms-cyan/20 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02] animate-pulse";
+  }
   return "bg-white border-slate-200 text-yms-primary hover:border-yms-primary/30";
 }
 
@@ -228,7 +259,7 @@ const InfoField = ({ label, value }: { label: string, value?: string }) => (
   </div>
 );
 
-// --- DOCK SLOT (REDISENADO: ICONOS Y HEADER) ---
+// --- DOCK SLOT (REDISENADO SEGÚN SOLICITUD) ---
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -260,41 +291,40 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
         isDropTarget && "scale-105 ring-2 ring-yms-cyan ring-offset-2 z-10"
       )}
     >
-      {/* HEADER: Nombre + Icono Tipo + % */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5 overflow-hidden">
-             {/* ICONO TIPO */}
+      <div className="flex flex-col items-start w-full mb-2">
+        {/* HEADER: ICONO + NOMBRE */}
+        <div className="flex items-center gap-1.5 w-full">
              {!isMaintenance && <TypeIcon className={cn("w-4 h-4 shrink-0", iconColor)} strokeWidth={2.5} />}
-             
-             {/* NOMBRE MUELLE */}
-             <span className={cn("font-serif font-bold text-xs truncate", isMaintenance ? "text-gray-300" : "text-[#1C1E59]")} title={dock.name}>
+             <span className={cn("font-serif font-bold text-xs truncate", isMaintenance ? "text-gray-500" : "text-[#1C1E59]")} title={dock.name}>
                 {dock.name}
              </span>
+             {isMaintenance && <WrenchIcon className="w-4 h-4 text-gray-400 shrink-0 ml-auto" />}
         </div>
         
-        {/* PORCENTAJE/ESTADO A LA DERECHA */}
-        {!isMaintenance && (
-           <div className={cn("text-[9px] font-black px-1.5 py-0.5 rounded tracking-tight", 
-               dock.occupancy >= 100 ? "bg-red-200 text-red-900" : 
-               dock.occupancy > 0 ? "bg-orange-200 text-orange-900" : 
-               "bg-slate-100 text-slate-400"
-           )}>
-              {dock.occupancy >= 100 ? "100%" : dock.occupancy > 0 ? `${dock.occupancy}%` : "0%"}
+        {/* SUBTITULO: FULL/PARCIAL (Solo ocupados) */}
+        {!isMaintenance && dock.occupancy > 0 && (
+           <div className="mt-1">
+              <span className={cn("text-[10px] font-bold uppercase tracking-tight", 
+                  dock.occupancy >= 100 ? "text-red-700" : "text-orange-700"
+              )}>
+                  {dock.occupancy >= 100 ? "FULL 100%" : `PARCIAL ${dock.occupancy}%`}
+              </span>
            </div>
         )}
-        {isMaintenance && <WrenchIcon className="w-4 h-4 text-gray-400 shrink-0" />}
       </div>
 
       <div className="flex-1 flex flex-col justify-center min-h-0 mt-1 relative">
+        {/* MANTENIMIENTO: GRIS */}
         {isMaintenance && (
           <div className="flex flex-col items-center justify-center text-gray-400 gap-1 opacity-70">
-            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
-               <AlertTriangle className="w-5 h-5 text-gray-300" />
+            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center border border-gray-300">
+               <AlertTriangle className="w-5 h-5 text-gray-500" />
             </div>
-            <span className="text-[10px] font-bold text-center uppercase tracking-wider text-gray-400">En Mantenimiento</span>
+            <span className="text-[10px] font-bold text-center uppercase tracking-wider text-gray-500">En Mantenimiento</span>
           </div>
         )}
 
+        {/* DISPONIBLE: BLANCO */}
         {!isMaintenance && dock.occupancy === 0 && (
           <div className="flex flex-col items-center justify-center opacity-30 gap-1">
             <div className="w-9 h-9 rounded-full border border-dashed border-slate-400 flex items-center justify-center">
@@ -304,10 +334,11 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
           </div>
         )}
 
+        {/* CITA: SIN SOMBRA NI BORDES PESADOS */}
         {showContent && dock.currentAppointment && (
           <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
-            <div className="flex-1 bg-white/60 rounded-lg p-2 border border-black/5 flex flex-col gap-0.5 shadow-sm">
-                <div className="flex items-center gap-1.5 border-b border-black/5 pb-1 mb-1">
+            <div className="flex-1 bg-transparent rounded-lg p-1 flex flex-col gap-0.5">
+                <div className="flex items-center gap-1.5 pb-1 mb-1 border-b border-black/5">
                   {dock.currentAppointment.type === "inbound" ? 
                      <ArrowDownIcon className="w-3 h-3 text-yms-cyan shrink-0" /> : 
                      <ArrowUpIcon className="w-3 h-3 text-yms-secondary shrink-0" />
@@ -569,8 +600,8 @@ function AppointmentEditModal({
 }: { 
   appointment: Appointment, 
   dockName: string, 
-  currentDockId: string,
-  availableDocks: Dock[],
+  currentDockId: string, 
+  availableDocks: Dock[], 
   onClose: () => void, 
   onSave: (id: string, newTime: string, newDockId: string) => void, 
   onDelete: (id: string) => void 
