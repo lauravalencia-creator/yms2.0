@@ -431,50 +431,110 @@ function EditProfileModal({ isOpen, onClose, profileData }: { isOpen: boolean; o
   );
 }
 
-// --- COMPONENTES TABLAS DE USUARIOS ---
 function UsuariosTable() {
+  // Datos de ejemplo
+  const USERS_DATA = [
+    {
+      id: 1,
+      usuario: "UNIDADES",
+      perfil: "Administrador",
+      tipo: "Interno",
+      nivel: "Corporativo",
+      localidad: "Todas",
+      proveedor: "N/A",
+      telefono: "3001234567",
+      estatus: "Activo",
+      email: "unidades@example.com"
+    },
+    {
+      id: 2,
+      usuario: "JUAN.PEREZ",
+      perfil: "Operativo",
+      tipo: "Externo",
+      nivel: "Localidad",
+      localidad: "Bogotá",
+      proveedor: "TransCarga",
+      telefono: "3109876543",
+      estatus: "Activo",
+      email: "juan.perez@example.com"
+    }
+  ];
+
   return (
-    <div className="overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent border-none">
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[20%]", COLORS.NAVY)}>Usuario</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[15%]", COLORS.NAVY)}>Perfil</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[15%]", COLORS.NAVY)}>Tipo</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[15%]", COLORS.NAVY)}>Localidad</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[15%]", COLORS.NAVY)}>Estado</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[20%]", COLORS.NAVY)}>Email</TableHead>
-          </TableRow>
-        </TableHeader>
+    <div className="flex flex-col h-full space-y-6">
+      
+      {/* --- BARRA SUPERIOR (BOTÓN + BUSCADORES) --- */}
+      <div className="flex items-center gap-4 flex-wrap px-1">
+        {/* Botón Generar Usuario */}
+        <Button 
+          className="bg-[#1C1E59] hover:bg-[#e66000] text-white text-[11px] font-bold uppercase tracking-wide rounded-xl h-10 px-6 shadow-lg shadow-orange-100 flex items-center gap-2 transition-all hover:scale-105"
+        >
+           <div className="text-lg leading-none mb-0.5">+</div> 
+           Generar Usuario
+        </Button>
 
-        <TableBody>
-          <TableRow className="border-b border-gray-100 hover:bg-slate-50/50">
-            <TableCell className="font-bold text-gray-700 text-sm py-4">UNIDADES</TableCell>
-            <TableCell className="text-gray-600 text-sm">Administrador</TableCell>
-            <TableCell className="text-gray-600 text-sm">Interno</TableCell>
-            <TableCell className="text-gray-600 text-sm">Todas</TableCell>
-            <TableCell>
-              <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-none shadow-none font-bold px-3">Activo</Badge>
-            </TableCell>
-            <TableCell className="text-gray-500 text-sm">unidades@example.com</TableCell>
-          </TableRow>
+        {/* Buscador Usuario */}
+        <div className="relative w-64 group">
+           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
+           <Input 
+             placeholder="Buscar Usuario" 
+             className="pl-10 h-10 text-xs rounded-full border-cyan-100 bg-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20 transition-all placeholder:text-gray-400 font-medium" 
+           />
+        </div>
 
-          <TableRow className="border-b border-gray-100 hover:bg-slate-50/50">
-            <TableCell className="font-bold text-gray-700 text-sm py-4">JUAN.PEREZ</TableCell>
-            <TableCell className="text-gray-600 text-sm">Operativo</TableCell>
-            <TableCell className="text-gray-600 text-sm">Externo</TableCell>
-            <TableCell className="text-gray-600 text-sm">Bogotá</TableCell>
-            <TableCell>
-              <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-none shadow-none font-bold px-3">Activo</Badge>
-            </TableCell>
-            <TableCell className="text-gray-500 text-sm">juan.perez@example.com</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+        {/* Buscador Perfil */}
+        <div className="relative w-64 group">
+           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
+           <Input 
+             placeholder="Buscar Perfil" 
+             className="pl-10 h-10 text-xs rounded-full border-cyan-100 bg-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20 transition-all placeholder:text-gray-400 font-medium" 
+           />
+        </div>
+      </div>
+
+      {/* --- TABLA --- */}
+      <div className="rounded-[1.5rem] border border-gray-100 overflow-hidden shadow-sm flex-1 bg-white flex flex-col">
+        <div className="overflow-auto flex-1 custom-scrollbar">
+            <Table>
+            <TableHeader className="bg-[#1e2b58] sticky top-0 z-10">
+                <TableRow className="border-none hover:bg-transparent">
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 pl-6">Usuario</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Perfil</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Tipo de Usuario</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Nivel Visibilidad</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Localidad</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Proveedor</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Teléfono</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 text-center">Estatus</TableHead>
+                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 pr-6">E-mail</TableHead>
+                </TableRow>
+            </TableHeader>
+
+            <TableBody>
+                {USERS_DATA.map((row) => (
+                <TableRow key={row.id} className="group hover:bg-orange-50/30 border-b border-gray-50 transition-colors">
+                    <TableCell className="font-bold text-[#1e2b58] text-xs py-4 pl-6 uppercase">{row.usuario}</TableCell>
+                    <TableCell className="text-gray-600 text-xs font-medium">{row.perfil}</TableCell>
+                    <TableCell className="text-gray-600 text-xs">{row.tipo}</TableCell>
+                    <TableCell className="text-gray-600 text-xs">{row.nivel}</TableCell>
+                    <TableCell className="text-gray-600 text-xs">{row.localidad}</TableCell>
+                    <TableCell className="text-gray-500 text-xs italic">{row.proveedor}</TableCell>
+                    <TableCell className="text-gray-600 text-xs font-mono">{row.telefono}</TableCell>
+                    <TableCell className="text-center">
+                    <Badge className={cn("border-none shadow-none text-[9px] font-bold px-2 py-0.5", row.estatus === "Activo" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-500")}>
+                        {row.estatus}
+                    </Badge>
+                    </TableCell>
+                    <TableCell className="text-gray-500 text-xs pr-6">{row.email}</TableCell>
+                </TableRow>
+                ))}
+            </TableBody>
+            </Table>
+        </div>
+      </div>
     </div>
   );
 }
-
 // --- CONTENIDO TAB PERFILES (CON LÓGICA DE MODALES) ---
 function PerfilesTabContent() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -1441,40 +1501,63 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
                       </Dialog>
 
                       {/* GESTIÓN DE USUARIOS */}
-                      <Dialog>
-  <DialogTrigger asChild>
-    <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-      <Users size={16} className="text-[#1C1E59]" />
-      <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
-    </button>
-  </DialogTrigger>
-  {/* Ajusté el ancho máximo y padding para mejor visualización */}
-  <DialogContent className="sm:max-w-5xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden h-[600px] flex flex-col">
-    <div className="px-8 py-5 border-b border-gray-100 bg-slate-50/30 flex items-center gap-3 shrink-0">
-        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
-            <Users className={cn("w-5 h-5", COLORS.NAVY)} />
-        </div>
-        <div>
-            <DialogTitle className={cn("text-lg font-black uppercase italic tracking-tight", COLORS.NAVY)}>Gestión de Usuarios</DialogTitle>
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Administración de accesos y roles</p>
-        </div>
-    </div>
-    
-    <div className="flex-1 p-8 overflow-y-auto">
-      <Tabs defaultValue="usuarios" className="h-full flex flex-col">
-        <TabsList className="bg-slate-100 p-1 rounded-xl h-11 w-fit mb-6 self-start border border-gray-200">
-          <TabsTrigger value="usuarios" className="rounded-lg px-6 h-full text-xs font-bold uppercase data-[state=active]:bg-white data-[state=active]:text-[#ff6b00] data-[state=active]:shadow-sm transition-all">Administración de Usuarios</TabsTrigger>
-          <TabsTrigger value="perfiles" className="rounded-lg px-6 h-full text-xs font-bold uppercase data-[state=active]:bg-white data-[state=active]:text-[#ff6b00] data-[state=active]:shadow-sm transition-all">Administración de Perfiles</TabsTrigger>
-        </TabsList>
-        
-        <div className="flex-1">
-          <TabsContent value="usuarios " className="mt-0 h-full"><UsuariosTable /></TabsContent>
-          <TabsContent value="perfiles" className="mt-0 h-full"><PerfilesTabContent /></TabsContent>
-        </div>
-      </Tabs>
-    </div>
-  </DialogContent>
-</Dialog>
+                     {/* GESTIÓN DE USUARIOS */}
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+                              <Users size={16} className="text-[#1C1E59]" />
+                              <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
+                            </button>
+                          </DialogTrigger>
+                          
+                          <DialogContent className="sm:max-w-[90vw] w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden h-[80vh] flex flex-col">
+                            {/* Header */}
+                            <div className="px-8 py-5 border-b border-gray-100 bg-white flex items-center gap-4 shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-slate-50 border border-gray-100 flex items-center justify-center">
+                                    <Users className="w-6 h-6 text-[#1e2b58]" />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-lg font-black uppercase italic tracking-tight text-[#1e2b58]">Gestión de Usuarios</DialogTitle>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Administración de accesos y roles</p>
+                                </div>
+                                <DialogPrimitive.Close className="ml-auto text-gray-400 hover:text-gray-600">
+                                    <X size={24} />
+                                </DialogPrimitive.Close>
+                            </div>
+                            
+                            <div className="flex-1 p-8 bg-[#F8FAFC] overflow-hidden flex flex-col">
+                              <Tabs defaultValue="usuarios" className="h-full flex flex-col">
+                                {/* Tabs List */}
+                                <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit mb-6 self-start border border-gray-100 shadow-sm">
+                                  <TabsTrigger 
+                                    value="usuarios" 
+                                    className="rounded-xl px-6 h-full text-[11px] font-black uppercase text-gray-400 data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+                                  >
+                                    Administración de Usuarios
+                                  </TabsTrigger>
+                                  <TabsTrigger 
+                                    value="perfiles" 
+                                    className="rounded-xl px-6 h-full text-[11px] font-black uppercase text-gray-400 data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+                                  >
+                                    Administración de Perfiles
+                                  </TabsTrigger>
+                                </TabsList>
+                                
+                                {/* Content Area */}
+                                <div className="flex-1 min-h-0">
+                                  {/* AQUÍ ESTABA EL ERROR: Asegúrate que value sea "usuarios" (sin espacios extra) */}
+                                  <TabsContent value="usuarios" className="mt-0 h-full data-[state=active]:flex flex-col">
+                                    <UsuariosTable />
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="perfiles" className="mt-0 h-full data-[state=active]:flex flex-col">
+                                    <PerfilesTabContent />
+                                  </TabsContent>
+                                </div>
+                              </Tabs>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
 
                       <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
                         <DialogTrigger asChild>
