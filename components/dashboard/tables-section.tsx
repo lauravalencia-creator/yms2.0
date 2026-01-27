@@ -473,13 +473,14 @@ function DeleteConfirmDialog({ isOpen, onClose, onConfirm }: { isOpen: boolean, 
 }
 
 /* ---------------- COMPONENT ---------------- */
+/* ---------------- COMPONENT ---------------- */
 export function TablesSection({ locationId }: TablesSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [section, setSection] = useState<"monitoreo" | "gestion">("monitoreo");
   const [monitoreoView, setMonitoreoView] = useState("appointments");
   const [gestionView, setGestionView] = useState("solicitudes");
 
-   // --- ESTADOS PARA CONTROLAR LOS MODALES ---
+  // --- ESTADOS PARA CONTROLAR LOS MODALES ---
   const [requestModalAppointment, setRequestModalAppointment] = useState<Appointment | null>(null);
   const [createModalAppointment, setCreateModalAppointment] = useState<Appointment | null>(null);
 
@@ -487,7 +488,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
   const [solicitudes, setSolicitudes] = useState<Appointment[]>(INITIAL_SOLICITUDES);
   const [itemAEliminar, setItemAEliminar] = useState<Appointment | null>(null);
 
-    // Función para confirmar la eliminación
+  // Función para confirmar la eliminación
   const confirmarEliminacion = () => {
     if (itemAEliminar) {
       setSolicitudes(solicitudes.filter(s => s.id !== itemAEliminar.id));
@@ -509,17 +510,18 @@ export function TablesSection({ locationId }: TablesSectionProps) {
     { id: "recurrencia", label: "Recurrencia de Citas", icon: CalendarRange },
   ];
 
-  if (!locationId) {
-    return (
-      <div className="h-full w-full flex flex-col items-center justify-center bg-white border rounded-3xl border-dashed border-slate-200 p-12 text-center">
-        <div className="bg-slate-50 p-6 rounded-full mb-4 shadow-inner">
-          <Monitor className="w-10 h-10 text-slate-300" />
-        </div>
-        <h3 className="text-lg font-black text-[#1C1E59] uppercase tracking-tighter italic">Selecciona una Localidad</h3>
-        <p className="text-sm text-slate-400 max-w-xs">Elige una planta para visualizar las tablas de gestión y monitoreo.</p>
+  // --- COMPONENTE VISUAL PARA ESTADO SIN LOCALIDAD ---
+  const SelectLocationState = () => (
+    <div className="h-full w-full flex flex-col items-center justify-center bg-slate-50/30 p-12 text-center animate-in fade-in duration-500">
+      <div className="bg-slate-50 p-6 rounded-full mb-4 shadow-inner border border-slate-100">
+        <Monitor className="w-10 h-10 text-slate-300" />
       </div>
-    );
-  }
+      <h3 className="text-lg font-black text-[#1C1E59] uppercase tracking-tighter italic">Selecciona una Localidad</h3>
+      <p className="text-sm text-slate-400 max-w-xs mx-auto mt-2">
+        Elige una planta en el filtro superior para visualizar los datos de esta tabla.
+      </p>
+    </div>
+  );
 
   return (
     <div className={cn(
@@ -533,20 +535,20 @@ export function TablesSection({ locationId }: TablesSectionProps) {
         <div className="px-5 py-3 border-b flex items-center justify-between bg-white shrink-0 gap-4">
             <div className="flex items-center gap-4">
                 <TabsList className="h-10 bg-slate-100 p-1 rounded-xl shrink-0 border border-slate-200 flex items-center">
-    <TabsTrigger 
-        value="monitoreo" 
-        className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
-    >
-        <Monitor className="w-4 h-4" />
-    </TabsTrigger>
-    
-    <TabsTrigger 
-        value="gestion" 
-        className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
-    >
-        <CalendarDays className="w-4 h-4" />
-    </TabsTrigger>
-</TabsList>
+                  <TabsTrigger 
+                      value="monitoreo" 
+                      className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
+                  >
+                      <Monitor className="w-4 h-4" />
+                  </TabsTrigger>
+                  
+                  <TabsTrigger 
+                      value="gestion" 
+                      className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
+                  >
+                      <CalendarDays className="w-4 h-4" />
+                  </TabsTrigger>
+                </TabsList>
 
                 <div className="h-6 w-px bg-slate-200 shrink-0" />
 
@@ -571,12 +573,13 @@ export function TablesSection({ locationId }: TablesSectionProps) {
             </div>
 
             <div className="flex items-center gap-3">
-                
-               
                 <div className="h-6 w-px bg-slate-200 mx-1" />
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><RefreshCcw className="w-4 h-4"/></Button>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><Download className="w-4 h-4"/></Button>
-                <FilterModal />
+                <Button disabled={!locationId} variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><RefreshCcw className="w-4 h-4"/></Button>
+                <Button disabled={!locationId} variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><Download className="w-4 h-4"/></Button>
+                {/* Deshabilitamos el filtro si no hay localidad, o lo dejamos activo si prefieres */}
+                {locationId ? <FilterModal /> : (
+                   <Button disabled variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400"><Filter className="w-4 h-4"/></Button>
+                )}
                 <Button 
                     variant="ghost" size="icon" 
                     className={cn("h-9 w-9 rounded-xl transition-all", isExpanded ? "text-orange-500 bg-orange-50" : "text-slate-400 hover:bg-slate-50")}
@@ -589,9 +592,15 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 
         {/* --- AREA DE TABLA CON MARGEN Y ESTILO --- */}
         <div className="flex-1 overflow-hidden bg-slate-50/50 p-3 flex flex-col min-h-0">
-            <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden flex flex-col">
+            <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/60 overflow-hidden flex flex-col relative">
+                
+                {/* CONTENIDO PRINCIPAL */}
                 <div className="flex-1 overflow-auto custom-scrollbar">
-                      <TabsContent value="monitoreo" className="h-full m-0">
+                  <TabsContent value="monitoreo" className="h-full m-0">
+                    {!locationId ? (
+                        <SelectLocationState />
+                    ) : (
+                      <>
                         {/* --- VISTA: CONSULTA DE CITAS --- */}
                         {monitoreoView === "appointments" && (
                           <Table>
@@ -679,697 +688,317 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 
                         {/* --- VISTA: EDITAR INFORMACIÓN (Otras) --- */}
                         {monitoreoView === "inventory" && (
-                      <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-                        <div className="flex-1 overflow-auto custom-scrollbar">
-                          <Table>
-                            <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-                              <TableRow className="border-none hover:bg-transparent">
-                                <TableHead className="w-12 text-center">
-                                  <input type="checkbox" className="rounded border-white/20 bg-transparent" />
-                                </TableHead>
-                                {[
-                                  "Unidad Negocio", "Proveedor", "Fecha", "Hora", "Tipo Cita", 
-                                  "ID Cita", "Estado", "Cédula", "Orden Compra", "No. Recibo", 
-                                  "Recibo", "Muelle", "Conductor", "Teléfono", "Vehículo", 
-                                  "Categorización", "Transportadora", "ID Contenedor", "No. Orden", 
-                                  "No. Importación", "OBS", "ID Proveedor", "No. Pallets", 
-                                  "Entrada UN", "T. Transcurrido", "T. Est. Descargue", "Salida", 
-                                  "Usuario", "A Tiempo", "Descargue %", "Acciones"
-                                ].map((h) => (
-                                  <TableHead key={h} className="text-white/90 font-bold text-[9px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
-                                    {h}
-                                  </TableHead>
-                                ))}
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {[...Array(10)].map((_, i) => (
-                                <TableRow key={i} className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14">
-                                  <TableCell className="text-center">
-                                    <input type="checkbox" className="rounded border-slate-200" />
-                                  </TableCell>
-                                  
-                                  {/* Datos básicos */}
-                                  <TableCell className="px-4 font-bold text-slate-700 text-[10px] whitespace-nowrap">Planta Bello</TableCell>
-                                  <TableCell className="px-4 font-black text-[#1C1E59] text-[10px] uppercase whitespace-nowrap">Logística Integral S.A.</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">26/01/2026</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap font-medium">14:30</TableCell>
-                                  <TableCell className="px-4 font-bold text-blue-600 text-[9px] uppercase">Descargue</TableCell>
-                                  <TableCell className="px-4 font-black text-[#1C1E59] text-[11px] tracking-tighter">DOC-992{i}</TableCell>
-                                  <TableCell className="px-4"><StatusBadge status="en_proceso" /></TableCell>
-                                  
-                                  {/* Datos de Identificación y Documentos */}
-                                  <TableCell className="px-4 text-slate-500 text-[10px] font-mono">1.033.455.{i}</TableCell>
-                                  <TableCell className="px-4"><Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[9px]">OC-7721</Badge></TableCell>
-                                  <TableCell className="px-4 text-slate-600 text-[10px]">#99821</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">REC-001</TableCell>
-                                  <TableCell className="px-4 font-bold text-slate-700 text-[10px]">Muelle 04</TableCell>
-                                  
-                                  {/* Conductor y Vehículo */}
-                                  <TableCell className="px-4 font-medium text-slate-700 text-[10px] uppercase whitespace-nowrap">Carlos Rodriguez</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">310 455 2211</TableCell>
-                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase font-semibold">Tractomula</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">Materia Prima</TableCell>
-                                  
-                                  {/* Logística */}
-                                  <TableCell className="px-4 text-slate-700 text-[10px] font-bold uppercase">Carga Segura</TableCell>
-                                  <TableCell className="px-4">
-                                    <span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[10px] uppercase">REM-552{i}</span>
-                                  </TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">ORD-112</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">IMP-223</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[9px] italic max-w-[100px] truncate">Llegada sin novedad...</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">NIT 800.221</TableCell>
-                                  <TableCell className="px-4 text-center font-bold text-slate-700">24</TableCell>
-                                  
-                                  {/* Tiempos */}
-                                  <TableCell className="px-4 text-slate-500 text-[10px] italic">14:45:00</TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px] text-orange-600 font-bold">01:20:00</TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px] text-slate-400">02:00:00</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">16:05</TableCell>
-                                  <TableCell className="px-4 text-slate-600 text-[10px] font-medium uppercase">Admin_Jpm</TableCell>
-                                  
-                                  {/* KPIs */}
-                                  <TableCell className="px-4 text-center">
-                                    {i % 2 === 0 ? <Check className="w-4 h-4 text-emerald-500 mx-auto" /> : <XCircle className="w-4 h-4 text-rose-500 mx-auto" />}
-                                  </TableCell>
-                                  <TableCell className="px-4">
-                                    <div className="w-full bg-slate-100 rounded-full h-1.5 min-w-[50px]">
-                                      <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '85%' }}></div>
-                                    </div>
-                                  </TableCell>
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    <TableHead className="w-12 text-center">
+                                      <input type="checkbox" className="rounded border-white/20 bg-transparent" />
+                                    </TableHead>
+                                    {[
+                                      "Unidad Negocio", "Proveedor", "Fecha", "Hora", "Tipo Cita", 
+                                      "ID Cita", "Estado", "Cédula", "Orden Compra", "No. Recibo", 
+                                      "Recibo", "Muelle", "Conductor", "Teléfono", "Vehículo", 
+                                      "Categorización", "Transportadora", "ID Contenedor", "No. Orden", 
+                                      "No. Importación", "OBS", "ID Proveedor", "No. Pallets", 
+                                      "Entrada UN", "T. Transcurrido", "T. Est. Descargue", "Salida", 
+                                      "Usuario", "A Tiempo", "Descargue %", "Acciones"
+                                    ].map((h) => (
+                                      <TableHead key={h} className="text-white/90 font-bold text-[9px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
+                                        {h}
+                                      </TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {[...Array(10)].map((_, i) => (
+                                    <TableRow key={i} className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14">
+                                      <TableCell className="text-center">
+                                        <input type="checkbox" className="rounded border-slate-200" />
+                                      </TableCell>
+                                      
+                                      {/* Datos básicos */}
+                                      <TableCell className="px-4 font-bold text-slate-700 text-[10px] whitespace-nowrap">Planta Bello</TableCell>
+                                      <TableCell className="px-4 font-black text-[#1C1E59] text-[10px] uppercase whitespace-nowrap">Logística Integral S.A.</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">26/01/2026</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap font-medium">14:30</TableCell>
+                                      <TableCell className="px-4 font-bold text-blue-600 text-[9px] uppercase">Descargue</TableCell>
+                                      <TableCell className="px-4 font-black text-[#1C1E59] text-[11px] tracking-tighter">DOC-992{i}</TableCell>
+                                      <TableCell className="px-4"><StatusBadge status="en_proceso" /></TableCell>
+                                      
+                                      {/* Datos de Identificación y Documentos */}
+                                      <TableCell className="px-4 text-slate-500 text-[10px] font-mono">1.033.455.{i}</TableCell>
+                                      <TableCell className="px-4"><Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[9px]">OC-7721</Badge></TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-[10px]">#99821</TableCell>
+                                      <TableCell className="px-4 text-slate-400 text-[10px]">REC-001</TableCell>
+                                      <TableCell className="px-4 font-bold text-slate-700 text-[10px]">Muelle 04</TableCell>
+                                      
+                                      {/* Conductor y Vehículo */}
+                                      <TableCell className="px-4 font-medium text-slate-700 text-[10px] uppercase whitespace-nowrap">Carlos Rodriguez</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px]">310 455 2211</TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-[10px] uppercase font-semibold">Tractomula</TableCell>
+                                      <TableCell className="px-4 text-slate-400 text-[10px]">Materia Prima</TableCell>
+                                      
+                                      {/* Logística */}
+                                      <TableCell className="px-4 text-slate-700 text-[10px] font-bold uppercase">Carga Segura</TableCell>
+                                      <TableCell className="px-4">
+                                        <span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[10px] uppercase">REM-552{i}</span>
+                                      </TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px]">ORD-112</TableCell>
+                                      <TableCell className="px-4 text-slate-400 text-[10px]">IMP-223</TableCell>
+                                      <TableCell className="px-4 text-slate-400 text-[9px] italic max-w-[100px] truncate">Llegada sin novedad...</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px]">NIT 800.221</TableCell>
+                                      <TableCell className="px-4 text-center font-bold text-slate-700">24</TableCell>
+                                      
+                                      {/* Tiempos */}
+                                      <TableCell className="px-4 text-slate-500 text-[10px] italic">14:45:00</TableCell>
+                                      <TableCell className="px-4 font-mono text-[10px] text-orange-600 font-bold">01:20:00</TableCell>
+                                      <TableCell className="px-4 font-mono text-[10px] text-slate-400">02:00:00</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-[10px]">16:05</TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-[10px] font-medium uppercase">Admin_Jpm</TableCell>
+                                      
+                                      {/* KPIs */}
+                                      <TableCell className="px-4 text-center">
+                                        {i % 2 === 0 ? <Check className="w-4 h-4 text-emerald-500 mx-auto" /> : <XCircle className="w-4 h-4 text-rose-500 mx-auto" />}
+                                      </TableCell>
+                                      <TableCell className="px-4">
+                                        <div className="w-full bg-slate-100 rounded-full h-1.5 min-w-[50px]">
+                                          <div className="bg-blue-500 h-1.5 rounded-full" style={{ width: '85%' }}></div>
+                                        </div>
+                                      </TableCell>
 
-                                  {/* COLUMNA ACCIONES: BOTÓN EDITAR SOLICITADO */}
-                                  <TableCell className="px-4 text-right">
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="h-8 px-4 bg-white border-slate-200 text-[#1C1E59] font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 flex items-center gap-2"
-                                    >
-                                      <FileText className="w-3.5 h-3.5" />
-                                      Editar
-                                    </Button>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      </div>
+                                      {/* COLUMNA ACCIONES */}
+                                      <TableCell className="px-4 text-right">
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="h-8 px-4 bg-white border-slate-200 text-[#1C1E59] font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 flex items-center gap-2"
+                                        >
+                                          <FileText className="w-3.5 h-3.5" />
+                                          Editar
+                                        </Button>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
-                      </TabsContent>
+                  </TabsContent>
 
-                      {/* --- CONTENIDO: GESTIÓN DE CITAS --- */}
-<TabsContent value="gestion" className="h-full m-0 flex flex-col">
-  
-  {/* 1. TABLA DE SOLICITUDES (Pestaña "Solicitud") */}
-{/* 1. TABLA DE SOLICITUDES (Pestaña "Solicitud") */}
-{gestionView === "solicitudes" && (
-  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-    <div className="flex-1 overflow-auto custom-scrollbar">
-      <Table>
-        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-          <TableRow className="border-none hover:bg-transparent">
-            <TableHead className="w-12 text-center">
-              <input type="checkbox" className="rounded border-white/20 bg-transparent" />
-            </TableHead>
-            {[
-              "ID Solicitud", "Transportadora", "Fecha Sugerida", 
-              "Ventana Horaria", "Tipo de Carga", "Cant. Pallets", 
-              "Estado", "Acciones"
-            ].map((h) => (
-              <TableHead key={h} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
-                {h}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
+                  {/* --- CONTENIDO: GESTIÓN DE CITAS --- */}
+                  <TabsContent value="gestion" className="h-full m-0 flex flex-col">
+                    {!locationId ? (
+                        <SelectLocationState />
+                    ) : (
+                      <>
+                        {/* 1. TABLA DE SOLICITUDES */}
+                        {gestionView === "solicitudes" && (
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    <TableHead className="w-12 text-center">
+                                      <input type="checkbox" className="rounded border-white/20 bg-transparent" />
+                                    </TableHead>
+                                    {[
+                                      "ID Solicitud", "Transportadora", "Fecha Sugerida", 
+                                      "Ventana Horaria", "Tipo de Carga", "Cant. Pallets", 
+                                      "Estado", "Acciones"
+                                    ].map((h) => (
+                                      <TableHead key={h} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
+                                        {h}
+                                      </TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
 
-        <TableBody>
-          {solicitudes.map((apt) => (
-            <TableRow 
-              key={apt.id} 
-              className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14"
-            >
-              <TableCell className="text-center">
-                <input type="checkbox" className="rounded border-slate-200" />
-              </TableCell>
+                                <TableBody>
+                                  {solicitudes.map((apt) => (
+                                    <TableRow 
+                                      key={apt.id} 
+                                      className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14"
+                                    >
+                                      <TableCell className="text-center">
+                                        <input type="checkbox" className="rounded border-slate-200" />
+                                      </TableCell>
+                                      <TableCell className="px-4"><span className="font-black text-[#1C1E59] text-sm italic tracking-tighter">{apt.id}</span></TableCell>
+                                      <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase">{apt.carrier}</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs">{apt.date}</TableCell>
+                                      <TableCell className="px-4"><Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold text-[10px]">08:00 - 10:00</Badge></TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase">{apt.loadType}</TableCell>
+                                      <TableCell className="px-4 text-center font-mono font-bold text-blue-600">24</TableCell>
+                                      <TableCell className="px-4"><StatusBadge status={apt.status} /></TableCell>
+                                      <TableCell className="px-4 text-right">
+                                        <div className="flex justify-end gap-2">
+                                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 rounded-xl" onClick={() => setRequestModalAppointment(apt)}><CheckSquare className="w-4 h-4" /></Button>
+                                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 rounded-xl" onClick={() => setItemAEliminar(apt)}><XCircle className="w-4 h-4" /></Button>
+                                        </div>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                  {solicitudes.length === 0 && (
+                                    <TableRow><TableCell colSpan={9} className="h-32 text-center text-slate-400 italic">No hay solicitudes pendientes.</TableCell></TableRow>
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
 
-              {/* ID Solicitud */}
-              <TableCell className="px-4">
-                <span className="font-black text-[#1C1E59] text-sm italic tracking-tighter">
-                  {apt.id}
-                </span>
-              </TableCell>
+                        {/* 2. TABLA DE CONFIRMACIÓN */}
+                        {gestionView === "programadas" && (
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    {["Acciones", "ID Cita", "Estado", "Tipo de Producto", "Orden de Compra", "Fecha Cita", "Hora Cita", "Proveedor", "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"].map((header) => (
+                                      <TableHead key={header} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center">{header}</TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {[...Array(10)].map((_, i) => (
+                                    <TableRow key={i} className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14">
+                                      <TableCell className="text-center px-4"><Button size="sm" className="bg-[#378424] hover:bg-[#327D20] text-white font-black text-[10px] uppercase rounded-xl h-8 px-4 flex items-center gap-1.5 mx-auto"><Check className="w-3.5 h-3.5" /></Button></TableCell>
+                                      <TableCell className="px-4 text-center"><span className="font-black text-[#1C1E59] text-sm tracking-tighter italic">APT-772{i}</span></TableCell>
+                                      <TableCell className="px-4 text-center"><StatusBadge status="confirmado" /></TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase text-center">Materia Prima</TableCell>
+                                      <TableCell className="px-4 text-center"><Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px]">OC-99234</Badge></TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">26/01/2026</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-1.5 text-slate-500 font-medium text-xs italic"><Clock className="w-3.5 h-3.5 text-slate-300" /> 10:30 AM</div></TableCell>
+                                      <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase text-center">Proveedor Global</TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-xs font-semibold uppercase text-center">Transportes Atlas</TableCell>
+                                      <TableCell className="px-4 text-slate-700 text-[11px] font-medium uppercase text-center">Ricardo M.</TableCell>
+                                      <TableCell className="px-4 text-center"><span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[11px] uppercase">JVW-00{i}</span></TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">Sencillo</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-2 text-slate-500 text-[10px] font-bold"><div className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> Bodega A</div></TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
 
-              {/* Transportadora */}
-              <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase">
-                {apt.carrier}
-              </TableCell>
+                        {/* 3. TABLA DE CANCELACIÓN */}
+                        {gestionView === "cancelacion" && (
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    {["Acciones", "ID Cita", "Estado", "Tipo de Producto", "Orden de Compra", "Fecha Cita", "Hora Cita", "Proveedor", "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"].map((header) => (
+                                      <TableHead key={header} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center">{header}</TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {[...Array(10)].map((_, i) => (
+                                    <TableRow key={i} className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14">
+                                      <TableCell className="text-center px-4"><Button size="sm" className="bg-[#EC2C2C] hover:bg-[#B11C1C] text-white font-black text-[10px] uppercase rounded-xl h-8 px-4 flex items-center gap-1.5 mx-auto"><XCircle className="w-3.5 h-3.5" /></Button></TableCell>
+                                      <TableCell className="px-4 text-center"><span className="font-black text-[#1C1E59] text-sm tracking-tighter italic">APT-772{i}</span></TableCell>
+                                      <TableCell className="px-4 text-center"><StatusBadge status="confirmado" /></TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase text-center">Materia Prima</TableCell>
+                                      <TableCell className="px-4 text-center"><Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px]">OC-99234</Badge></TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">26/01/2026</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-1.5 text-slate-500 font-medium text-xs italic"><Clock className="w-3.5 h-3.5 text-slate-300" /> 10:30 AM</div></TableCell>
+                                      <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase text-center">Proveedor Global</TableCell>
+                                      <TableCell className="px-4 text-slate-600 text-xs font-semibold uppercase text-center">Transportes Atlas</TableCell>
+                                      <TableCell className="px-4 text-slate-700 text-[11px] font-medium uppercase text-center">Ricardo M.</TableCell>
+                                      <TableCell className="px-4 text-center"><span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[11px] uppercase">JVW-00{i}</span></TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">Sencillo</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-2 text-slate-500 text-[10px] font-bold"><div className="w-1.5 h-1.5 rounded-full bg-indigo-400" /> Bodega A</div></TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
 
-              {/* Fecha Sugerida */}
-              <TableCell className="px-4 text-slate-500 text-xs">
-                {apt.date}
-              </TableCell>
+                        {/* 4. TABLA DE REAGENDAMIENTO */}
+                        {gestionView === "reagendamiento" && (
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    {["Acciones", "Solicitud", "ID Cita", "Fecha Original", "Hora Original", "Estado", "Gestión", "Proveedor", "Tipo Producto", "Orden Compra", "Cant. Unidades", "Nueva Fecha", "Nueva Hora", "Motivo"].map((header) => (
+                                      <TableHead key={header} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center">{header}</TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {[...Array(10)].map((_, i) => (
+                                    <TableRow key={i} className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14">
+                                      <TableCell className="text-center px-4"><Button size="sm" className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase rounded-xl h-8 px-4 flex items-center gap-1.5 mx-auto"><History className="w-3.5 h-3.5" /> Reagendar</Button></TableCell>
+                                      <TableCell className="px-4 text-center font-bold text-slate-400 text-[11px]">#RS-992{i}</TableCell>
+                                      <TableCell className="px-4 text-center"><span className="font-black text-[#1C1E59] text-sm tracking-tighter">APT-445{i}</span></TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">20/01/2026</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs italic"><Clock className="w-3 h-3" /> 08:00 AM</div></TableCell>
+                                      <TableCell className="px-4 text-center"><StatusBadge status="retrasado" /></TableCell>
+                                      <TableCell className="px-4 text-center text-slate-600 text-[11px] font-semibold uppercase">Manual</TableCell>
+                                      <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase tracking-tight text-center">Bayer Industrial</TableCell>
+                                      <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">Insumos</TableCell>
+                                      <TableCell className="px-4 text-center"><Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px]">OC-11223</Badge></TableCell>
+                                      <TableCell className="px-4 text-center font-mono font-bold text-blue-600">1,250</TableCell>
+                                      <TableCell className="px-4 text-[#1C1E59] text-xs text-center font-black italic">26/01/2026</TableCell>
+                                      <TableCell className="px-4 text-center"><div className="flex items-center justify-center gap-1.5 text-[#1C1E59] font-black text-xs italic bg-blue-50 py-1 rounded-lg border border-blue-100">14:00 PM</div></TableCell>
+                                      <TableCell className="px-4 text-left min-w-[200px]"><div className="flex items-start gap-2 text-slate-500 text-[10px] italic leading-tight"><AlertTriangle className="w-3 h-3 text-orange-400 shrink-0 mt-0.5" /> Reprogramación por retraso.</div></TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
 
-              {/* Ventana Horaria */}
-              <TableCell className="px-4">
-                <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold text-[10px]">
-                  08:00 - 10:00
-                </Badge>
-              </TableCell>
-
-              {/* Tipo de Carga */}
-              <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase">
-                {apt.loadType}
-              </TableCell>
-
-              {/* Cant. Pallets (Dato mock o de apt si lo tienes) */}
-              <TableCell className="px-4 text-center font-mono font-bold text-blue-600">
-                24
-              </TableCell>
-
-              {/* Estado */}
-              <TableCell className="px-4">
-                 <StatusBadge status={apt.status} />
-              </TableCell>
-
-              {/* ACCIONES */}
-              <TableCell className="px-4 text-right">
-                <div className="flex justify-end gap-2">
-                  {/* BOTÓN APROBAR: Abre el flujo de solicitud de cita */}
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 hover:text-green-700 border border-transparent hover:border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
-                    title="Aprobar Solicitud"
-                    onClick={() => setRequestModalAppointment(apt)}
-                  >
-                    <CheckSquare className="w-4 h-4" />
-                  </Button>
-                  
-                  {/* BOTÓN ELIMINAR: Abre el modal de confirmación */}
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
-                    title="Rechazar Solicitud"
-                    onClick={() => setItemAEliminar(apt)}
-                  >
-                    <XCircle className="w-4 h-4" />
-                  </Button>
+                        {/* 5. TABLA DE RECURRENCIA */}
+                        {gestionView === "recurrencia" && (
+                          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl overflow-hidden mx-1 mb-1">
+                            <div className="flex-1 overflow-auto custom-scrollbar">
+                              <Table>
+                                <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                                  <TableRow className="border-none hover:bg-transparent">
+                                    {["Unidad de negocio", "Proveedor", "Carrier", "Dirección", "Hora de la cita", "Tiempo de inicio", "Fin de la cita", "Editar", "Eliminar", "Reporte"].map((header) => (
+                                      <TableHead key={header} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center">{header}</TableHead>
+                                    ))}
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {[...Array(8)].map((_, i) => (
+                                    <TableRow key={i} className="group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none h-14">
+                                      <TableCell className="px-4 text-center"><span className="font-bold text-slate-700 text-xs uppercase">Planta Bello</span></TableCell>
+                                      <TableCell className="px-4 text-center"><span className="font-black text-[#1C1E59] text-[11px] uppercase tracking-tight">Colgate</span></TableCell>
+                                      <TableCell className="px-4 text-center text-slate-600 text-[11px] font-semibold uppercase">Servientrega</TableCell>
+                                      <TableCell className="px-4 text-center max-w-[150px] truncate"><div className="flex items-center justify-center gap-1 text-slate-400 text-[10px] italic"><MapPin className="w-3 h-3 shrink-0" /> Calle 45</div></TableCell>
+                                      <TableCell className="px-4 text-center"><div className="inline-flex items-center gap-1.5 text-[#1C1E59] font-bold text-xs bg-slate-100 px-2 py-1 rounded-lg"><Clock className="w-3.5 h-3.5" /> 07:00 AM</div></TableCell>
+                                      <TableCell className="px-4 text-center text-slate-500 text-xs font-medium italic">06:45 AM</TableCell>
+                                      <TableCell className="px-4 text-center text-slate-500 text-xs font-medium italic">08:30 AM</TableCell>
+                                      <TableCell className="px-4 text-center"><Button size="sm" className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase rounded-xl h-8 px-4 flex items-center gap-1.5 mx-auto"><FileText className="w-3.5 h-3.5" /></Button></TableCell>
+                                      <TableCell className="px-4 text-center"><Button variant="outline" size="icon" className="h-8 w-8 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-50"><Trash2 className="w-4 h-4" /></Button></TableCell>
+                                      <TableCell className="px-4 text-center"><Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl text-slate-400 hover:text-[#1C1E59] hover:bg-slate-100"><BarChart3 className="w-4 h-4" /></Button></TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </TabsContent>
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-          
-          {/* Mensaje si no hay datos en el estado */}
-          {solicitudes.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={9} className="h-32 text-center text-slate-400 italic">
-                No hay solicitudes pendientes.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  </div>
-)}
-
-
-{/* 2. TABLA DE CONFIRMACIÓN (Pestaña "Confirmación") */}
-{gestionView === "programadas" && (
-  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-    <div className="flex-1 overflow-auto custom-scrollbar">
-      <Table>
-        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-          <TableRow className="border-none hover:bg-transparent">
-            {[
-              "Acciones", "ID Cita", "Estado", "Tipo de Producto", 
-              "Orden de Compra", "Fecha Cita", "Hora Cita", "Proveedor", 
-              "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"
-            ].map((header) => (
-              <TableHead 
-                key={header} 
-                className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center"
-              >
-                {header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[...Array(10)].map((_, i) => (
-            <TableRow 
-              key={i} 
-              className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14"
-            >
-              {/* ACCIONES - BOTÓN CONFIRMAR ESTILIZADO */}
-              <TableCell className="text-center px-4">
-                <Button 
-                  size="sm" 
-                  className="bg-[#378424] hover:bg-[#327D20] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                 
-                </Button>
-              </TableCell>
-
-              {/* ID CITA */}
-              <TableCell className="px-4 text-center">
-                <span className="font-black text-[#1C1E59] text-sm tracking-tighter italic">APT-772{i}</span>
-              </TableCell>
-
-              {/* ESTADO */}
-              <TableCell className="px-4 text-center">
-                <StatusBadge status="confirmado" />
-              </TableCell>
-
-              {/* TIPO DE PRODUCTO */}
-              <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase text-center whitespace-nowrap">
-                Materia Prima
-              </TableCell>
-
-              {/* ORDEN DE COMPRA */}
-              <TableCell className="px-4 text-center">
-                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px] shadow-sm">
-                  OC-99234
-                </Badge>
-              </TableCell>
-
-              {/* FECHA CITA */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">
-                26/01/2026
-              </TableCell>
-
-              {/* HORA CITA */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-slate-500 font-medium text-xs italic whitespace-nowrap">
-                  <Clock className="w-3.5 h-3.5 text-slate-300" /> 10:30 AM
-                </div>
-              </TableCell>
-
-              {/* PROVEEDOR */}
-              <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase tracking-tight text-center whitespace-nowrap">
-                Proveedor Global S.A.
-              </TableCell>
-
-              {/* TRANSPORTISTA */}
-              <TableCell className="px-4 text-slate-600 text-xs font-semibold uppercase text-center whitespace-nowrap">
-                Transportes Atlas
-              </TableCell>
-
-              {/* CONDUCTOR */}
-              <TableCell className="px-4 text-slate-700 text-[11px] font-medium uppercase text-center whitespace-nowrap">
-                Ricardo Montenegro
-              </TableCell>
-
-              {/* PLACA */}
-              <TableCell className="px-4 text-center">
-                <span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[11px] uppercase shadow-sm">
-                  JVW-00{i}
-                </span>
-              </TableCell>
-
-              {/* VEHÍCULO */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">
-                Sencillo
-              </TableCell>
-
-              {/* TALLERES ENTREGA */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-2 text-slate-500 text-[10px] font-bold whitespace-nowrap">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                  Bodega Principal A
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  </div>
-)}
-
-
-{/* 2. TABLA DE CANCELACIÓN (Pestaña "Cancelación") */}
-{gestionView === "cancelacion" && (
-  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-    <div className="flex-1 overflow-auto custom-scrollbar">
-      <Table>
-        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-          <TableRow className="border-none hover:bg-transparent">
-            {[
-              "Acciones", "ID Cita", "Estado", "Tipo de Producto", 
-              "Orden de Compra", "Fecha Cita", "Hora Cita", "Proveedor", 
-              "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"
-            ].map((header) => (
-              <TableHead 
-                key={header} 
-                className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center"
-              >
-                {header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[...Array(10)].map((_, i) => (
-            <TableRow 
-              key={i} 
-              className="group hover:bg-blue-50/40 transition-colors border-b border-slate-50 last:border-none h-14"
-            >
-              {/* ACCIONES - BOTÓN CONFIRMAR ESTILIZADO */}
-              <TableCell className="text-center px-4">
-                <Button 
-                  size="sm" 
-                  className="bg-[#EC2C2C] hover:bg-[#B11C1C] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
-                >
-                  <XCircle className="w-3.5 h-3.5" />
-                 
-                </Button>
-              </TableCell>
-
-              {/* ID CITA */}
-              <TableCell className="px-4 text-center">
-                <span className="font-black text-[#1C1E59] text-sm tracking-tighter italic">APT-772{i}</span>
-              </TableCell>
-
-              {/* ESTADO */}
-              <TableCell className="px-4 text-center">
-                <StatusBadge status="confirmado" />
-              </TableCell>
-
-              {/* TIPO DE PRODUCTO */}
-              <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase text-center whitespace-nowrap">
-                Materia Prima
-              </TableCell>
-
-              {/* ORDEN DE COMPRA */}
-              <TableCell className="px-4 text-center">
-                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px] shadow-sm">
-                  OC-99234
-                </Badge>
-              </TableCell>
-
-              {/* FECHA CITA */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">
-                26/01/2026
-              </TableCell>
-
-              {/* HORA CITA */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-slate-500 font-medium text-xs italic whitespace-nowrap">
-                  <Clock className="w-3.5 h-3.5 text-slate-300" /> 10:30 AM
-                </div>
-              </TableCell>
-
-              {/* PROVEEDOR */}
-              <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase tracking-tight text-center whitespace-nowrap">
-                Proveedor Global S.A.
-              </TableCell>
-
-              {/* TRANSPORTISTA */}
-              <TableCell className="px-4 text-slate-600 text-xs font-semibold uppercase text-center whitespace-nowrap">
-                Transportes Atlas
-              </TableCell>
-
-              {/* CONDUCTOR */}
-              <TableCell className="px-4 text-slate-700 text-[11px] font-medium uppercase text-center whitespace-nowrap">
-                Ricardo Montenegro
-              </TableCell>
-
-              {/* PLACA */}
-              <TableCell className="px-4 text-center">
-                <span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[11px] uppercase shadow-sm">
-                  JVW-00{i}
-                </span>
-              </TableCell>
-
-              {/* VEHÍCULO */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">
-                Sencillo
-              </TableCell>
-
-              {/* TALLERES ENTREGA */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-2 text-slate-500 text-[10px] font-bold whitespace-nowrap">
-                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                  Bodega Principal A
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  </div>
-)}
-
-
-{/* 4. TABLA DE REAGENDAMIENTO (Pestaña "Reagendar") */}
-{gestionView === "reagendamiento" && (
-  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-    <div className="flex-1 overflow-auto custom-scrollbar">
-      <Table>
-        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-          <TableRow className="border-none hover:bg-transparent">
-            {[
-              "Acciones",         // field: 'actions'
-              "Solicitud",        // field: 'reschedule' (label a)
-              "ID Cita",          // field: 'appointment' (label b)
-              "Fecha Original",   // field: 'appointment_date' (label c)
-              "Hora Original",    // field: 'appointment_time' (label d)
-              "Estado",           // field: 'request_status' (label e)
-              "Gestión",          // field: 'management' (label f)
-              "Proveedor",        // field: 'supplier' (label g)
-              "Tipo Producto",    // field: 'product_type' (label h)
-              "Orden Compra",     // field: 'purchase_order' (label i)
-              "Cant. Unidades",   // field: 'quantity_of_units' (label j)
-              "Nueva Fecha",      // field: 'rescheduled_date' (label k)
-              "Nueva Hora",       // field: 'assigned_time' (label l)
-              "Motivo"            // field: 'Reason_rescheduling' (label m)
-            ].map((header) => (
-              <TableHead 
-                key={header} 
-                className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center"
-              >
-                {header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[...Array(10)].map((_, i) => (
-            <TableRow 
-              key={i} 
-              className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14"
-            >
-              {/* ACCIONES - BOTÓN REAGENDAR ESTILIZADO */}
-              <TableCell className="text-center px-4">
-                <Button 
-                  size="sm" 
-                  className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
-                >
-                  <History className="w-3.5 h-3.5" />
-                  Reagendar
-                </Button>
-              </TableCell>
-
-              {/* LABEL A: Solicitud */}
-              <TableCell className="px-4 text-center font-bold text-slate-400 text-[11px]">
-                #RS-992{i}
-              </TableCell>
-
-              {/* LABEL B: ID Cita */}
-              <TableCell className="px-4 text-center">
-                <span className="font-black text-[#1C1E59] text-sm tracking-tighter">APT-445{i}</span>
-              </TableCell>
-
-              {/* LABEL C: Fecha Cita */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center font-medium">
-                20/01/2026
-              </TableCell>
-
-              {/* LABEL D: Hora Cita */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-slate-400 text-xs italic">
-                  <Clock className="w-3 h-3" /> 08:00 AM
-                </div>
-              </TableCell>
-
-              {/* LABEL E: Estado */}
-              <TableCell className="px-4 text-center">
-                <StatusBadge status="retrasado" />
-              </TableCell>
-
-              {/* LABEL F: Gestión */}
-              <TableCell className="px-4 text-center text-slate-600 text-[11px] font-semibold uppercase">
-                Manual
-              </TableCell>
-
-              {/* LABEL G: Proveedor */}
-              <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase tracking-tight text-center whitespace-nowrap">
-                Bayer Industrial
-              </TableCell>
-
-              {/* LABEL H: Tipo Producto */}
-              <TableCell className="px-4 text-slate-500 text-xs text-center uppercase font-medium">
-                Insumos
-              </TableCell>
-
-              {/* LABEL I: Orden Compra */}
-              <TableCell className="px-4 text-center">
-                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-bold text-[10px]">
-                  OC-11223
-                </Badge>
-              </TableCell>
-
-              {/* LABEL J: Cant. Unidades */}
-              <TableCell className="px-4 text-center font-mono font-bold text-blue-600">
-                1,250
-              </TableCell>
-
-              {/* LABEL K: Fecha Reagendada */}
-              <TableCell className="px-4 text-[#1C1E59] text-xs text-center font-black italic">
-                26/01/2026
-              </TableCell>
-
-              {/* LABEL L: Hora Asignada */}
-              <TableCell className="px-4 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-[#1C1E59] font-black text-xs italic bg-blue-50 py-1 rounded-lg border border-blue-100">
-                  14:00 PM
-                </div>
-              </TableCell>
-
-              {/* LABEL M: Motivo Reagendamiento */}
-              <TableCell className="px-4 text-left min-w-[200px]">
-                <div className="flex items-start gap-2 text-slate-500 text-[10px] italic leading-tight">
-                  <AlertTriangle className="w-3 h-3 text-orange-400 shrink-0 mt-0.5" />
-                  Reprogramación por retraso en puerto de salida.
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  </div>
-)}
- {/* 5. TABLA DE RECURRENCIA (Pestaña "Recurrencia") */}
-{gestionView === "recurrencia" && (
-  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-    <div className="flex-1 overflow-auto custom-scrollbar">
-      <Table>
-        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-          <TableRow className="border-none hover:bg-transparent">
-            {[
-              "Unidad de negocio", "Proveedor", "Carrier", "Dirección", 
-              "Hora de la cita", "Tiempo de inicio", "Fin de la cita", 
-              "Editar", "Eliminar", "Reporte"
-            ].map((header) => (
-              <TableHead 
-                key={header} 
-                className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center"
-              >
-                {header}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[...Array(8)].map((_, i) => (
-            <TableRow 
-              key={i} 
-              className="group hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-none h-14"
-            >
-              {/* UNIDAD DE NEGOCIO */}
-              <TableCell className="px-4 text-center">
-                <span className="font-bold text-slate-700 text-xs uppercase">Planta Bello 1405</span>
-              </TableCell>
-
-              {/* PROVEEDOR */}
-              <TableCell className="px-4 text-center">
-                <span className="font-black text-[#1C1E59] text-[11px] uppercase tracking-tight">Colgate-Palmolive</span>
-              </TableCell>
-
-              {/* CARRIER */}
-              <TableCell className="px-4 text-center text-slate-600 text-[11px] font-semibold uppercase">
-                Servientrega S.A.
-              </TableCell>
-
-              {/* DIRECCIÓN */}
-              <TableCell className="px-4 text-center max-w-[150px] truncate">
-                <div className="flex items-center justify-center gap-1 text-slate-400 text-[10px] italic">
-                  <MapPin className="w-3 h-3 shrink-0" />
-                  Calle 45 #12-80, Bello
-                </div>
-              </TableCell>
-
-              {/* HORA DE LA CITA */}
-              <TableCell className="px-4 text-center">
-                <div className="inline-flex items-center gap-1.5 text-[#1C1E59] font-bold text-xs bg-slate-100 px-2 py-1 rounded-lg">
-                  <Clock className="w-3.5 h-3.5" /> 07:00 AM
-                </div>
-              </TableCell>
-
-              {/* TIEMPO DE INICIO */}
-              <TableCell className="px-4 text-center text-slate-500 text-xs font-medium italic">
-                06:45 AM
-              </TableCell>
-
-              {/* FIN DE LA CITA */}
-              <TableCell className="px-4 text-center text-slate-500 text-xs font-medium italic">
-                08:30 AM
-              </TableCell>
-
-              {/* ACCIÓN: EDITAR (Botón con Box Shadow) */}
-              <TableCell className="px-4 text-center">
-                <Button 
-                  size="sm" 
-                  className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase rounded-xl shadow-md shadow-orange-200 hover:shadow-lg transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                 
-                </Button>
-              </TableCell>
-
-              {/* ACCIÓN: ELIMINAR */}
-              <TableCell className="px-4 text-center">
-                <Button 
-                  variant="outline"
-                  size="icon" 
-                  className="h-8 w-8 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-all"
-                  title="Eliminar Recurrencia"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </TableCell>
-
-              {/* ACCIÓN: REPORTE */}
-              <TableCell className="px-4 text-center">
-                <Button 
-                  variant="ghost"
-                  size="icon" 
-                  className="h-8 w-8 rounded-xl text-slate-400 hover:text-[#1C1E59] hover:bg-slate-100 transition-all"
-                  title="Ver Reporte de Patrón"
-                >
-                  <BarChart3 className="w-4 h-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  </div>
-)}
-  
-  
-</TabsContent>
-              </div>
-                <TablePagination total={45} />
+                
+                {/* PAGINACIÓN - Solo visible si hay localidad */}
+                {locationId && <TablePagination total={45} />}
             </div>
 
        {requestModalAppointment && (
@@ -1388,13 +1017,11 @@ export function TablesSection({ locationId }: TablesSectionProps) {
           appointment={createModalAppointment} 
           onClose={() => setCreateModalAppointment(null)} 
           onConfirm={() => { 
-            // Aquí iría la lógica para actualizar la tabla o base de datos
             setCreateModalAppointment(null); 
             alert("Cita creada con éxito desde la gestión de solicitudes");
           }} 
         />
       )}
-
 
       <DeleteConfirmDialog 
         isOpen={!!itemAEliminar} 

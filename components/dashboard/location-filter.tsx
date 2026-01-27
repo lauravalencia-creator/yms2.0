@@ -1091,10 +1091,10 @@ const locationsData: Location[] = [
     name: "Centro de Distribucion Norte",
     address: "Av. Industrial 1250, CDMX",
     dockGroups: [
-      { id: "dg-1a", name: "Muelles Recepcion A", dockCount: 4, type: "inbound" },
-      { id: "dg-1b", name: "Muelles Recepcion B", dockCount: 4, type: "inbound" },
-      { id: "dg-1c", name: "Muelles Despacho", dockCount: 6, type: "outbound" },
-      { id: "dg-1d", name: "Muelles Mixtos", dockCount: 2, type: "mixed" },
+      { id: "dg-1a", name: "Muelle A", dockCount: 4, type: "inbound" },
+      { id: "dg-1b", name: "Muelle B", dockCount: 4, type: "inbound" },
+      { id: "dg-1c", name: "Muelle Despacho", dockCount: 6, type: "outbound" },
+      { id: "dg-1d", name: "Muelle Mixto", dockCount: 2, type: "mixed" },
     ],
   },
   {
@@ -1411,15 +1411,15 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
             <div className="w-px h-8 bg-yms-border" />
             <div className="flex items-center gap-2 text-yms-gray">
               <LayersIcon className="w-5 h-5 text-yms-cyan" />
-              <span className="font-medium text-sm">Grupo:</span>
+              <span className="font-medium text-sm">Muelle:</span>
             </div>
             <Select value={selectedDockGroupId || ""} onValueChange={handleDockGroupChange}>
               <SelectTrigger className={cn("w-[280px] rounded-[1.25rem] border-yms-border bg-white focus:ring-2 focus:ring-yms-cyan focus:border-yms-cyan hover:border-yms-cyan/50 transition-colors", !selectedDockGroupId && "text-yms-gray")}>
-                <SelectValue placeholder="Todos los grupos..." />
+                <SelectValue placeholder="Todos los Muelles..." />
               </SelectTrigger>
               <SelectContent className="rounded-[1rem] border-yms-border">
                 <SelectItem value="all" className="rounded-[0.75rem] cursor-pointer focus:bg-yms-cyan/10">
-                  <div className="flex items-center gap-2"><LayersIcon className="w-4 h-4 text-yms-primary" /><span className="font-medium">Todos los grupos</span></div>
+                  <div className="flex items-center gap-2"><LayersIcon className="w-4 h-4 text-yms-primary" /><span className="font-medium">Todos los muelles</span></div>
                 </SelectItem>
                 {selectedLocation?.dockGroups.map((group) => (
                   <SelectItem key={group.id} value={group.id} className="rounded-[0.75rem] cursor-pointer focus:bg-yms-cyan/10">
