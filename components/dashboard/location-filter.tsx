@@ -22,8 +22,10 @@ import { cn } from "@/lib/utils";
 import { 
   Search, BarChart3, ClipboardList, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
-  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle, Info
+  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle, Check, Package, X, QrCode, ArrowRight, ArrowLeft,
 } from 'lucide-react';
+
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 import { 
   Popover,
@@ -82,6 +84,16 @@ function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+  const REGISTRO_OPCIONES = [
+  { id: "entrada", label: "Registro de entrada", icon: ArrowRight },
+  { id: "salida", label: "Registro de salida", icon: ArrowLeft },
+  { id: "ini-descargue", label: "Inicio de Descargue", icon: Package },
+  { id: "fin-descargue", label: "Fin de Descargue", icon: Check },
+  { id: "ini-cargue", label: "Inicio de Cargue", icon: Package },
+  { id: "fin-cargue", label: "Fin de Cargue", icon: Check },
+];
+
 
 // --- UTILS UI ---
 const FilterLabel = ({ children }: { children: React.ReactNode }) => (
@@ -695,6 +707,92 @@ interface LocationFilterProps {
   onFilterChange: (locationId: string | null, dockGroupId: string | null) => void;
 }
 
+function RegistrosModalContent({ registroId }: { registroId: string }) {
+  const opcion = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
+  const [codigo, setCodigo] = useState("");
+  const esValido = codigo.trim().length > 3;
+
+  return (
+    <div className="flex flex-col h-full w-full bg-[#FDFDFD] overflow-hidden">
+      {/* HEADER NAVY */}
+      <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+        <div className="flex items-center gap-3">
+          <Package className="text-white" size={20} />
+          <h2 className="text-sm font-bold text-white uppercase tracking-tight">
+            Gestión de Registros
+          </h2>
+        </div>
+        <DialogPrimitive.Close className="text-white/40 hover:text-white transition-colors outline-none p-1.5 hover:bg-white/10 rounded-full">
+          <X size={20} />
+        </DialogPrimitive.Close>
+      </div>
+
+      {/* CONTENIDO CENTRAL */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4 bg-slate-50/30 overflow-y-auto">
+        <div className="w-full max-w-md flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
+          
+          <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 border border-gray-100">
+            <opcion.icon className="text-[#4CCAC8]" size={28} />
+          </div>
+
+          <h3 className="text-xl font-bold text-[#1C1E59] uppercase tracking-tight mb-6 text-center">
+            {opcion.label}
+          </h3>
+
+          {/* CARD DE FORMULARIO */}
+          <div className="bg-white p-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] w-full border border-gray-100 mb-8">
+            <div className="space-y-6">
+              <div className="space-y-3 text-center">
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
+                  Número de Cita / Código
+                </label>
+                <Input 
+                  placeholder="Ej: CITA-9982-24"
+                  value={codigo}
+                  onChange={(e) => setCodigo(e.target.value)}
+                  className="h-14 rounded-xl border-none bg-gray-50/50 text-center text-lg font-bold placeholder:text-gray-300 focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500 transition-all shadow-inner"
+                />
+              </div>
+
+              <Button 
+                disabled={!esValido}
+                className={cn(
+                  "w-full h-14 font-bold uppercase tracking-wider rounded-xl text-xs shadow-md transition-all border-none",
+                  esValido 
+                    ? "bg-[#1C1E59] text-white hover:bg-[#151744] active:scale-[0.98]" 
+                    : "bg-[#F1F5F9] text-gray-400 cursor-not-allowed"
+                )}
+              >
+                Confirmar Registro
+              </Button>
+            </div>
+          </div>
+
+          {/* SECCIÓN QR - Botón de tamaño normal y centrado */}
+          <div className="text-center w-full flex flex-col items-center space-y-4">
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              ¿Deseas agilizar el proceso?
+            </p>
+            
+            <Button 
+              className={cn(
+                "h-12 px-8 rounded-2xl bg-[#ff6b00] hover:bg-[#e66000] border-none",
+                "flex items-center justify-center gap-3 transition-all duration-300",
+                "shadow-lg shadow-orange-200 active:scale-[0.95]"
+              )}
+            >
+              <QrCode size={18} className="text-white" />
+              <span className="font-bold uppercase text-[11px] tracking-tight text-white">
+                Escanear Código QR
+              </span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedDockGroupId, setSelectedDockGroupId] = useState<string | null>(null);
@@ -704,6 +802,16 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
 
   const selectedLocation = locationsData.find((loc) => loc.id === selectedLocationId);
+
+  // ESTADOS PARA REGISTROS
+  const [selectedRegistro, setSelectedRegistro] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenRegistro = (id: string) => {
+    setSelectedRegistro(id);
+    setIsModalOpen(true);
+  };
+
 
   useEffect(() => {
     onFilterChange(selectedLocationId, selectedDockGroupId);
@@ -833,7 +941,41 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
               </DialogContent>
             </Dialog>
 
-            <button title="Registros" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><ClipboardList size={18} /></button>
+            {/* MODAL REGISTROS */}
+              <Popover>
+              <PopoverTrigger asChild>
+                <button 
+                  title="Registros" 
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
+                >
+                  <ClipboardList size={18} />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100 bg-white" align="end">
+                <div className="flex flex-col gap-1">
+                  {REGISTRO_OPCIONES.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => handleOpenRegistro(opt.id)}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-gray-600 hover:text-[#1C1E59] transition-all group"
+                    >
+                      <opt.icon size={18} className="text-gray-400 group-hover:text-[#ff6b00] transition-colors" />
+                      <span className="text-sm font-semibold tracking-tight">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* EL MODAL DE PANTALLA COMPLETA */}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogContent 
+                className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden"
+              >
+                {/* Pasamos el ID seleccionado para que el modal sepa qué texto e icono mostrar */}
+                {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
+              </DialogContent>
+            </Dialog>
 
             {/* MODAL USUARIOS */}
             <Dialog>
@@ -870,6 +1012,9 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
                     <div className="px-8 pb-8"><UploadResultsContent onClose={() => setIsResultsModalOpen(false)} /></div>
                 </DialogContent>
             </Dialog>
+
+
+
           </div>
         )}
       </div>

@@ -255,9 +255,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 
             <div className="flex items-center gap-3">
                 
-                <Button className="h-9 gap-2 bg-[#FF6B00] hover:bg-[#e65c00] text-white rounded-xl px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-200">
-                    <PlusIcon className="w-4 h-4" /> New Entry
-                </Button>
+               
                 <div className="h-6 w-px bg-slate-200 mx-1" />
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><RefreshCcw className="w-4 h-4"/></Button>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><Download className="w-4 h-4"/></Button>
