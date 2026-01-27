@@ -21,7 +21,7 @@ import {
   Minimize2,
   Monitor,
   CalendarDays,
-  PlusIcon,
+ClipboardList,
   FileText,
   CheckSquare,
   XCircle,
@@ -63,6 +63,61 @@ interface TablesSectionProps {
   dockGroupId?: string | null;
 }
 
+
+export interface Appointment {
+  id: string;
+  carrier: string;
+  truckId: string;
+  time: string;
+  type: "inbound" | "outbound";
+  status: string;
+  locationId?: string;
+  dockGroupId?: string;
+  duration?: number;
+  driver?: string;
+  city?: string;
+  department?: string;
+  locationName?: string;
+  zone?: string;
+  date?: string;
+  vehicleType?: string;
+  loadType?: string;
+  operationType?: string;
+  product?: string;
+  nit?: string;
+  quantityOrdered?: number;
+  quantityDelivered?: number;
+  appointmentIdRef?: string;
+  transportCompany?: string;
+  loadDate?: string;
+  loadTime?: string;
+  unloadDate?: string;
+  unloadTime?: string;
+  driverId?: string;
+  driverPhone?: string;
+  driverEmail?: string;
+  merchandiseCode?: string;
+  isReadyForAssignment?: boolean;
+  codigoLocalidad?: string;
+  tipoLocalidad?: string;
+  idTipoProducto?: string;
+  idProducto?: string;
+  descripcionCompany?: string;
+  estadoDocumento?: string;
+  unidadNegocio?: string;
+  canal?: string;
+  tipoOperacion?: string;
+  tipoMercancia?: string;
+  tipoCargue?: string;
+  peso?: string;
+  volumen?: string;
+  litros?: string;
+  codigoArticulo?: string;
+  cantidadPedida?: number;
+  cantidadRecibida?: number;
+  unidadMedida?: string;
+}
+
 /* ---------------- UI HELPERS ---------------- */
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
@@ -92,6 +147,182 @@ const TablePagination = ({ total }: { total: number }) => (
     </div>
   </div>
 );
+
+// 1. Modal de Solicitud (Paso 1)
+function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+           <div className="flex items-center gap-3"><div className="bg-slate-100 p-2 rounded-lg border border-slate-200"><ClipboardList className="w-6 h-6 text-[#1C1E59]" /></div><h3 className="text-lg font-bold text-[#1C1E59] uppercase tracking-tighter">SOLICITUD DE CITAS</h3></div>
+           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">x</button>
+        </div>
+        <div className="p-8 bg-gray-50/50">
+           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-[#1C1E59] uppercase">Detalles de entrega</h4></div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600 truncate">Cant. entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
+                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
+                 <div className="px-4 py-3 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50"><span className="font-semibold text-slate-600 px-4 uppercase text-[10px]">CANTIDAD POR ENTREGAR</span><span className="font-bold text-orange-600 text-right px-4">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span></div>
+              </div>
+           </div>
+        </div>
+        <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
+           <Button className="bg-[#FF6B00] hover:bg-orange-600 text-white font-bold px-8 h-12 rounded-xl shadow-lg shadow-orange-200" onClick={onContinue}>CONTINUAR</Button>
+           <button className="text-slate-400 font-bold text-sm hover:text-[#1C1E59] transition-colors" onClick={onClose}>CANCELAR</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 2. Modal de Creación (Paso 2)
+function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+           <div className="flex items-center gap-3">
+              <div className="bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <ClipboardList className="w-6 h-6 text-indigo-900" />
+              </div>
+              <h3 className="text-lg font-bold text-indigo-900">SOLICITUD DE CITAS</h3>
+           </div>
+           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+              x
+           </button>
+        </div>
+        <div className="p-8 bg-white space-y-6">
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Detalles de la cita</h4>
+              </div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Destino</span>
+                    <span className="font-medium text-slate-900">{appointment.locationName}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">ID de la cita</span>
+                    <span className="font-medium text-slate-900">{appointment.appointmentIdRef || '---'}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Transportista de la cita</span>
+                    <span className="font-medium text-slate-900">SI</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Transportista</span>
+                    <span className="font-medium text-slate-900">{appointment.transportCompany || appointment.carrier}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Tipo de carga</span>
+                    <span className="font-medium text-slate-900">{appointment.loadType}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Vehículo</span>
+                    <span className="font-medium text-slate-900">{appointment.vehicleType}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Fecha de cargue</span>
+                    <span className="font-medium text-slate-900">{appointment.loadDate}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Hora de cargue</span>
+                    <span className="font-medium text-slate-900">{appointment.loadTime}</span>
+                 </div>
+                 <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Fecha de descargue</span>
+                    <span className="font-medium text-slate-900">{appointment.unloadDate}</span>
+                 </div>
+                 <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Hora de descargue</span>
+                    <span className="font-medium text-slate-900">{appointment.unloadTime}</span>
+                 </div>
+              </div>
+           </div>
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Conductor</h4>
+              </div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Nombre del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driver}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Documento del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverId}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Teléfono del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverPhone}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Correo electrónico del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverEmail}</span>
+                 </div>
+                 <div className="px-4 py-3 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center col-span-2">
+                    <span className="font-semibold text-slate-600">Placa del vehículo</span>
+                    <span className="font-medium text-slate-900">{appointment.truckId}</span>
+                 </div>
+              </div>
+           </div>
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Comentarios</h4>
+              </div>
+              <div className="text-sm">
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600 pt-2">Escribe comentarios</span>
+                    <textarea 
+                       className="w-full border border-slate-200 rounded p-2 text-slate-600 text-sm focus:outline-none focus:border-orange-400 placeholder:text-slate-300"
+                       placeholder="Añadir observaciones aquí..."
+                       rows={2}
+                    />
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Orden de compra</span>
+                    <span className="font-medium text-slate-900">{appointment.id}</span>
+                 </div>
+                 <div className="grid grid-cols-2">
+                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Muelle sugerido</span>
+                       <span className="font-medium text-slate-900">2</span>
+                    </div>
+                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Mercancía</span>
+                       <span className="font-medium text-slate-900">{appointment.merchandiseCode}</span>
+                    </div>
+                 </div>
+                 <div className="grid grid-cols-2 border-t border-slate-100">
+                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Cantidad a entregar</span>
+                       <span className="font-medium text-slate-900">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span>
+                    </div>
+                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Tipo de mercancía</span>
+                       <span className="font-medium text-slate-900">{appointment.product || 'No Alimentos'}</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+        <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
+           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onConfirm}>
+             CREAR CITA
+           </Button>
+           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>
+             ATRÁS
+           </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function FilterModal() {
   return (
@@ -178,12 +409,91 @@ function FilterModal() {
   );
 }
 
+// 1. Datos de ejemplo iniciales (fuera o dentro del componente)
+const INITIAL_SOLICITUDES = [...Array(10)].map((_, i) => ({
+  id: `REQ-882${i}`,
+  carrier: i % 2 === 0 ? "DHL Logistics Express" : "Carga Segura S.A.",
+  truckId: `XYZ-12${i}`,
+  time: "08:00 AM",
+  type: "inbound" as const,
+  status: "pending" as const,
+  quantityOrdered: 1000,
+  quantityDelivered: 0,
+  locationName: "Planta Bello 1405",
+  loadType: "Materia Prima (Seca)",
+  product: "Insumos Industriales",
+  nit: "800.123.456-1",
+  date: "26/01/2026"
+}));
+
+function DeleteConfirmDialog({ isOpen, onClose, onConfirm }: { isOpen: boolean, onClose: () => void, onConfirm: () => void }) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[400px] p-0 overflow-hidden border-0 rounded-[2rem] shadow-2xl bg-white">
+        <div className="p-8 text-center">
+          {/* Círculo del icono en Naranja suave */}
+          <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-orange-100">
+            <AlertTriangle className="w-10 h-10 text-orange-500" />
+          </div>
+          
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black text-[#1C1E59] text-center uppercase tracking-tight">
+              ¿Estás seguro?
+            </DialogTitle>
+          </DialogHeader>
+          
+          <p className="text-slate-500 text-sm mt-3 leading-relaxed">
+            Esta acción eliminará la solicitud permanentemente. 
+            <span className="block font-bold text-orange-600 mt-1 italic text-xs">
+              Una vez eliminado, no podrá recuperarse.
+            </span>
+          </p>
+        </div>
+
+        <div className="px-8 py-6 bg-slate-50 flex flex-col gap-3">
+          {/* Botón Principal en Naranja */}
+          <Button 
+            onClick={onConfirm}
+            className="w-full h-12 bg-[#FF6B00] hover:bg-[#e65c00] text-white font-black uppercase tracking-widest rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-95 border-none"
+          >
+            SÍ, ELIMINAR SOLICITUD
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            onClick={onClose}
+            className="w-full h-12 text-slate-400 font-bold uppercase text-[11px] hover:text-slate-600 transition-colors"
+          >
+            NO, MANTENER REGISTRO
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /* ---------------- COMPONENT ---------------- */
 export function TablesSection({ locationId }: TablesSectionProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [section, setSection] = useState<"monitoreo" | "gestion">("monitoreo");
   const [monitoreoView, setMonitoreoView] = useState("appointments");
   const [gestionView, setGestionView] = useState("solicitudes");
+
+   // --- ESTADOS PARA CONTROLAR LOS MODALES ---
+  const [requestModalAppointment, setRequestModalAppointment] = useState<Appointment | null>(null);
+  const [createModalAppointment, setCreateModalAppointment] = useState<Appointment | null>(null);
+
+  // --- ESTADOS PARA GESTIONAR LOS DATOS DE LA TABLA ---
+  const [solicitudes, setSolicitudes] = useState<Appointment[]>(INITIAL_SOLICITUDES);
+  const [itemAEliminar, setItemAEliminar] = useState<Appointment | null>(null);
+
+    // Función para confirmar la eliminación
+  const confirmarEliminacion = () => {
+    if (itemAEliminar) {
+      setSolicitudes(solicitudes.filter(s => s.id !== itemAEliminar.id));
+      setItemAEliminar(null);
+    }
+  };
 
   const monitoringTabs = [
     { id: "appointments", label: "Consulta de Citas", icon: CalendarRange, count: 24 },
@@ -222,14 +532,21 @@ export function TablesSection({ locationId }: TablesSectionProps) {
         {/* --- TOOLBAR SUPERIOR --- */}
         <div className="px-5 py-3 border-b flex items-center justify-between bg-white shrink-0 gap-4">
             <div className="flex items-center gap-4">
-                <TabsList className="h-10 bg-slate-100 p-1 rounded-xl shrink-0 border border-slate-200">
-                    <TabsTrigger value="monitoreo" className="h-8 px-4 data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all">
-                        <Monitor className="w-4 h-4 mr-2" />
-                    </TabsTrigger>
-                    <TabsTrigger value="gestion" className="h-8 px-4 data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all">
-                        <CalendarDays className="w-4 h-4 mr-2" />
-                    </TabsTrigger>
-                </TabsList>
+                <TabsList className="h-10 bg-slate-100 p-1 rounded-xl shrink-0 border border-slate-200 flex items-center">
+    <TabsTrigger 
+        value="monitoreo" 
+        className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
+    >
+        <Monitor className="w-4 h-4" />
+    </TabsTrigger>
+    
+    <TabsTrigger 
+        value="gestion" 
+        className="h-8 w-10 p-0 flex items-center justify-center data-[state=active]:bg-white data-[state=active]:text-[#1C1E59] data-[state=active]:shadow-sm transition-all rounded-lg"
+    >
+        <CalendarDays className="w-4 h-4" />
+    </TabsTrigger>
+</TabsList>
 
                 <div className="h-6 w-px bg-slate-200 shrink-0" />
 
@@ -466,93 +783,119 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 <TabsContent value="gestion" className="h-full m-0 flex flex-col">
   
   {/* 1. TABLA DE SOLICITUDES (Pestaña "Solicitud") */}
-  {gestionView === "solicitudes" && (
-    <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
-      <div className="flex-1 overflow-auto custom-scrollbar">
-        <Table>
-          <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-            <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="w-12 text-center">
-                <input type="checkbox" className="rounded border-white/20 bg-transparent" />
+{/* 1. TABLA DE SOLICITUDES (Pestaña "Solicitud") */}
+{gestionView === "solicitudes" && (
+  <div className="flex-1 flex flex-col min-h-0 bg-white rounded-xl shadow-2xl shadow-slate-200/60 border border-slate-100 overflow-hidden mx-1 mb-1">
+    <div className="flex-1 overflow-auto custom-scrollbar">
+      <Table>
+        <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+          <TableRow className="border-none hover:bg-transparent">
+            <TableHead className="w-12 text-center">
+              <input type="checkbox" className="rounded border-white/20 bg-transparent" />
+            </TableHead>
+            {[
+              "ID Solicitud", "Transportadora", "Fecha Sugerida", 
+              "Ventana Horaria", "Tipo de Carga", "Cant. Pallets", 
+              "Estado", "Acciones"
+            ].map((h) => (
+              <TableHead key={h} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
+                {h}
               </TableHead>
-              {[
-                "ID Solicitud", "Transportadora", "Fecha Sugerida", 
-                "Ventana Horaria", "Tipo de Carga", "Cant. Pallets", 
-                "Estado", "Acciones"
-              ].map((h) => (
-                <TableHead key={h} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none">
-                  {h}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {[...Array(10)].map((_, i) => (
-              <TableRow key={i} className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14">
-                <TableCell className="text-center">
-                  <input type="checkbox" className="rounded border-slate-200" />
-                </TableCell>
-
-                {/* ID Solicitud - Itálico y elegante */}
-                <TableCell className="px-4">
-                  <span className="font-black text-[#1C1E59] text-sm italic tracking-tighter">REQ-882{i}</span>
-                </TableCell>
-
-                <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase">
-                  DHL Logistics Express
-                </TableCell>
-
-                <TableCell className="px-4 text-slate-500 text-xs">
-                  26/01/2026
-                </TableCell>
-
-                {/* Ventana Horaria - Estilo Badge */}
-                <TableCell className="px-4">
-                  <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold text-[10px]">
-                    08:00 - 10:00
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase">
-                  Materia Prima (Seca)
-                </TableCell>
-
-                <TableCell className="px-4 text-center font-mono font-bold text-blue-600">
-                  24
-                </TableCell>
-
-                <TableCell className="px-4">
-                   <StatusBadge status="pendiente" />
-                </TableCell>
-
-                {/* ACCIONES: Botones estilizados con Shadow */}
-                <TableCell className="px-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 hover:text-green-700 border border-transparent hover:border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
-                      title="Aprobar Solicitud"
-                    >
-                      <CheckSquare className="w-4 h-4" />
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
-                      title="Rechazar Solicitud"
-                    >
-                      <XCircle className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
             ))}
-          </TableBody>
-        </Table>
-      </div>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {solicitudes.map((apt) => (
+            <TableRow 
+              key={apt.id} 
+              className="group hover:bg-orange-50/30 transition-colors border-b border-slate-50 last:border-none h-14"
+            >
+              <TableCell className="text-center">
+                <input type="checkbox" className="rounded border-slate-200" />
+              </TableCell>
+
+              {/* ID Solicitud */}
+              <TableCell className="px-4">
+                <span className="font-black text-[#1C1E59] text-sm italic tracking-tighter">
+                  {apt.id}
+                </span>
+              </TableCell>
+
+              {/* Transportadora */}
+              <TableCell className="px-4 font-bold text-slate-700 text-xs uppercase">
+                {apt.carrier}
+              </TableCell>
+
+              {/* Fecha Sugerida */}
+              <TableCell className="px-4 text-slate-500 text-xs">
+                {apt.date}
+              </TableCell>
+
+              {/* Ventana Horaria */}
+              <TableCell className="px-4">
+                <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold text-[10px]">
+                  08:00 - 10:00
+                </Badge>
+              </TableCell>
+
+              {/* Tipo de Carga */}
+              <TableCell className="px-4 text-slate-600 text-xs font-medium uppercase">
+                {apt.loadType}
+              </TableCell>
+
+              {/* Cant. Pallets (Dato mock o de apt si lo tienes) */}
+              <TableCell className="px-4 text-center font-mono font-bold text-blue-600">
+                24
+              </TableCell>
+
+              {/* Estado */}
+              <TableCell className="px-4">
+                 <StatusBadge status={apt.status} />
+              </TableCell>
+
+              {/* ACCIONES */}
+              <TableCell className="px-4 text-right">
+                <div className="flex justify-end gap-2">
+                  {/* BOTÓN APROBAR: Abre el flujo de solicitud de cita */}
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 hover:text-green-700 border border-transparent hover:border-green-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
+                    title="Aprobar Solicitud"
+                    onClick={() => setRequestModalAppointment(apt)}
+                  >
+                    <CheckSquare className="w-4 h-4" />
+                  </Button>
+                  
+                  {/* BOTÓN ELIMINAR: Abre el modal de confirmación */}
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-100 rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95"
+                    title="Rechazar Solicitud"
+                    onClick={() => setItemAEliminar(apt)}
+                  >
+                    <XCircle className="w-4 h-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+          
+          {/* Mensaje si no hay datos en el estado */}
+          {solicitudes.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={9} className="h-32 text-center text-slate-400 italic">
+                No hay solicitudes pendientes.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
-  )}
+  </div>
+)}
 
 
 {/* 2. TABLA DE CONFIRMACIÓN (Pestaña "Confirmación") */}
@@ -1028,6 +1371,37 @@ export function TablesSection({ locationId }: TablesSectionProps) {
               </div>
                 <TablePagination total={45} />
             </div>
+
+       {requestModalAppointment && (
+        <RequestAppointmentModal 
+          appointment={requestModalAppointment} 
+          onClose={() => setRequestModalAppointment(null)} 
+          onContinue={() => { 
+            setCreateModalAppointment(requestModalAppointment); 
+            setRequestModalAppointment(null); 
+          }} 
+        />
+      )}
+
+      {createModalAppointment && (
+        <CreateAppointmentModal 
+          appointment={createModalAppointment} 
+          onClose={() => setCreateModalAppointment(null)} 
+          onConfirm={() => { 
+            // Aquí iría la lógica para actualizar la tabla o base de datos
+            setCreateModalAppointment(null); 
+            alert("Cita creada con éxito desde la gestión de solicitudes");
+          }} 
+        />
+      )}
+
+
+      <DeleteConfirmDialog 
+        isOpen={!!itemAEliminar} 
+        onClose={() => setItemAEliminar(null)} 
+        onConfirm={confirmarEliminacion} 
+      />
+
         </div>
       </Tabs>
     </div>

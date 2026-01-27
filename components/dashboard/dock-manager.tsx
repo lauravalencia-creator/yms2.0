@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { 
   LayoutGrid, 
   Calendar as CalendarIcon, 
-  ChevronLeft, 
   ChevronRight,
   Clock,
   Maximize2, 
@@ -17,17 +16,23 @@ import {
   X,
   MapPin,
   User,
-  Truck,
-  FileText,
   AlertTriangle,
   ClipboardList,
-  CheckCircle2,
-  Filter,
-  Activity,
   ArrowDownCircle, 
   ArrowUpCircle,   
-  ArrowRightLeft   
+  ArrowRightLeft,
+  Package, Search, Boxes, ArrowRight, ListFilter, 
+  ChevronLeft, LayoutList, Truck, CheckCircle, Info, FileText
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // --- TIPOS (Sin cambios) ---
 type AppointmentStatus = "scheduled" | "in-progress" | "completed" | "delayed" | "pending";
@@ -68,6 +73,24 @@ export interface Appointment {
   driverEmail?: string;
   merchandiseCode?: string;
   isReadyForAssignment?: boolean;
+  codigoLocalidad?: string;
+  tipoLocalidad?: string;
+  idTipoProducto?: string;
+  idProducto?: string;
+  descripcionCompany?: string;
+  estadoDocumento?: string;
+  unidadNegocio?: string;
+  canal?: string;
+  tipoOperacion?: string;
+  tipoMercancia?: string;
+  tipoCargue?: string;
+  peso?: string;
+  volumen?: string;
+  litros?: string;
+  codigoArticulo?: string;
+  cantidadPedida?: number;
+  cantidadRecibida?: number;
+  unidadMedida?: string;
 }
 
 export interface Dock {
@@ -133,7 +156,10 @@ const allDocks: Dock[] = [
   { id: "dock-1c-3", name: "Despacho 03", type: "outbound", status: "available", occupancy: 35, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-gray-3", carrier: "Envía Ya", truckId: "ENV-001", time: "11:00", type: "outbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Pedro Picapiedra", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Despachos", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Sencillo", loadType: "Paqueteo", operationType: "Cargue" } },
-  { id: "dock-1d-1", name: "Mixto 01", type: "both", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1d" },
+   { id: "dock-1c-4", name: "Despacho 04", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
+  { id: "dock-1c-5", name: "Despacho 05", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
+  { id: "dock-1c-6", name: "Despacho 06", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
+    { id: "dock-1d-1", name: "Mixto 01", type: "both", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1d" },
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
     currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane" } },
   { id: "dock-2a-1", name: "Norte 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
@@ -721,9 +747,77 @@ function DockTimeline({
 
 
 
+function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: Appointment, onClose: () => void }) {
+  const DataItem = ({ label, value }: { label: string, value: any }) => (
+    <div className="flex flex-col py-1.5 border-b border-slate-50 last:border-0 group">
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter group-hover:text-[#ff6b00] transition-colors">{label}</span>
+      <span className="text-[11px] font-bold text-slate-700 truncate">{value}</span>
+    </div>
+  );
+
+  return (
+    <Dialog open={!!appointment} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl p-0 overflow-hidden border-none rounded-[2rem] shadow-2xl bg-white">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Detalles Técnicos OC: {appointment.id}</DialogTitle>
+        </DialogHeader>
+
+        {/* Cabecera compacta */}
+        <div className="bg-[#1C1E59] px-6 py-4 text-white flex justify-between items-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5"><FileText size={100} /></div>
+          <div className="relative z-10 flex items-center gap-3">
+             <div className="p-2 bg-white/10 rounded-xl"><LayoutList size={18} className="text-orange-400" /></div>
+             <div>
+                <p className="text-[9px] font-bold text-orange-400 uppercase tracking-[0.2em] leading-none">Maestro de Documento</p>
+                <h3 className="text-lg font-black mt-1">OC: {appointment.id}</h3>
+             </div>
+          </div>
+          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors z-20 p-2 hover:bg-white/10 rounded-full">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Cuerpo con datos poblados */}
+        <div className="p-8 bg-white grid grid-cols-3 gap-x-10 gap-y-2">
+          <div className="space-y-1">
+            <DataItem label="Producto" value={appointment.product || "INSUMOS VARIOS"} />
+            <DataItem label="Nit Proveedor" value={appointment.nit || "900742771-9"} />
+            <DataItem label="Descripción Company" value={appointment.descripcionCompany || "Logística Integral SAS"} />
+            <DataItem label="Estado Documento" value="ACTIVO" />
+            <DataItem label="Unidad de Negocio" value={appointment.unidadNegocio || "CONSUMO MASIVO"} />
+            <DataItem label="Canal" value={appointment.canal || "MODERNO"} />
+          </div>
+          <div className="space-y-1 border-x border-slate-100 px-6">
+            <DataItem label="Fecha Inicio" value={appointment.date || "27/01/2026"} />
+            <DataItem label="Fecha Fin" value={appointment.date || "29/01/2026"} />
+            <DataItem label="Tipo de Operación" value={appointment.operationType || "DESCARGUE"} />
+            <DataItem label="Tipo Mercancía" value={appointment.tipoMercancia || "GENERAL NO PERECEDERA"} />
+            <DataItem label="Tipo de Cargue" value={appointment.loadType || "A GRANEL"} />
+            <DataItem label="Código Artículo" value={appointment.codigoArticulo || "SKU-882910"} />
+          </div>
+          <div className="space-y-1">
+            <DataItem label="Peso" value={appointment.peso || "1,240.00 KG"} />
+            <DataItem label="Volumen" value={appointment.volumen || "4.50 M3"} />
+            <DataItem label="Litros" value={appointment.litros || "0.00"} />
+            <DataItem label="Cantidad Pedida" value={appointment.quantityOrdered || "400"} />
+            <DataItem label="Cantidad Recibida" value={appointment.quantityDelivered || "0"} />
+            <DataItem label="U. Medida" value={appointment.unidadMedida || "UNIDADES (UND)"} />
+          </div>
+        </div>
+
+        <div className="p-6 bg-slate-50/50 flex justify-end rounded-b-[2rem]">
+          <Button onClick={onClose} className="bg-[#1C1E59] hover:bg-[#25286e] text-white text-[10px] font-bold uppercase px-10 rounded-2xl h-12 shadow-xl shadow-blue-900/20 transition-all active:scale-95">
+            Cerrar Detalle
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // --- MAIN COMPONENT ---
 export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
+  const [isTechnicalModalOpen, setIsTechnicalModalOpen] = useState(false);
   const [allDocksState, setAllDocksState] = useState(allDocks);
   const [allAppointmentsState, setAllAppointmentsState] = useState(pendingAppointments);
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -807,34 +901,172 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
       {isExpanded && <div className="p-2 border-b flex justify-end"><Button variant="ghost" size="sm" onClick={() => setIsExpanded(false)}><Minimize2 className="mr-2 w-4 h-4"/> Salir de pantalla completa</Button></div>}
       
       <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
-        {/* PANEL ASIGNACIONES (Con NIT y detalles originales) */}
-        <div className="w-72 shrink-0 flex flex-col min-h-0">
-          <div className="bg-yms-primary rounded-t-[1rem] p-3 text-white font-serif font-bold text-sm uppercase tracking-wide">Asignaciones</div>
-          {!selectedAppointment && (<div className="bg-white border-x border-b p-3 flex-shrink-0"><div className="relative"><svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg><input type="text" placeholder="Buscar orden..." className="w-full pl-10 pr-4 py-2 text-sm border rounded-lg" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /></div></div>)}
-          <div className="flex-1 bg-white border border-t-0 rounded-b-[1rem] p-3 overflow-y-auto">
-            {selectedAppointment ? (
-              <div className="space-y-4">
-                <button onClick={() => setSelectedAppointment(null)} className="flex items-center gap-2 text-yms-primary text-sm font-medium"><ChevronLeft className="w-4 h-4" /> Volver</button>
-                <div className="bg-[#1C1E59] rounded-xl p-4 text-white shadow-lg space-y-2">
-                  <div className="flex items-center gap-2 border-b border-white/10 pb-2 mb-2"><FileText className="w-5 h-5 text-orange-400" /><h4 className="font-bold">{selectedAppointment.id}</h4></div>
-                  <div className="space-y-2 text-xs">
-                 
-                      <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Producto:</span><span className="font-bold">{selectedAppointment.product || '---'}</span></div>
-                    <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Remolque:</span><span className="font-bold">{selectedAppointment.truckId}</span></div>
-                    <div className="flex justify-between border-b border-white/10 pb-1"><span className="opacity-70">Conductor:</span><span className="font-bold">{selectedAppointment.driver}</span></div>
-                  </div>
-                </div>
-                {!selectedAppointment.isReadyForAssignment ? <Button className="w-full bg-orange-500 text-white font-bold h-10 shadow-md uppercase" onClick={() => setRequestModalAppointment(selectedAppointment)}>Solicitar Cita</Button> : <div draggable onDragStart={(e) => { e.dataTransfer.setData("appointmentId", selectedAppointment.id); setDraggingId(selectedAppointment.id); }} className="p-4 border-2 border-dashed border-emerald-400 rounded-lg text-center text-xs text-emerald-600 font-bold bg-emerald-50 cursor-grab uppercase">::: Arrástrame al Muelle :::</div>}
-              </div>
-            ) : filteredAppointments.map(apt => (
-              <div key={apt.id} onClick={() => setSelectedAppointment(apt)} className={cn("p-3 border rounded-lg cursor-pointer hover:border-yms-cyan mb-2 relative overflow-hidden", apt.isReadyForAssignment && "border-l-4 border-l-emerald-500")}>
-                {apt.isReadyForAssignment && <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[9px] px-1.5 py-0.5 rounded-bl font-bold uppercase">Lista</div>}
-                <div className="font-bold text-xs truncate uppercase tracking-tight">{apt.carrier}</div>
-                <div className="text-[10px] text-gray-500">OC: {apt.id}</div>
-              </div>
-            ))}
+    
+       {/* PANEL ASIGNACIONES  */}
+
+<div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
+  
+  {/* Cabezal Navy con esquinas onduladas */}
+  <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem]">
+    <div className="flex items-center gap-2.5">
+      <div className="p-1.5 bg-orange-500/20 rounded-lg">
+        <LayoutList className="w-4 h-4 text-orange-400" />
+      </div>
+      <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Asignaciones</h2>
+    </div>
+
+    <div className="flex items-center gap-2">
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all active:scale-90">
+            <ListFilter className="w-4 h-4" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
+          <div className="space-y-4">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="OC o Proveedor..." 
+                className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
+                value={searchQuery} 
+                onChange={(e) => setSearchQuery(e.target.value)} 
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+      
+      <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/40">
+        {filteredAppointments.length}
+      </Badge>
+    </div>
+  </div>
+
+  {/* Contenido del Panel - Fondo sutil */}
+  <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
+   {selectedAppointment ? (
+  <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
+    <button 
+      onClick={() => setSelectedAppointment(null)} 
+      className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase transition-all ml-2 group"
+    >
+      <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER
+    </button>
+
+    <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
+      {/* Cabecera de tarjeta reducida */}
+      <div className="bg-[#1C1E59] p-4 text-white relative">
+        <span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span>
+        <h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4>
+      </div>
+      
+      {/* Info con padding optimizado */}
+      <div className="p-4 space-y-3">
+        <div className="space-y-2.5">
+          <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
+            <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span>
+            <p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">
+              {selectedAppointment.carrier}
+            </p>
+          </div>
+          <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
+            <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Producto</span>
+            <p className="text-[10px] font-bold text-slate-600 truncate max-w-[150px]">
+              {selectedAppointment.product || 'Insumos Varios'}
+            </p>
           </div>
         </div>
+
+        {/* Botones de acción mejorados */}
+        {/* Botones de acción mejorados con Drag and Drop habilitado */}
+<div className="flex gap-2 pt-1">
+  {!selectedAppointment.isReadyForAssignment ? (
+    // BOTÓN 1: SOLICITAR CITA (Si no está lista)
+    <Button 
+      className="flex-1 bg-[#FF6C01] hover:bg-[#e66000] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-95 border-none" 
+      onClick={() => setRequestModalAppointment(selectedAppointment)}
+    >
+      Solicitar Cita
+    </Button>
+  ) : (
+    // BOTÓN 1 (VERSIÓN DRAG): LISTO PARA ASIGNAR
+    <div 
+      draggable // <--- CRÍTICO PARA QUE FUNCIONE EL DRAG
+      onDragStart={(e) => { 
+        // PASA EL ID AL SISTEMA DE DRAG
+        e.dataTransfer.setData("appointmentId", selectedAppointment.id); 
+        setDraggingId(selectedAppointment.id); 
+      }} 
+      onDragEnd={() => setDraggingId(null)}
+      className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"
+    >
+      <div className="flex items-center justify-center gap-2">
+        <ArrowRight className="w-3 h-3 text-emerald-600 rotate-90 animate-bounce" />
+        <span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">
+          Arrastrar a Muelle
+        </span>
+      </div>
+    </div>
+  )}
+
+  {/* BOTÓN 2: INFO (Siempre visible) */}
+  <Button 
+    variant="outline"
+    className="px-4 border-none bg-slate-50/80 text-[#1C1E59] hover:bg-slate-200 rounded-2xl h-11 transition-all active:scale-95 shadow-sm"
+    onClick={() => setIsTechnicalModalOpen(true)}
+    title="Ver más información"
+  >
+    <Info size={18} />
+  </Button>
+</div>
+      </div>
+    </div>
+  </div>
+) : (
+      /* LISTADO DE ITEMS */
+      <div className="grid grid-cols-1 gap-2">
+        {filteredAppointments.map(apt => (
+          <div 
+            key={apt.id} 
+            onClick={() => setSelectedAppointment(apt)} 
+            className={cn(
+              "group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300",
+              "hover:shadow-lg hover:border-orange-500/30 hover:-translate-y-0.5",
+              apt.isReadyForAssignment && "border-l-4 border-l-emerald-500"
+            )}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={cn(
+                  "p-2 rounded-xl shrink-0 transition-colors",
+                  apt.isReadyForAssignment ? "bg-emerald-50 text-emerald-600" : "bg-slate-50 text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-500"
+                )}>
+                  <Package size={16} strokeWidth={2.5} />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">
+                    {apt.carrier}
+                  </h4>
+                  <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
+                    <span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span>
+                  </div>
+                </div>
+              </div>
+              <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
+
+
+
+
 
         {/* PANEL DERECHO */}
         <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">
@@ -860,6 +1092,14 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
              ) : (<DockTimeline docks={filteredDocks} timeFrame={timeFrame} highlightedDockId={highlightedDockId} onAppointmentClick={handleAppointmentClick} currentTime={currentTime || new Date()} />)}
            </div>
         </div>
+
+        {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
+          {selectedAppointment && isTechnicalModalOpen && (
+            <OrderDetailsTechnicalModal 
+              appointment={selectedAppointment} 
+              onClose={() => setIsTechnicalModalOpen(false)} 
+            />
+          )}
       </div>
     </div>
   );
