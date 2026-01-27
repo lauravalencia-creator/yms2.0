@@ -330,24 +330,204 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
     );
 }
 
-function AppointmentEditModal({ appointment, dockName, currentDockId, availableDocks, onClose, onSave, onDelete }: any) {
-    // Modal simplificado para el ejemplo
-    const [time, setTime] = useState(appointment.time);
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-6">
-                <h3 className="text-lg font-bold mb-4">Editar Cita {appointment.id}</h3>
-                <div className="mb-4">
-                    <label className="block text-sm font-bold mb-1">Hora</label>
-                    <input type="time" value={time} onChange={e => setTime(e.target.value)} className="border p-2 rounded w-full"/>
-                </div>
-                <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={onClose}>Cerrar</Button>
-                    <Button onClick={() => onSave(appointment.id, time, currentDockId)}>Guardar</Button>
-                </div>
+function AppointmentEditModal({ 
+  appointment, 
+  dockName, 
+  currentDockId, 
+  availableDocks, 
+  onClose, 
+  onSave, 
+  onDelete 
+}: { 
+  appointment: Appointment, 
+  dockName: string, 
+  currentDockId: string, 
+  availableDocks: Dock[], 
+  onClose: () => void, 
+  onSave: (id: string, newTime: string, newDockId: string) => void, 
+  onDelete: (id: string) => void 
+}) {
+  const [time, setTime] = useState(appointment.time);
+  const [selectedDockId, setSelectedDockId] = useState(currentDockId);
+  
+  // Lógica de colores según estado
+  const isCompleted = appointment.status === 'completed';
+  const isInProgressOrDelayed = appointment.status === 'in-progress' || appointment.status === 'delayed';
+  
+  const headerColor = isCompleted 
+    ? "bg-emerald-600" 
+    : isInProgressOrDelayed 
+      ? "bg-rose-600" 
+      : "bg-slate-600";
+
+  const getStatusSubtitle = (status: AppointmentStatus) => {
+    if (status === 'completed') return "Cita cumplida exitosamente";
+    if (status === 'in-progress') return "Operación en curso";
+    if (status === 'delayed') return "Operación retrasada";
+    return "Cita confirmada sin arribo"; 
+  };
+
+  // Filtramos los muelles para mostrar el actual + los disponibles
+  const dockOptions = useMemo(() => {
+    return availableDocks.filter(d => 
+      d.id === currentDockId || 
+      (d.status !== 'maintenance' && d.occupancy < 100) 
+    );
+  }, [availableDocks, currentDockId]);
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+        
+        {/* --- ENCABEZADO CON COLOR DINÁMICO --- */}
+        <div className={cn("px-6 py-4 flex justify-between items-center text-white shadow-md relative overflow-hidden", headerColor)}>
+          {/* Decoración de fondo */}
+          <div className="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-2">
+            {appointment.type === 'inbound' ? <ArrowDownIcon className="w-24 h-24" /> : <ArrowUpIcon className="w-24 h-24" />}
+          </div>
+
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-1">
+               {appointment.type === 'inbound' 
+                 ? <ArrowDownIcon className="w-5 h-5 text-white/90" /> 
+                 : <ArrowUpIcon className="w-5 h-5 text-white/90" />
+               }
+               <h3 className="text-lg font-black font-serif tracking-wide uppercase">
+                 {appointment.type === 'inbound' ? 'DESCARGUE' : 'CARGUE'}
+               </h3>
             </div>
+            <p className="text-white/90 text-xs font-medium flex items-center gap-1 uppercase tracking-wider">
+              {getStatusSubtitle(appointment.status)}
+            </p>
+          </div>
+          <button onClick={onClose} className="relative z-10 text-white/70 hover:text-white transition-colors bg-black/10 hover:bg-black/20 rounded-full p-1.5">
+            <X className="w-5 h-5" />
+          </button>
         </div>
-    )
+
+        {/* --- CUERPO DEL MODAL --- */}
+        <div className="p-6 overflow-y-auto space-y-6 bg-slate-50/50">
+           
+           {/* SECCIÓN 1: UBICACIÓN Y MUELLE */}
+           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+              <h4 className="flex items-center gap-2 text-xs font-black text-[#1C1E59] uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                <MapPin className="w-4 h-4 text-slate-400" /> Ubicación y Muelle
+              </h4>
+              <div className="grid grid-cols-2 gap-y-4 gap-x-4">
+                 <InfoField label="Ciudad" value={appointment.city || "Bello"} />
+                 <InfoField label="Departamento" value={appointment.department || "Antioquia"} />
+                 <div className="col-span-2">
+                    <InfoField label="Localidad" value={appointment.locationName || "Planta Principal"} />
+                 </div>
+                 
+                 {/* SELECTOR DE MUELLE */}
+                 <div className="col-span-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Muelle Asignado</div>
+                    {!isCompleted ? (
+                      <select 
+                        value={selectedDockId} 
+                        onChange={(e) => setSelectedDockId(e.target.value)} 
+                        className="font-bold text-[#1C1E59] text-sm bg-white border border-slate-300 rounded-md px-3 py-2 focus:outline-none focus:border-orange-500 w-full shadow-sm transition-all"
+                      >
+                        {dockOptions.map(dock => (
+                          <option key={dock.id} value={dock.id}>
+                            {dock.name} {dock.occupancy > 0 && dock.id !== currentDockId ? `(Ocupado: ${dock.occupancy}%)` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                        {dockName}
+                      </div>
+                    )}
+                 </div>
+              </div>
+           </div>
+
+           {/* SECCIÓN 2: DETALLES DE CITA */}
+           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+              <h4 className="flex items-center gap-2 text-xs font-black text-[#1C1E59] uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                <CalendarIcon className="w-4 h-4 text-slate-400" /> Detalles de Tiempo
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                 <InfoField label="Fecha Programada" value={appointment.date || "Hoy"} />
+                 
+                 {/* SELECTOR DE HORA */}
+                 <div>
+                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Hora Estimada</div>
+                    {!isCompleted ? (
+                       <div className="relative">
+                         <input 
+                           type="time" 
+                           value={time} 
+                           onChange={(e) => setTime(e.target.value)} 
+                           className="font-bold text-[#1C1E59] text-base bg-white border border-slate-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-orange-500 w-full shadow-sm"
+                         />
+                         <Clock className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                       </div>
+                    ) : (
+                      <div className="text-sm font-bold text-slate-800">{time}</div>
+                    )}
+                 </div>
+              </div>
+           </div>
+
+           {/* SECCIÓN 3: VEHÍCULO Y CONDUCTOR */}
+           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+              <h4 className="flex items-center gap-2 text-xs font-black text-[#1C1E59] uppercase tracking-wider mb-4 border-b border-slate-100 pb-2">
+                <Truck className="w-4 h-4 text-slate-400" /> Transporte
+              </h4>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                 <InfoField label="Placa Vehículo" value={appointment.truckId} />
+                 <InfoField label="Tipo Carga" value={appointment.loadType || "General"} />
+              </div>
+              <div className="space-y-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                 <div className="flex items-center gap-2 mb-2">
+                    <User className="w-4 h-4 text-slate-400" />
+                    <span className="text-xs font-bold text-slate-500 uppercase">Información del Conductor</span>
+                 </div>
+                 <div className="grid grid-cols-1 gap-2">
+                    <div className="text-sm font-bold text-[#1C1E59]">{appointment.driver || "No asignado"}</div>
+                    <div className="text-xs text-slate-500 font-medium">{appointment.carrier}</div>
+                 </div>
+              </div>
+           </div>
+
+           <div className="pt-2 text-[10px] text-slate-300 font-mono text-center">ID Sistema: {appointment.id}</div>
+        </div>
+
+        {/* --- FOOTER DE ACCIONES --- */}
+        {!isCompleted && (
+           <div className="bg-white px-6 py-4 flex justify-between items-center border-t border-slate-100 mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <Button 
+                variant="ghost" 
+                className="text-red-500 hover:text-red-700 hover:bg-red-50 gap-2 h-10 px-4 rounded-xl transition-all" 
+                onClick={() => onDelete(appointment.id)}
+              >
+                <Trash2 className="w-4 h-4" /> Eliminar
+              </Button>
+              
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={onClose} 
+                  className="h-10 px-6 rounded-xl border-slate-200 text-slate-600 font-bold uppercase text-xs hover:bg-slate-50"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  className="bg-[#ff6b00] hover:bg-[#e66000] text-white gap-2 h-10 px-6 rounded-xl font-bold uppercase text-xs shadow-lg shadow-orange-200 transition-all active:scale-95" 
+                  onClick={() => onSave(appointment.id, time, selectedDockId)}
+                >
+                  <Save className="w-4 h-4" /> Guardar Cambios
+                </Button>
+              </div>
+           </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: Appointment, onClose: () => void }) {

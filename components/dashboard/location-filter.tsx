@@ -1574,6 +1574,15 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
                       </DialogContent>
                     </Dialog>
 
+                      <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="contents"><MenuGridButton icon={HistoryIcon} label="Catalogo" /></div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl max-h-[95vh]">
+                        
+                      </DialogContent>
+                    </Dialog>
+
                   </div>
                 </div>
               </div>
