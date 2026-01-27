@@ -7,6 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+
 } from "@/components/ui/select";
 import {
   Dialog,
@@ -23,7 +24,7 @@ import {
   Search, BarChart3, ClipboardList, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
   RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle,
-  Package, X, QrCode, ArrowRight, 
+  Package, X, QrCode, ArrowRight, LayoutGrid,
   Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
@@ -1013,111 +1014,135 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
 
-      {isLoaded && selectedLocation && (
-          <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
+      {/* 3. BOTÓN ÚNICO DE ITEMS (ACCIONES) */}
+        {isLoaded && selectedLocation && (
+          <div className="ml-auto flex items-center gap-4">
             <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yms-gray group-focus-within:text-yms-cyan transition-colors pointer-events-none" />
-              <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 h-10 w-48 bg-white border border-yms-border rounded-xl text-sm outline-none focus:border-yms-cyan focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 h-10 w-48 bg-gray-50 border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
             </div>
-            <div className="w-px h-8 bg-yms-border" />
 
-            {/* MODAL HISTORIAL / AUDITORÍA */}
-            <Dialog>
-  <DialogTrigger asChild>
-    <button title="Historial de Auditoría" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md">
-        <HistoryIcon size={18} />
-    </button>
-  </DialogTrigger>
-  <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl overflow-hidden max-h-[95vh]">
-    <AuditHistoryContent />
-  </DialogContent>
-</Dialog>
-
-            {/* ... RECUERDA DEJAR AQUÍ EL RESTO DE TUS DIALOGS (Reportes, Usuarios, etc) ... */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <button title="Reportes" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><BarChart3 size={18} /></button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-4xl w-full p-8 bg-white rounded-[2rem] sm:rounded-[2rem] border-0 shadow-2xl">
-                <DialogHeader><DialogTitle className={cn("text-center text-2xl font-black uppercase tracking-wide mb-2", COLORS.NAVY)}>Filtros de Búsqueda</DialogTitle></DialogHeader>
-                <ReportFiltersContent />
-              </DialogContent>
-            </Dialog>
-
-            {/* MODAL REGISTROS */}
-              <Popover>
+            <Popover>
               <PopoverTrigger asChild>
-                <button 
-                  title="Registros" 
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-md"
-                >
-                  <ClipboardList size={18} />
+                <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-orange-200">
+                  <LayoutGrid size={20} />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100 bg-white" align="end">
-                <div className="flex flex-col gap-1">
-                  {REGISTRO_OPCIONES.map((opt) => (
-                    <button
-                      key={opt.id}
-                      onClick={() => handleOpenRegistro(opt.id)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-gray-600 hover:text-[#1C1E59] transition-all group"
-                    >
-                      <opt.icon size={18} className="text-gray-400 group-hover:text-[#ff6b00] transition-colors" />
-                      <span className="text-sm font-semibold tracking-tight">{opt.label}</span>
-                    </button>
-                  ))}
+              <PopoverContent className="w-72 p-3 rounded-[1.5rem] shadow-2xl border-gray-100 bg-white" align="end">
+                <div className="space-y-4">
+                  {/* SECCIÓN REGISTROS RÁPIDOS */}
+                  <div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-2 block">Registros</span>
+                    <div className="grid grid-cols-1 gap-1">
+                      {REGISTRO_OPCIONES.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleOpenRegistro(opt.id)}
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-50 text-gray-600 hover:text-[#ff6b00] transition-all group text-left"
+                        >
+                          <opt.icon size={16} className="text-gray-400 group-hover:text-[#ff6b00]" />
+                          <span className="text-xs font-bold">{opt.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-gray-100 mx-2" />
+
+                  {/* SECCIÓN HERRAMIENTAS */}
+                  <div>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-2 block">Herramientas</span>
+                    <div className="flex flex-col gap-1">
+                      {/* CADA BOTÓN ACTIVA SU PROPIO DIALOG */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+                            <HistoryIcon size={16} className="text-[#1C1E59]" />
+                            <span className="text-xs font-bold text-[#1C1E59]">Historial de Auditoría</span>
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl overflow-hidden max-h-[95vh]">
+                          <AuditHistoryContent />
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+                            <BarChart3 size={16} className="text-[#1C1E59]" />
+                            <span className="text-xs font-bold text-[#1C1E59]">Filtros y Reportes</span>
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-4xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
+                          <DialogHeader><DialogTitle className={cn("text-center text-2xl font-black uppercase mb-2", COLORS.NAVY)}>Filtros de Búsqueda</DialogTitle></DialogHeader>
+                          <ReportFiltersContent />
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+                            <Users size={16} className="text-[#1C1E59]" />
+                            <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-7xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
+                          <DialogHeader><DialogTitle className={cn("text-xl font-black uppercase", COLORS.NAVY)}>Gestión de Usuarios</DialogTitle></DialogHeader>
+                          <Tabs defaultValue="usuarios" className="mt-4">
+                            <TabsList className="bg-gray-50 p-1.5 rounded-full h-auto w-fit border border-gray-100">
+                              <TabsTrigger value="usuarios" className="rounded-full px-6 py-2 text-xs font-bold">Usuarios</TabsTrigger>
+                              <TabsTrigger value="perfiles" className="rounded-full px-6 py-2 text-xs font-bold">Perfiles</TabsTrigger>
+                            </TabsList>
+                            <div className="mt-6">
+                              <TabsContent value="usuarios"><UsuariosTable /></TabsContent>
+                              <TabsContent value="perfiles"><PerfilesTable /></TabsContent>
+                            </div>
+                          </Tabs>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+                        <DialogTrigger asChild>
+                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+                            <Upload size={16} className="text-[#1C1E59]" />
+                            <span className="text-xs font-bold text-[#1C1E59]">Carga de Archivos</span>
+                          </button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-6xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
+                          <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
+                            <Upload className={cn("w-5 h-5", COLORS.NAVY)} />
+                            <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Carga de Archivos</DialogTitle>
+                          </div>
+                          <div className="px-8 pb-8">
+                            <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
                 </div>
               </PopoverContent>
             </Popover>
 
-            {/* EL MODAL DE PANTALLA COMPLETA */}
+            {/* MODAL REGISTROS (FUERA DEL POPOVER PARA EVITAR CONFLICTOS DE ENFOQUE) */}
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogContent 
-                className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden"
-              >
-                {/* Pasamos el ID seleccionado para que el modal sepa qué texto e icono mostrar */}
+              <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
                 {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
               </DialogContent>
             </Dialog>
 
-            {/* MODAL USUARIOS */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <button title="Usuarios" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><Users size={18} /></button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-7xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
-                <DialogHeader><DialogTitle className={cn("text-xl font-black uppercase tracking-wide", COLORS.NAVY)}>Gestión de Usuarios</DialogTitle></DialogHeader>
-                <Tabs defaultValue="usuarios" className="mt-6">
-                  <TabsList className="bg-gray-50 p-1.5 rounded-full h-auto w-fit border border-gray-100">
-                    <TabsTrigger value="usuarios" className="rounded-full px-6 py-2.5 font-bold text-sm text-gray-500 data-[state=active]:bg-white data-[state=active]:text-[#1e2b58] data-[state=active]:shadow-sm transition-all">Administración de usuarios</TabsTrigger>
-                    <TabsTrigger value="perfiles" className="rounded-full px-6 py-2.5 font-bold text-sm text-gray-500 data-[state=active]:bg-white data-[state=active]:text-[#1e2b58] data-[state=active]:shadow-sm transition-all">Administración de perfiles</TabsTrigger>
-                  </TabsList>
-                  <div className="mt-6"><TabsContent value="usuarios"><UsuariosTable /></TabsContent><TabsContent value="perfiles"><PerfilesTable /></TabsContent></div>
-                </Tabs>
-              </DialogContent>
-            </Dialog>
-
-            {/* MODAL CARGA */}
-            <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-              <DialogTrigger asChild>
-                <button title="Carga de Archivos" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><Upload size={18} /></button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-6xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-                <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3"><div className="p-2 bg-slate-50 rounded-lg"><Upload className={cn("w-5 h-5", COLORS.NAVY)} /></div><DialogTitle className={cn("text-lg font-black uppercase tracking-wide", COLORS.NAVY)}>Carga de Archivos</DialogTitle></div>
-                <div className="px-8 pb-8"><FileUploadContent onUpload={handleUploadComplete} /></div>
-              </DialogContent>
-            </Dialog>
-
-            {/* MODAL RESULTADOS */}
+            {/* MODAL RESULTADOS DE CARGA */}
             <Dialog open={isResultsModalOpen} onOpenChange={setIsResultsModalOpen}>
-                <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-                    <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3"><div className="p-2 bg-slate-50 rounded-lg"><Upload className={cn("w-5 h-5", COLORS.NAVY)} /></div><DialogTitle className={cn("text-lg font-black uppercase tracking-wide", COLORS.NAVY)}>Carga de Archivos</DialogTitle></div>
-                    <div className="px-8 pb-8"><UploadResultsContent onClose={() => setIsResultsModalOpen(false)} /></div>
-                </DialogContent>
+              <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
+                <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Resultados de Carga</DialogTitle>
+                </div>
+                <div className="px-8 pb-8">
+                  <UploadResultsContent onClose={() => setIsResultsModalOpen(false)} />
+                </div>
+              </DialogContent>
             </Dialog>
-
-
-
           </div>
         )}
       </div>
