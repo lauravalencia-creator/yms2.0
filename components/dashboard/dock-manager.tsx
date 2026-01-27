@@ -1121,13 +1121,33 @@ export function DockManager({ locationId, dockGroupId }: DockManagerProps) {
               </div>
            </div>
             {/* Vista Grid de los muelles */}
-           <div className="flex-1 overflow-hidden">
-             {viewMode === 'grid' ? (
-                <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/50">
-                  {filteredDocks.map(dock => <DockSlot key={dock.id} dock={dock} isDragging={!!draggingId} onDrop={handleDrop} onDragOver={() => setDropTargetId(dock.id)} onDragLeave={() => setDropTargetId(null)} isDropTarget={dropTargetId === dock.id} onClick={() => handleDockClick(dock.id)} />)}
-                </div>
-             ) : (<DockTimeline docks={filteredDocks} timeFrame={timeFrame} highlightedDockId={highlightedDockId} onAppointmentClick={handleAppointmentClick} currentTime={currentTime || new Date()} />)}
-           </div>
+           <div className="flex-1 overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+    {viewMode === 'grid' ? (
+    // Tu div interno se mantiene igual, creando un efecto "frosted" sobre la grilla
+    <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/50 backdrop-blur-[1px]">
+        {filteredDocks.map(dock => (
+            <DockSlot 
+                key={dock.id} 
+                dock={dock} 
+                isDragging={!!draggingId} 
+                onDrop={handleDrop} 
+                onDragOver={() => setDropTargetId(dock.id)} 
+                onDragLeave={() => setDropTargetId(null)} 
+                isDropTarget={dropTargetId === dock.id} 
+                onClick={() => handleDockClick(dock.id)} 
+            />
+        ))}
+    </div>
+    ) : (
+        <DockTimeline 
+            docks={filteredDocks} 
+            timeFrame={timeFrame} 
+            highlightedDockId={highlightedDockId} 
+            onAppointmentClick={handleAppointmentClick} 
+            currentTime={currentTime || new Date()} 
+        />
+    )}
+</div>
         </div>
 
         {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
