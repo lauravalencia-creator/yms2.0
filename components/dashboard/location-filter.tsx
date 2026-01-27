@@ -400,16 +400,7 @@ function AuditHistoryContent() {
           <h2 className="text-xl font-black text-[#1C1E59] uppercase italic">Auditoría de documentos</h2>
         </div>
 
-        <div className="flex gap-3">
-          <div className="bg-white border border-gray-200 p-2 px-5 rounded-2xl flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fallas: <span className="text-[#1C1E59] text-sm ml-1">06</span></span>
-          </div>
-          <div className="bg-white border border-gray-200 p-2 px-5 rounded-2xl flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#4CCAC8]" />
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Procesados: <span className="text-[#1C1E59] text-sm ml-1">42</span></span>
-          </div>
-        </div>
+      
       </div>
 
       {/* TOOLBAR */}
@@ -744,33 +735,44 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   };
 
   return (
-    <div className="bg-white border-b border-yms-border px-6 py-4">
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-yms-gray">
-            <MapPinIcon className="w-5 h-5 text-yms-secondary" />
-            <span className="font-medium text-sm">Localidad:</span>
-          </div>
-          <Select value={selectedLocationId || ""} onValueChange={handleLocationChange}>
-            <SelectTrigger className={cn("w-[320px] rounded-[1.25rem] border-yms-border bg-white focus:ring-2 focus:ring-yms-cyan focus:border-yms-cyan hover:border-yms-cyan/50 transition-colors", !selectedLocationId && "text-yms-gray")}>
-              <SelectValue placeholder="Seleccionar localidad..." />
-            </SelectTrigger>
-            <SelectContent className="rounded-[1rem] border-yms-border">
-              {locationsData.map((location) => (
-                <SelectItem key={location.id} value={location.id} className="rounded-[0.75rem] cursor-pointer focus:bg-yms-cyan/10">
-                  <div className="flex items-start gap-3 py-1">
-                    <BuildingIcon className="w-4 h-4 text-yms-primary mt-0.5 shrink-0" />
-                    <div className="flex flex-col">
-                      <span className="font-medium text-yms-primary">{location.name}</span>
-                      <span className="text-xs text-yms-gray">{location.address}</span>
-                    </div>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+       <div className="bg-white flex flex-col w-full border-none shadow-sm">
+    {/* --- FILA PRINCIPAL: Logo + Filtros + Botones --- */}
+    <div className="px-6 py-4 flex items-center gap-8"> {/* gap-8 mantiene una separación elegante */}
+      
+      {/* 1. LOGO */}
+      <div className="flex-shrink-0">
+        <img 
+          src="/ControlT.png" 
+          alt="Logo"
+          className="h-10 w-auto object-contain" 
+        />
+      </div>
 
+      {/* 2. SELECTOR LOCALIDAD (Agrupado cerca del logo) */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 text-yms-gray">
+          <MapPinIcon className="w-5 h-5 text-yms-secondary" />
+          <span className="font-bold text-sm text-gray-600">Localidad:</span>
+        </div>
+        <Select value={selectedLocationId || ""} onValueChange={handleLocationChange}>
+          <SelectTrigger className={cn(
+            "w-[320px] h-10 rounded-full border-gray-200 bg-white focus:ring-2 focus:ring-yms-cyan transition-all text-sm", 
+            !selectedLocationId && "text-gray-400"
+          )}>
+            <SelectValue placeholder="Seleccionar localidad..." />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+            {locationsData.map((location) => (
+              <SelectItem key={location.id} value={location.id} className="cursor-pointer focus:bg-gray-100 focus:text-gray-900 rounded-lg m-1">
+                <div className="flex flex-col py-1">
+                  <span className="font-bold text-yms-primary">{location.name}</span>
+                  <span className="text-[10px] text-gray-400 leading-tight">{location.address}</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
         {selectedLocationId && (
           <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-300">
             <div className="w-px h-8 bg-yms-border" />
@@ -871,7 +873,18 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
       </div>
-      {!selectedLocationId && <div className="mt-3 flex items-center gap-2 text-yms-gray/70 text-sm"><svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clipRule="evenodd" /></svg><span>Selecciona una localidad para cargar el dashboard de operaciones</span></div>}
+    
+    
+       {/* --- 3. IMAGEN DEL RECTÁNGULO (BORDE INFERIOR REAL) --- */}
+      <div className="w-full leading-[0]">
+        <img 
+          src="/rectangle.jpg" 
+          alt="Decorative border"
+          className="w-full h-[4px] object-fill block" // 
+        />
+      </div>
+    
+    
     </div>
   );
 }
