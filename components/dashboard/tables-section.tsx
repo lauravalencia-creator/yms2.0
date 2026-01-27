@@ -178,9 +178,11 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                 {section === "gestion" && (
                      <div className="flex gap-2">
                         {[
-                            { id: "solicitudes", label: "Solicitudes", icon: FileText },
+                            { id: "solicitudes", label: "Solicitud de Citas", icon: FileText },
                             { id: "programadas", label: "Confirmación", icon: CheckSquare },
                             { id: "ingresos", label: "Cancelación", icon: RefreshCcw },
+                            { id: "reagendamiento de Citas", label: "Reagendar Citar", icon: CheckSquare },
+                            { id: "Recurrencia de Citas", label: "Recurrencia de Citas", icon: RefreshCcw },
                         ].map(tab => {
                             const isActive = gestionView === tab.id;
                             return (
@@ -282,14 +284,146 @@ export function TablesSection({ locationId }: TablesSectionProps) {
               )}
             </TabsContent>
 
-            <TabsContent value="gestion" className="h-full m-0 p-4 overflow-auto flex items-center justify-center">
-                 <div className="text-center space-y-2">
-                    <div className="bg-slate-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <CalendarDays className="w-8 h-8 text-slate-400" />
+            {/* ---------------- SECCIÓN GESTIÓN (Tablas Fake) ---------------- */}
+            <TabsContent value="gestion" className="h-full m-0 p-0 overflow-auto">
+                
+                {/* 1. TABLA SOLICITUDES (Pendientes de aprobación) */}
+                {gestionView === "solicitudes" && (
+                    <div className="h-full flex flex-col">
+                         {/* Datos Fake definidos inline para ejemplo */}
+                        {(() => {
+                            const requestsData = [
+                                { id: "REQ-8821", carrier: "DHL Logistics", date: "2023-11-15", window: "08:00 - 10:00", items: "Pallets x12", status: "pending" },
+                                { id: "REQ-8822", carrier: "FedEx Ground", date: "2023-11-15", window: "10:30 - 12:00", items: "Cajas Sueltas", status: "pending" },
+                                { id: "REQ-8825", carrier: "Transportes Norte", date: "2023-11-16", window: "14:00 - 16:00", items: "Contenedor 20ft", status: "review" },
+                            ];
+                            
+                            return (
+                                <Table>
+                                    <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                                        <TableRow>
+                                            <TableHead>ID Solicitud</TableHead>
+                                            <TableHead>Transportista</TableHead>
+                                            <TableHead>Fecha Solicitada</TableHead>
+                                            <TableHead>Ventana Horaria</TableHead>
+                                            <TableHead>Carga</TableHead>
+                                            <TableHead className="text-right">Acciones</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {requestsData.map((item) => (
+                                            <TableRow key={item.id} className="hover:bg-slate-50">
+                                                <TableCell className="font-medium">{item.id}</TableCell>
+                                                <TableCell>{item.carrier}</TableCell>
+                                                <TableCell>{item.date}</TableCell>
+                                                <TableCell><Badge variant="outline" className="bg-slate-100">{item.window}</Badge></TableCell>
+                                                <TableCell className="text-slate-600">{item.items}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button size="sm" variant="outline" className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                                                            <span className="sr-only">Rechazar</span>
+                                                            <span className="text-xs font-bold">✕</span>
+                                                        </Button>
+                                                        <Button size="sm" className="h-7 w-7 p-0 bg-green-600 hover:bg-green-700 text-white">
+                                                            <CheckSquare className="w-3 h-3" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            );
+                        })()}
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-700">Gestión de Citas</h3>
-                    <p className="text-slate-500 max-w-sm">Selecciona una opción en la barra superior para gestionar las solicitudes y programación.</p>
-                 </div>
+                )}
+
+                {/* 2. TABLA CONFIRMACIÓN (Programadas) */}
+                {gestionView === "programadas" && (
+                    <div className="h-full flex flex-col">
+                        {(() => {
+                            const scheduledData = [
+                                { id: "CNF-102", driver: "Roberto Gomez", plate: "ABC-123", dock: "Muelle A-02", eta: "09:45 AM", status: "confirmed" },
+                                { id: "CNF-105", driver: "Luis Fernandez", plate: "XYZ-987", dock: "Muelle B-01", eta: "11:00 AM", status: "awaiting_driver" },
+                                { id: "CNF-108", driver: "Ana Torres", plate: "LMN-456", dock: "Patio C", eta: "02:15 PM", status: "confirmed" },
+                            ];
+
+                            return (
+                                <Table>
+                                    <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                                        <TableRow>
+                                            <TableHead>Referencia</TableHead>
+                                            <TableHead>Conductor</TableHead>
+                                            <TableHead>Placa / Patente</TableHead>
+                                            <TableHead>Ubicación Asignada</TableHead>
+                                            <TableHead>Hora Estimada (ETA)</TableHead>
+                                            <TableHead className="text-right">Estatus</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {scheduledData.map((item) => (
+                                            <TableRow key={item.id} className="hover:bg-slate-50">
+                                                <TableCell className="font-semibold text-slate-700">{item.id}</TableCell>
+                                                <TableCell>{item.driver}</TableCell>
+                                                <TableCell className="font-mono text-xs">{item.plate}</TableCell>
+                                                <TableCell>{item.dock}</TableCell>
+                                                <TableCell>{item.eta}</TableCell>
+                                                <TableCell className="text-right">
+                                                    {item.status === "confirmed" ? (
+                                                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100 shadow-none border border-green-200">Confirmado</Badge>
+                                                    ) : (
+                                                        <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 shadow-none border border-amber-200">Falta Chofer</Badge>
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )
+                        })()}
+                    </div>
+                )}
+
+                {/* 3. TABLA CANCELACIÓN (Ingresos/Histórico de fallos) */}
+                {gestionView === "ingresos" && (
+                    <div className="h-full flex flex-col">
+                         {(() => {
+                            const cancelledData = [
+                                { id: "APT-009", carrier: "LogiCargo", originalDate: "2023-11-14", reason: "Llegada tardía (>4h)", user: "admin_sys" },
+                                { id: "APT-012", carrier: "Swift Transport", originalDate: "2023-11-14", reason: "Documentación incompleta", user: "j_martinez" },
+                                { id: "REQ-991", carrier: "FastFreight", originalDate: "2023-11-13", reason: "Cancelado por transportista", user: "system" },
+                            ];
+
+                            return (
+                                <Table>
+                                    <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-sm">
+                                        <TableRow>
+                                            <TableHead>ID Original</TableHead>
+                                            <TableHead>Transportista</TableHead>
+                                            <TableHead>Fecha Original</TableHead>
+                                            <TableHead>Motivo de Cancelación</TableHead>
+                                            <TableHead>Responsable</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {cancelledData.map((item) => (
+                                            <TableRow key={item.id} className="hover:bg-red-50/30">
+                                                <TableCell className="font-medium text-slate-500 line-through">{item.id}</TableCell>
+                                                <TableCell>{item.carrier}</TableCell>
+                                                <TableCell>{item.originalDate}</TableCell>
+                                                <TableCell className="text-red-600 font-medium flex items-center gap-2">
+                                                    <AlertOctagon className="w-3 h-3" />
+                                                    {item.reason}
+                                                </TableCell>
+                                                <TableCell className="text-xs text-slate-500 uppercase">{item.user}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )
+                        })()}
+                    </div>
+                )}
             </TabsContent>
 
         </div>

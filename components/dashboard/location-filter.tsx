@@ -20,16 +20,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { 
-  Search, 
-  BarChart3, 
-  ClipboardList, 
-  Users, 
-  Upload, 
-  Calendar as CalendarIcon,
-  FileUp,
-  CheckCircle2,
-  FileText
+  Search, BarChart3, ClipboardList, Users, Upload, Calendar as CalendarIcon,
+  FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
+  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle, Info
 } from 'lucide-react';
+
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 import {
   Tabs,
@@ -229,6 +229,314 @@ function ReportFiltersContent() {
         <Button className={cn("font-bold uppercase tracking-wider px-10 py-6 h-12 rounded-xl text-base shadow-lg hover:shadow-xl transition-all w-48 border-none", COLORS.ORANGE_BG, COLORS.ORANGE_HOVER)}>
           Buscar
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function LogAnalysisModal({ docId, onClose }: { docId: string, onClose: () => void }) {
+  return (
+    <Dialog open={!!docId} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-0 rounded-[1.5rem] shadow-2xl">
+        {/* Header Compacto */}
+        <div className="relative bg-[#1C1E59] p-5 text-white">
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }}></div>
+          <div className="relative z-10 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-black italic tracking-tighter flex items-center gap-2">
+                ANÁLISIS DE <span className="text-[#4CCAC8]">LOGS</span>
+              </h2>
+              <p className="text-cyan-400 font-mono text-[10px] uppercase tracking-widest">Expediente: {docId}</p>
+            </div>
+            <button onClick={onClose} className="text-white/50 hover:text-white">x</button>
+          </div>
+        </div>
+
+        <div className="p-5 bg-white space-y-5">
+          {/* Info General Compacta */}
+          <div className="grid grid-cols-2 gap-4 border-b pb-4">
+            <div className="space-y-0.5">
+              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Validación</span>
+              <div><Badge className="bg-red-50 text-red-500 text-[9px] py-0 px-2 shadow-none font-bold">FAILED</Badge></div>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Timestamp</span>
+              <p className="text-[#1C1E59] font-bold text-xs">26/01/2026, 5:27 PM</p>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Auditor</span>
+              <p className="text-[#1C1E59] font-bold text-xs">J.GARCIA</p>
+            </div>
+            <div className="space-y-0.5">
+              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Categoría</span>
+              <p className="text-[#1C1E59] font-bold text-xs uppercase">Packing List</p>
+            </div>
+          </div>
+
+          {/* Ruta Logística Compacta */}
+          <div className="space-y-3">
+            <h4 className="text-[#1C1E59] text-xs font-black italic uppercase tracking-tighter flex items-center gap-2">
+              <div className="w-1 h-4 bg-cyan-400 rounded-full"></div> Ruta de Datos
+            </h4>
+            <div className="relative pl-6 space-y-4 before:absolute before:left-[9px] before:top-1 before:bottom-1 before:w-0.5 before:bg-gray-100">
+              <div className="relative text-[11px]">
+                <div className="absolute -left-[21px] w-4 h-4 rounded-full bg-white border-2 border-cyan-400 z-10"></div>
+                <p className="font-bold text-[#1C1E59]">GENERACIÓN DOCUMENTAL</p>
+                <p className="text-gray-400 text-[10px]">Procesado por motor YMS.</p>
+              </div>
+              <div className="relative text-[11px]">
+                <div className="absolute -left-[21px] w-4 h-4 rounded-full bg-white border-2 border-orange-500 z-10"></div>
+                <p className="font-bold text-[#1C1E59]">SINCRONIZACIÓN API</p>
+                <p className="text-gray-400 text-[10px]">Transmisión a infraestructura central.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Anomalía Compacta */}
+          <div className="bg-red-50 border border-red-100 p-3 rounded-xl flex items-center gap-3 text-red-600">
+             <AlertTriangle size={16} />
+             <p className="text-[10px] font-bold italic">Connection timeout with external API endpoint 504</p>
+          </div>
+        </div>
+
+        {/* Footer Compacto */}
+        <div className="p-4 bg-slate-50 flex gap-3 border-t border-gray-100">
+          <Button className="flex-1 h-10 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold uppercase rounded-xl shadow-md">
+            Reproceso Manual
+          </Button>
+          <Button variant="outline" className="flex-1 h-10 border-[#1C1E59] text-[#1C1E59] text-xs font-bold uppercase rounded-xl">
+            Exportar
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// --- COMPONENTE: MODAL DE CONFIRMACIÓN DE REPROCESO ---
+function ReprocessConfirmModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0 rounded-[2rem] shadow-2xl">
+        {/* Cabecera Naranja */}
+        <div className="bg-[#FF6C01] p-8 flex flex-col items-center text-white relative">
+          <button onClick={onClose} className="absolute right-4 top-4 text-white/80 hover:text-white">
+            x
+          </button>
+          
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6 border border-white/30">
+            <AlertTriangle size={32} className="text-white" />
+          </div>
+          
+          <h2 className="text-2xl font-black italic tracking-tighter uppercase mb-1">
+            Confirmar Reproceso
+          </h2>
+          <p className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-90">
+            Seguridad YMS • Protocolo Crítico
+          </p>
+        </div>
+
+        {/* Cuerpo del Modal */}
+        <div className="p-8 bg-white text-center">
+          <p className="text-gray-500 text-sm leading-relaxed mb-6 italic">
+            Se ha iniciado una solicitud para reprocesar <span className="font-black text-[#1C1E59] tracking-tight">1 PAQUETE(S) DE DATOS</span>. Esta acción intentará registrar nuevamente los documentos en la base de datos central de CONTROLT.
+          </p>
+          
+          <p className="text-gray-600 font-bold text-sm italic mb-8">
+            ¿Desea proceder con el envío manual a la API?
+          </p>
+
+          <div className="flex gap-4">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="flex-1 h-14 border-gray-200 text-gray-400 font-black italic uppercase rounded-2xl text-xs hover:bg-gray-50"
+            >
+              Abordar Operación
+            </Button>
+            <Button 
+              className="flex-1 h-14 bg-[#1C1E59] hover:bg-[#151744] text-white font-black italic uppercase rounded-2xl text-xs shadow-xl shadow-blue-900/30"
+            >
+              Iniciar Ejecución
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// --- COMPONENTE: MODAL HISTORIAL (CON TOGGLE Y HEADER AZUL) ---
+function AuditHistoryContent() {
+  const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
+  const [isReprocessOpen, setIsReprocessOpen] = useState(false);
+  // NUEVO ESTADO: Controla la vista de Creación vs Actualización
+  const [operationType, setOperationType] = useState<"creacion" | "actualizacion">("creacion");
+
+  // NUEVO: Datos actualizados con la propiedad `operation`
+  const auditData = [
+    { id: "DOC-1024", type: "PACKING LIST", status: "FAILED", auditor: "J.GARCIA", time: "26/01/2026, 17:27", operation: "creacion" },
+    { id: "DOC-1025", type: "ASN", status: "SUCCESS", auditor: "M.RODRIGUEZ", time: "26/01/2026, 16:27", operation: "creacion" },
+    { id: "DOC-2048", type: "WAYBILL", status: "SUCCESS", auditor: "A.MARTINEZ", time: "26/01/2026, 15:27", operation: "actualizacion" },
+    { id: "DOC-2049", type: "CUSTOMS DECLARATION", status: "FAILED", auditor: "L.GOMEZ", time: "26/01/2026, 14:15", operation: "actualizacion" },
+    { id: "DOC-1026", type: "INVOICE", status: "SUCCESS", auditor: "A.MARTINEZ", time: "26/01/2026, 15:27", operation: "creacion" },
+    { id: "DOC-1027", type: "PACKING LIST", status: "SUCCESS", auditor: "J.GARCIA", time: "26/01/2026, 14:27", operation: "creacion" },
+  ];
+
+  // Filtramos los datos según el toggle seleccionado
+  const filteredData = auditData.filter(row => row.operation === operationType);
+
+  return (
+    <div className="flex flex-col h-full bg-[#f8fafc]">
+      <LogAnalysisModal docId={selectedDoc || ""} onClose={() => setSelectedDoc(null)} />
+      <ReprocessConfirmModal isOpen={isReprocessOpen} onClose={() => setIsReprocessOpen(false)} />
+
+      {/* Header Modal */}
+      <div className="flex items-center justify-between mb-8 px-2 shrink-0">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100">
+            <HistoryIcon className="text-[#1C1E59]" size={20} />
+          </div>
+          <h2 className="text-xl font-black text-[#1C1E59] uppercase italic">Auditoría de documentos</h2>
+        </div>
+
+        <div className="flex gap-3">
+          <div className="bg-white border border-gray-200 p-2 px-5 rounded-2xl flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fallas: <span className="text-[#1C1E59] text-sm ml-1">06</span></span>
+          </div>
+          <div className="bg-white border border-gray-200 p-2 px-5 rounded-2xl flex items-center gap-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#4CCAC8]" />
+            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Procesados: <span className="text-[#1C1E59] text-sm ml-1">42</span></span>
+          </div>
+        </div>
+      </div>
+
+      {/* TOOLBAR */}
+      <div className="flex items-center justify-between mb-6 px-2 shrink-0 gap-3">
+        {/* Buscador */}
+        <div className="relative w-full max-w-sm group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#FF6C01]" />
+          <Input 
+            placeholder="Buscar por ID, Tipo o Auditor..." 
+            className="bg-white border-gray-200 pl-11 h-11 rounded-xl w-full shadow-sm focus:ring-[#FF6C01]/10" 
+          />
+        </div>
+        
+        {/* ACCIONES DERECHA: Toggle + Filtros + Exportar */}
+        <div className="flex items-center gap-3">
+          
+          {/* NUEVO AJUSTE: TOGGLE DE VISTA (Creación / Actualización) */}
+          <div className="bg-slate-100 p-1 rounded-2xl flex items-center border border-gray-200 shadow-sm h-11">
+            <button
+              onClick={() => setOperationType("creacion")}
+              className={cn(
+                "px-5 h-full rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
+                operationType === "creacion" 
+                  ? "bg-white text-[#1C1E59] shadow-md" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+              )}
+            >
+              <div className={cn("w-1.5 h-1.5 rounded-full", operationType === "creacion" ? "bg-cyan-500" : "bg-transparent")} />
+              Creación
+            </button>
+            <button
+              onClick={() => setOperationType("actualizacion")}
+              className={cn(
+                "px-5 h-full rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
+                operationType === "actualizacion" 
+                  ? "bg-white text-[#1C1E59] shadow-md" 
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+              )}
+            >
+              <div className={cn("w-1.5 h-1.5 rounded-full", operationType === "actualizacion" ? "bg-orange-500" : "bg-transparent")} />
+              Actualización
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-200 mx-1"></div>
+
+          {/* Botón Filtros */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button className="h-11 px-4 rounded-xl bg-[#FF6C01] hover:bg-[#e66101] text-white font-bold gap-2 shadow-lg shadow-orange-200">
+                <Filter size={18} />
+                <span>Filtros</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl" align="end">
+              <div className="space-y-4">
+                <h4 className="font-black text-[#1C1E59] text-xs uppercase italic">Filtros Avanzados</h4>
+                <div className="grid grid-cols-2 gap-2">
+                   <Input type="date" className="text-xs h-9" />
+                   <Input type="date" className="text-xs h-9" />
+                </div>
+                <Button className="w-full bg-[#1C1E59] text-white text-[10px] font-bold uppercase rounded-lg">Aplicar</Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Botón Exportar */}
+          <Button className="h-11 w-11 p-0 bg-[#FF6C01] hover:bg-[#e66101] text-white rounded-xl shadow-lg shadow-orange-200">
+            <FileText size={20} />
+          </Button>
+        </div>
+      </div>
+
+      {/* TABLA PRINCIPAL */}
+      <div className="bg-white rounded-[1.5rem] border border-gray-100 shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <Table>
+            <TableHeader className="sticky top-0 bg-[#1C1E59] z-20">
+              <TableRow className="hover:bg-transparent border-none">
+                <TableHead className="w-12 text-center"><input type="checkbox" className="rounded border-white/20 bg-transparent" /></TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic">Documento ID</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic">Tipo Logístico</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic text-center">Estado</TableHead>
+                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic text-right pr-12">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {/* Mapeamos filteredData en lugar de todos */}
+              {filteredData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-32 text-gray-400 font-bold italic">No hay registros para esta vista.</TableCell>
+                </TableRow>
+              ) : (
+                filteredData.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-slate-50/50 border-b border-gray-50 h-16">
+                    <TableCell className="text-center"><input type="checkbox" className="rounded" /></TableCell>
+                    <TableCell className="font-black text-xs text-[#1C1E59]">{row.id}</TableCell>
+                    <TableCell className="text-[10px] font-bold text-gray-500 uppercase">{row.type}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge className={cn(
+                        "text-[8px] px-3 font-black rounded-full border-none shadow-none",
+                        row.status === "FAILED" ? "bg-red-50 text-red-500" : "bg-emerald-50 text-emerald-500"
+                      )}>{row.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right pr-6">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => setSelectedDoc(row.id)} className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-cyan-500 shadow-sm transition-all"><Eye size={16} /></button>
+                        <button className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-orange-500 shadow-sm transition-all"><Download size={16} /></button>
+                        {row.status === "FAILED" && <button onClick={() => setIsReprocessOpen(true)} className="p-2.5 rounded-xl bg-white border border-gray-100 text-[#FF6C01] shadow-sm hover:bg-orange-50 transition-all active:scale-90"><RotateCw size={16} /></button>}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* PAGINACIÓN */}
+        <div className="px-6 py-3 bg-slate-50/50 border-t flex items-center justify-between shrink-0">
+           <span className="text-[9px] font-bold text-gray-400 uppercase italic">Mostrando {filteredData.length} registros</span>
+           <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronLeft size={14} /></Button>
+              <Button className="h-7 w-7 bg-[#1C1E59] text-white text-[10px] font-bold rounded-lg shadow-md shadow-blue-900/20">1</Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronRight size={14} /></Button>
+           </div>
+        </div>
       </div>
     </div>
   );
@@ -492,7 +800,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
 
-        {isLoaded && selectedLocation && (
+      {isLoaded && selectedLocation && (
           <div className="ml-auto flex items-center gap-2 animate-in fade-in slide-in-from-right-4 duration-300">
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-yms-gray group-focus-within:text-yms-cyan transition-colors pointer-events-none" />
@@ -500,7 +808,19 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
             </div>
             <div className="w-px h-8 bg-yms-border" />
 
-            {/* MODAL REPORTES - ANCHO 4XL + W-FULL */}
+            {/* MODAL HISTORIAL / AUDITORÍA */}
+            <Dialog>
+  <DialogTrigger asChild>
+    <button title="Historial de Auditoría" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md">
+        <HistoryIcon size={18} />
+    </button>
+  </DialogTrigger>
+  <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl overflow-hidden max-h-[95vh]">
+    <AuditHistoryContent />
+  </DialogContent>
+</Dialog>
+
+            {/* ... RECUERDA DEJAR AQUÍ EL RESTO DE TUS DIALOGS (Reportes, Usuarios, etc) ... */}
             <Dialog>
               <DialogTrigger asChild>
                 <button title="Reportes" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><BarChart3 size={18} /></button>
@@ -513,7 +833,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
 
             <button title="Registros" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><ClipboardList size={18} /></button>
 
-            {/* MODAL USUARIOS - ANCHO 7XL + W-FULL */}
+            {/* MODAL USUARIOS */}
             <Dialog>
               <DialogTrigger asChild>
                 <button title="Usuarios" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><Users size={18} /></button>
@@ -530,7 +850,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
               </DialogContent>
             </Dialog>
 
-            {/* MODAL CARGA - ANCHO 6XL + W-FULL */}
+            {/* MODAL CARGA */}
             <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
               <DialogTrigger asChild>
                 <button title="Carga de Archivos" className="w-10 h-10 flex items-center justify-center rounded-xl bg-yms-secondary text-white hover:brightness-110 active:scale-95 transition-all shadow-md"><Upload size={18} /></button>
@@ -541,7 +861,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
               </DialogContent>
             </Dialog>
 
-            {/* MODAL RESULTADOS - ANCHO 4XL + W-FULL */}
+            {/* MODAL RESULTADOS */}
             <Dialog open={isResultsModalOpen} onOpenChange={setIsResultsModalOpen}>
                 <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
                     <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3"><div className="p-2 bg-slate-50 rounded-lg"><Upload className={cn("w-5 h-5", COLORS.NAVY)} /></div><DialogTitle className={cn("text-lg font-black uppercase tracking-wide", COLORS.NAVY)}>Carga de Archivos</DialogTitle></div>

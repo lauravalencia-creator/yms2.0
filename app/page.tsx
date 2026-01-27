@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Navbar } from "@/components/dashboard/navbar";
 import { LocationFilter } from "@/components/dashboard/location-filter";
 import { DockManager } from "@/components/dashboard/dock-manager";
 import { TablesSection } from "@/components/dashboard/tables-section";
@@ -17,8 +16,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-      {/* Top Navbar */}
-      <Navbar />
+   
 
       {/* Location Filter Bar */}
       <LocationFilter onFilterChange={handleFilterChange} />
