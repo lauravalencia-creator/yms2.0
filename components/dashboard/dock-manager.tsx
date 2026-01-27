@@ -293,10 +293,17 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
            <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
         </div>
         <div className="p-8 bg-gray-50/50">
-           {/* Contenido mock del modal */}
-           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm p-4">
-              <h4 className="text-sm font-bold text-indigo-900 uppercase mb-4">Detalles de la orden {appointment.id}</h4>
-              <p className="text-sm text-gray-600">Este es un modal de ejemplo para solicitar cita.</p>
+           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-indigo-900 uppercase">Detalles de entrega</h4></div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
+                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
+                 <div className="px-4 py-3 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50"><span className="font-semibold text-slate-600 px-4">CANTIDAD POR ENTREGAR</span><span className="font-bold text-orange-600 text-right px-4">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span></div>
+              </div>
            </div>
         </div>
         <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
@@ -308,27 +315,150 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
   );
 }
 
+
 function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: () => void }) {
-    return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-          <div className="flex items-center justify-between px-6 py-4 border-b">
-             <div className="flex items-center gap-3">
-                <h3 className="text-lg font-bold text-indigo-900">CREAR CITA</h3>
-             </div>
-             <button onClick={onClose}><X className="w-6 h-6 text-slate-400" /></button>
-          </div>
-          <div className="p-8 bg-white">
-             <p>Formulario de creación para {appointment.id}</p>
-          </div>
-          <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
-             <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold" onClick={onConfirm}>CREAR CITA</Button>
-             <button className="text-orange-500 font-bold text-sm" onClick={onClose}>ATRÁS</button>
-          </div>
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+           <div className="flex items-center gap-3">
+              <div className="bg-slate-100 p-2 rounded-lg border border-slate-200">
+                <ClipboardList className="w-6 h-6 text-indigo-900" />
+              </div>
+              <h3 className="text-lg font-bold text-indigo-900">SOLICITUD DE CITAS</h3>
+           </div>
+           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+              x
+           </button>
+        </div>
+        <div className="p-8 bg-white space-y-6">
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Detalles de la cita</h4>
+              </div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Destino</span>
+                    <span className="font-medium text-slate-900">{appointment.locationName}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">ID de la cita</span>
+                    <span className="font-medium text-slate-900">{appointment.appointmentIdRef || '---'}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Transportista de la cita</span>
+                    <span className="font-medium text-slate-900">SI</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Transportista</span>
+                    <span className="font-medium text-slate-900">{appointment.transportCompany || appointment.carrier}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Tipo de carga</span>
+                    <span className="font-medium text-slate-900">{appointment.loadType}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Vehículo</span>
+                    <span className="font-medium text-slate-900">{appointment.vehicleType}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Fecha de cargue</span>
+                    <span className="font-medium text-slate-900">{appointment.loadDate}</span>
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Hora de cargue</span>
+                    <span className="font-medium text-slate-900">{appointment.loadTime}</span>
+                 </div>
+                 <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Fecha de descargue</span>
+                    <span className="font-medium text-slate-900">{appointment.unloadDate}</span>
+                 </div>
+                 <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Hora de descargue</span>
+                    <span className="font-medium text-slate-900">{appointment.unloadTime}</span>
+                 </div>
+              </div>
+           </div>
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Conductor</h4>
+              </div>
+              <div className="grid grid-cols-2 text-sm">
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Nombre del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driver}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Documento del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverId}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Teléfono del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverPhone}</span>
+                 </div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
+                    <span className="font-semibold text-slate-600">Correo electrónico del conductor</span>
+                    <span className="font-medium text-slate-900">{appointment.driverEmail}</span>
+                 </div>
+                 <div className="px-4 py-3 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center col-span-2">
+                    <span className="font-semibold text-slate-600">Placa del vehículo</span>
+                    <span className="font-medium text-slate-900">{appointment.truckId}</span>
+                 </div>
+              </div>
+           </div>
+           <div className="rounded-lg border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-sm font-bold text-indigo-900">Comentarios</h4>
+              </div>
+              <div className="text-sm">
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600 pt-2">Escribe comentarios</span>
+                    <textarea 
+                       className="w-full border border-slate-200 rounded p-2 text-slate-600 text-sm focus:outline-none focus:border-orange-400 placeholder:text-slate-300"
+                       placeholder="Añadir observaciones aquí..."
+                       rows={2}
+                    />
+                 </div>
+                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                    <span className="font-semibold text-slate-600">Orden de compra</span>
+                    <span className="font-medium text-slate-900">{appointment.id}</span>
+                 </div>
+                 <div className="grid grid-cols-2">
+                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Muelle sugerido</span>
+                       <span className="font-medium text-slate-900">2</span>
+                    </div>
+                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Mercancía</span>
+                       <span className="font-medium text-slate-900">{appointment.merchandiseCode}</span>
+                    </div>
+                 </div>
+                 <div className="grid grid-cols-2 border-t border-slate-100">
+                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Cantidad a entregar</span>
+                       <span className="font-medium text-slate-900">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span>
+                    </div>
+                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
+                       <span className="font-semibold text-slate-600">Tipo de mercancía</span>
+                       <span className="font-medium text-slate-900">{appointment.product || 'No Alimentos'}</span>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+        <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
+           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onConfirm}>
+             CREAR CITA
+           </Button>
+           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>
+             ATRÁS
+           </button>
         </div>
       </div>
-    );
+    </div>
+  );
 }
+
 
 function AppointmentEditModal({ 
   appointment, 
@@ -877,7 +1007,43 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
     <div className={expandedClasses}>
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
       {requestModalAppointment && <RequestAppointmentModal appointment={requestModalAppointment} onClose={() => setRequestModalAppointment(null)} onContinue={() => { setCreateModalAppointment(requestModalAppointment); setRequestModalAppointment(null); }} />}
-      {createModalAppointment && <CreateAppointmentModal appointment={createModalAppointment} onClose={() => setCreateModalAppointment(null)} onConfirm={() => { setAllAppointmentsState(prev => prev.map(a => a.id === createModalAppointment.id ? {...a, isReadyForAssignment: true} : a)); setCreateModalAppointment(null); setSelectedAppointment(prev => prev ? {...prev, isReadyForAssignment: true} : null); }} />}
+     {createModalAppointment && (
+  <CreateAppointmentModal 
+    appointment={createModalAppointment} 
+    onClose={() => setCreateModalAppointment(null)} 
+    onConfirm={() => { 
+        // 1. Encontrar el Muelle A-02 (o el primero disponible) para asignar la cita
+        // Simulamos que asignamos automáticamente al muelle "dock-1a-2"
+        const targetDockId = "dock-1a-2"; 
+
+        setAllDocksState(prev => prev.map(dock => {
+            if (dock.id === targetDockId) {
+                return {
+                    ...dock,
+                    status: "occupied", // Cambia estado a ocupado o programado
+                    occupancy: 50, // Ocupación parcial
+                    currentAppointment: {
+                        ...createModalAppointment,
+                        status: "scheduled", // Estado: Programado
+                        dockGroupId: dock.dockGroupId,
+                        locationId: dock.locationId,
+                        // Ajustamos hora para demostración
+                        time: "10:00" 
+                    }
+                };
+            }
+            return dock;
+        }));
+
+        // 2. Quitamos la cita de la lista de pendientes (barra izquierda)
+        setAllAppointmentsState(prev => prev.filter(a => a.id !== createModalAppointment.id));
+        
+        // 3. Limpiamos estados
+        setCreateModalAppointment(null); 
+        setSelectedAppointment(null);
+    }} 
+  />
+)}
 
       {isExpanded && <div className="p-2 border-b flex justify-end"><Button variant="ghost" size="sm" onClick={() => setIsExpanded(false)}><Minimize2 className="mr-2 w-4 h-4"/> Salir de pantalla completa</Button></div>}
       
