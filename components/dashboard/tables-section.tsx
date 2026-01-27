@@ -929,7 +929,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
               <TableCell className="text-center px-4">
                 <Button 
                   size="sm" 
-                  className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
+                  className="bg-[#378424] hover:bg-[#327D20] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
                 >
                   <Check className="w-3.5 h-3.5" />
                  
@@ -1044,7 +1044,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
               <TableCell className="text-center px-4">
                 <Button 
                   size="sm" 
-                  className="bg-[#FF6B00] hover:bg-[#e66101] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
+                  className="bg-[#EC2C2C] hover:bg-[#B11C1C] text-white font-black text-[10px] uppercase tracking-tighter rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 h-8 px-4 flex items-center gap-1.5 mx-auto"
                 >
                   <XCircle className="w-3.5 h-3.5" />
                  

@@ -21,10 +21,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { 
-  Search, BarChart3, ClipboardList, Users, Upload, Calendar as CalendarIcon,
+  Search, BarChart3, Settings, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
   RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle,
-  Package, X, QrCode, ArrowRight, LayoutGrid,
+  Package, X, QrCode, ArrowRight, LayoutGrid, Type,
   Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
@@ -105,6 +105,80 @@ const FilterLabel = ({ children }: { children: React.ReactNode }) => (
   </label>
 );
 
+// --- DATOS DE PERMISOS (Simulando la estructura de tu imagen) ---
+const PERMISSIONS_DATA = [
+  {
+    category: "ACCESO",
+    items: [
+      { id: "p1", label: "Registros ➝ Entrada", active: true },
+      { id: "p2", label: "Registros ➝ Salida", active: true },
+      { id: "p3", label: "Registros ➝ Inicio de descargue", active: true },
+      { id: "p4", label: "Registros ➝ Fin de descargue", active: true },
+      { id: "p5", label: "Registros ➝ Inicio de Cargue", active: true },
+      { id: "p6", label: "Registros ➝ Fin de Cargue", active: true },
+    ]
+  },
+  {
+    category: "MENU ACCESO",
+    items: [
+      { id: "p7", label: "Gestión de citas ➝ Solicitud de citas", active: false },
+      { id: "p8", label: "Carga de archivos ➝ Carga de Documentos", active: false },
+      { id: "p9", label: "Carga de archivos ➝ Carga de Documentos legacy", active: false },
+      { id: "p10", label: "Carga de archivos ➝ Carga de Citas", active: false },
+      { id: "p11", label: "Gestión de citas ➝ Confirmación/Cancelación", active: false },
+      { id: "p12", label: "Gestión de citas ➝ Recurrencia de citas", active: false },
+      { id: "p13", label: "Gestión de citas ➝ Reagendamiento", active: false },
+    ]
+  },
+  {
+    category: "MENU CATALOGOS",
+    items: [
+      { id: "p14", label: "Maestros ➝ Conductores", active: true },
+      { id: "p15", label: "Maestros ➝ Vehículos", active: true },
+    ]
+  }
+];
+
+// --- COMPONENTE TOGGLE SWITCH PERSONALIZADO ---
+const CustomSwitch = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+  <button 
+    onClick={onChange}
+    className={cn(
+      "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+      checked ? "bg-[#ff6b00]" : "bg-gray-200"
+    )}
+  >
+    <span className="sr-only">Toggle setting</span>
+    <span
+      className={cn(
+        "pointer-events-none block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform duration-200 ease-in-out",
+        checked ? "translate-x-5" : "translate-x-0"
+      )}
+    />
+  </button>
+);
+
+// Checkbox estilizado como tarjeta para mejor UX
+const ToggleCard = ({ icon: Icon, title, checked, onChange }: any) => (
+  <div 
+    onClick={() => onChange(!checked)}
+    className={cn(
+      "cursor-pointer rounded-xl border p-3 flex items-center gap-3 transition-all",
+      checked 
+        ? "border-[#ff6b00] bg-orange-50/50 text-[#1e2b58]" 
+        : "border-gray-100 bg-gray-50/50 text-gray-400 hover:border-gray-300"
+    )}
+  >
+    <div className={cn("p-2 rounded-lg", checked ? "bg-[#ff6b00] text-white" : "bg-white text-gray-400")}>
+      <Icon size={16} />
+    </div>
+    <div className="flex-1">
+      <span className="text-[11px] font-bold uppercase tracking-wider block select-none">{title}</span>
+    </div>
+    {checked && <CheckCircle2 size={16} className="text-[#ff6b00]" />}
+  </div>
+);
+
 const InputWithIcon = ({ icon: Icon, ...props }: any) => (
   <div className="relative">
     <Input 
@@ -116,6 +190,246 @@ const InputWithIcon = ({ icon: Icon, ...props }: any) => (
     </div>
   </div>
 );
+
+// --- MODAL: GENERAR PERFIL ---
+function CreateProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [flags, setFlags] = useState({ autocomplete: false, delivery: false, terminal: false });
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white">
+        {/* Header Compacto */}
+        <div className="bg-[#ff6b00] px-6 py-4 flex items-center justify-between text-white">
+          <div className="flex items-center gap-2">
+            <Users size={20} className="text-white/90" />
+            <h3 className="font-black italic uppercase tracking-wide text-sm">Generar Nuevo Perfil</h3>
+          </div>
+          <button onClick={onClose} className="text-white/70 hover:text-white transition-colors"><X size={20} /></button>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Fila 1: Descripción */}
+          <div className="space-y-1.5">
+            <FilterLabel>Descripción del Perfil</FilterLabel>
+            <Input placeholder="Ej: Operador Logístico Junior" className="h-10 text-sm border-gray-200 focus:border-[#ff6b00]" />
+          </div>
+
+          {/* Fila 2: Grid de Configuración */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <FilterLabel>Tipo</FilterLabel>
+              <Select defaultValue="operativo">
+                <SelectTrigger className="h-10 text-xs font-medium border-gray-200"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                  <SelectItem value="operativo">Operativo</SelectItem>
+                  <SelectItem value="consulta">Consulta</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <FilterLabel>Tiempo Sesión (Min)</FilterLabel>
+              <div className="relative">
+                <Input type="number" defaultValue={15} className="h-10 text-sm border-gray-200 pr-8" />
+                <HistoryIcon size={14} className="absolute right-3 top-3 text-gray-400" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+             <FilterLabel>Nivel de Visibilidad</FilterLabel>
+             <Select defaultValue="corp">
+                <SelectTrigger className="h-10 text-xs font-medium border-gray-200"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="corp">Corporativo (Global)</SelectItem>
+                  <SelectItem value="loc">Localidad</SelectItem>
+                </SelectContent>
+              </Select>
+          </div>
+
+          {/* Fila 3: Toggles / Checkboxes mejorados */}
+          <div>
+            <FilterLabel>Permisos Adicionales</FilterLabel>
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <ToggleCard icon={Type} title="Autocompletar" checked={flags.autocomplete} onChange={(v:boolean) => setFlags({...flags, autocomplete: v})} />
+              <ToggleCard icon={Package} title="Cant. Entrega" checked={flags.delivery} onChange={(v:boolean) => setFlags({...flags, delivery: v})} />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3 justify-end">
+           <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700 text-xs font-bold uppercase">Cancelar</Button>
+           <Button className="bg-[#ff6b00] hover:bg-[#e66000] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-orange-200 rounded-xl px-6">
+             Generar y Asignar
+           </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PermissionsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  // Estado local para manejar los toggles (en una app real esto vendría de BD)
+  const [permissions, setPermissions] = useState(PERMISSIONS_DATA);
+
+  const togglePermission = (catIndex: number, itemIndex: number) => {
+    const newPerms = [...permissions];
+    newPerms[catIndex].items[itemIndex].active = !newPerms[catIndex].items[itemIndex].active;
+    setPermissions(newPerms);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-2xl p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-[#F8FAFC] max-h-[85vh] flex flex-col">
+        
+        {/* Header */}
+        <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between shrink-0 z-10">
+          <div>
+            <h3 className="text-[#1C1E59] font-black italic uppercase text-lg tracking-wide flex items-center gap-2">
+              <span className="w-1 h-6 bg-[#ff6b00] rounded-full inline-block"></span>
+              Configuración de Permisos
+            </h3>
+            <p className="text-xs text-gray-400 font-medium pl-3">Control de acceso y visibilidad de módulos</p>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-all">
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Body Scrollable */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+          {permissions.map((section, catIndex) => (
+            <div key={section.category} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 pl-1">
+                {section.category}
+              </h4>
+              
+              <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-6 py-2 bg-gray-50/50 border-b border-gray-50 flex justify-end">
+                   <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Off / On</span>
+                </div>
+                {section.items.map((item, itemIndex) => (
+                  <div 
+                    key={item.id} 
+                    className="flex items-center justify-between px-6 py-4 border-b border-gray-50 last:border-0 hover:bg-slate-50 transition-colors group"
+                  >
+                    <span className="text-sm font-medium text-gray-600 group-hover:text-[#1C1E59] transition-colors flex items-center gap-2">
+                       {/* Transformamos la flecha de texto en un icono visual si lo prefieres, o dejamos el texto */}
+                       {item.label.split('➝').map((part, i, arr) => (
+                          <React.Fragment key={i}>
+                             {part.trim()}
+                             {i < arr.length - 1 && <ChevronRight size={12} className="text-gray-300 mx-1" />}
+                          </React.Fragment>
+                       ))}
+                    </span>
+                    <CustomSwitch 
+                      checked={item.active} 
+                      onChange={() => togglePermission(catIndex, itemIndex)} 
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="p-5 bg-white border-t border-gray-100 flex justify-end gap-3 shrink-0 z-10">
+           <Button variant="ghost" onClick={onClose} className="text-gray-400 hover:text-gray-600 font-bold uppercase text-xs">
+             Cancelar
+           </Button>
+           <Button onClick={onClose} className="bg-[#ff6b00] hover:bg-[#e66000] text-white font-bold uppercase text-xs px-8 rounded-xl shadow-lg shadow-orange-200">
+             Guardar Cambios
+           </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// --- MODAL: ACTUALIZAR PERFIL ---
+function EditProfileModal({ isOpen, onClose, profileData }: { isOpen: boolean; onClose: () => void; profileData: any }) {
+  const [flags, setFlags] = useState({ autocomplete: false, delivery: false, terminal: true });
+  
+  // NUEVO: Estado para controlar el modal de permisos
+  const [isPermissionsOpen, setIsPermissionsOpen] = useState(false);
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white">
+          {/* ... (Todo el Header y Body del EditProfileModal se mantiene igual) ... */}
+          <div className="bg-[#1e2b58] px-6 py-4 flex items-center justify-between text-white">
+            <div className="flex items-center gap-2">
+              <Settings size={20} className="text-[#4CCAC8]" />
+              <h3 className="font-black italic uppercase tracking-wide text-sm">Actualización de Perfil</h3>
+            </div>
+            <button onClick={onClose} className="text-white/70 hover:text-white transition-colors"><X size={20} /></button>
+          </div>
+
+          <div className="p-6 space-y-5">
+             <div className="flex items-center gap-2 mb-2">
+                <Badge variant="outline" className="text-xs text-gray-500 border-gray-200">ID: 1229</Badge>
+                <Badge className="bg-emerald-100 text-emerald-600 shadow-none border-none text-[10px] font-bold">ACTIVO</Badge>
+             </div>
+
+            <div className="grid grid-cols-3 gap-4">
+               <div className="col-span-2 space-y-1.5">
+                  <FilterLabel>Descripción</FilterLabel>
+                  <Input defaultValue="Administrador" className="h-10 text-sm font-bold text-[#1e2b58] border-gray-200 bg-gray-50/50" />
+               </div>
+               <div className="space-y-1.5">
+                  <FilterLabel>Tipo</FilterLabel>
+                  <div className="h-10 flex items-center px-3 bg-gray-100 rounded-md text-xs text-gray-500 font-bold border border-gray-200">
+                     Administrador
+                  </div>
+               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-1.5">
+                  <FilterLabel>Tiempo Sesión</FilterLabel>
+                  <Input type="number" defaultValue={120} className="h-10 text-sm border-gray-200" />
+               </div>
+               <div className="space-y-1.5">
+                   <FilterLabel>Terminal</FilterLabel>
+                   <ToggleCard icon={LayoutGrid} title="Modo Terminal" checked={flags.terminal} onChange={(v:boolean) => setFlags({...flags, terminal: v})} />
+               </div>
+            </div>
+
+            <div>
+              <FilterLabel>Configuración Avanzada</FilterLabel>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <ToggleCard icon={Type} title="Autocompletar" checked={flags.autocomplete} onChange={(v:boolean) => setFlags({...flags, autocomplete: v})} />
+                <ToggleCard icon={Package} title="Cant. Entrega" checked={flags.delivery} onChange={(v:boolean) => setFlags({...flags, delivery: v})} />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3">
+             {/* BOTÓN ACTUALIZADO */}
+             <Button 
+                variant="outline" 
+                onClick={() => setIsPermissionsOpen(true)} // AHORA ABRE EL NUEVO MODAL
+                className="flex-1 border-gray-200 text-[#1e2b58] hover:bg-white hover:border-[#1e2b58] font-bold text-xs uppercase rounded-xl h-10 shadow-sm"
+             >
+               Modificar Permisos
+             </Button>
+             
+             <Button className="flex-1 bg-[#ff6b00] hover:bg-[#e66000] text-white text-xs font-bold uppercase tracking-wider shadow-md rounded-xl h-10">
+               Actualizar Datos
+             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* RENDERIZAMOS EL MODAL DE PERMISOS AQUÍ */}
+      <PermissionsModal isOpen={isPermissionsOpen} onClose={() => setIsPermissionsOpen(false)} />
+    </>
+  );
+}
 
 // --- COMPONENTES TABLAS DE USUARIOS ---
 function UsuariosTable() {
@@ -161,30 +475,77 @@ function UsuariosTable() {
   );
 }
 
-function PerfilesTable() {
-  return (
-    <div className="overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent border-none">
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[25%]", COLORS.NAVY)}>Perfil</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[40%]", COLORS.NAVY)}>Descripción</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[20%]", COLORS.NAVY)}>Usuarios</TableHead>
-            <TableHead className={cn("font-bold uppercase tracking-wide h-10 w-[15%]", COLORS.NAVY)}>Estado</TableHead>
-          </TableRow>
-        </TableHeader>
+// --- CONTENIDO TAB PERFILES (CON LÓGICA DE MODALES) ---
+function PerfilesTabContent() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<any>(null);
 
-        <TableBody>
-          <TableRow className="border-b border-gray-100 hover:bg-slate-50/50">
-            <TableCell className="font-bold text-gray-700 text-sm py-4">Administrador</TableCell>
-            <TableCell className="text-gray-600 text-sm">Acceso total al sistema</TableCell>
-            <TableCell className="text-gray-600 text-sm">5</TableCell>
-            <TableCell>
-              <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-none shadow-none font-bold px-3">Activo</Badge>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+  const handleRowClick = (profile: any) => {
+    setSelectedProfile(profile);
+    setIsEditOpen(true);
+  };
+
+  return (
+    <div className="flex flex-col h-full min-h-[400px]">
+      <CreateProfileModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
+      {isEditOpen && <EditProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} profileData={selectedProfile} />}
+
+      {/* Toolbar Superior */}
+      <div className="flex items-center justify-between mb-6">
+         <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input placeholder="Buscar perfil..." className="pl-9 h-10 text-xs rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all" />
+         </div>
+         <Button 
+            onClick={() => setIsCreateOpen(true)}
+            className="bg-[#ff6b00] hover:bg-[#e66000] text-white text-xs font-bold uppercase tracking-wide rounded-xl h-10 px-5 shadow-lg shadow-orange-100 flex items-center gap-2"
+         >
+            <Users size={16} />
+            Generar Perfil
+         </Button>
+      </div>
+
+      {/* Tabla Mejorada */}
+      <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex-1">
+        <Table>
+          <TableHeader className="bg-[#1e2b58] hover:bg-[#1e2b58]">
+            <TableRow className="border-none hover:bg-transparent">
+              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Perfil</TableHead>
+              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Descripción</TableHead>
+              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11 text-center">Usuarios</TableHead>
+              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Estado</TableHead>
+              <TableHead className="w-10"></TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {[
+              { id: 1, name: "Administrador", desc: "Acceso total al sistema y configuración", count: 5, status: "active" },
+              { id: 2, name: "Operador de Patio", desc: "Gestión de entradas y salidas de vehículos", count: 12, status: "active" },
+              { id: 3, name: "Consulta Externa", desc: "Solo visualización de reportes", count: 3, status: "active" },
+            ].map((row) => (
+              <TableRow 
+                key={row.id} 
+                onClick={() => handleRowClick(row)}
+                className="group cursor-pointer hover:bg-orange-50/30 border-b border-gray-50 transition-colors"
+              >
+                <TableCell className="font-bold text-[#1e2b58] text-xs py-4">{row.name}</TableCell>
+                <TableCell className="text-gray-500 text-xs">{row.desc}</TableCell>
+                <TableCell className="text-center">
+                  <Badge variant="secondary" className="bg-gray-100 text-gray-600 font-bold">{row.count}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-none shadow-none text-[10px] font-bold px-2">Activo</Badge>
+                </TableCell>
+                <TableCell>
+                   <ChevronRight size={16} className="text-gray-300 group-hover:text-[#ff6b00] transition-colors" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
@@ -1079,27 +1440,41 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
                         </DialogContent>
                       </Dialog>
 
+                      {/* GESTIÓN DE USUARIOS */}
                       <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-                            <Users size={16} className="text-[#1C1E59]" />
-                            <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-7xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
-                          <DialogHeader><DialogTitle className={cn("text-xl font-black uppercase", COLORS.NAVY)}>Gestión de Usuarios</DialogTitle></DialogHeader>
-                          <Tabs defaultValue="usuarios" className="mt-4">
-                            <TabsList className="bg-gray-50 p-1.5 rounded-full h-auto w-fit border border-gray-100">
-                              <TabsTrigger value="usuarios" className="rounded-full px-6 py-2 text-xs font-bold">Usuarios</TabsTrigger>
-                              <TabsTrigger value="perfiles" className="rounded-full px-6 py-2 text-xs font-bold">Perfiles</TabsTrigger>
-                            </TabsList>
-                            <div className="mt-6">
-                              <TabsContent value="usuarios"><UsuariosTable /></TabsContent>
-                              <TabsContent value="perfiles"><PerfilesTable /></TabsContent>
-                            </div>
-                          </Tabs>
-                        </DialogContent>
-                      </Dialog>
+  <DialogTrigger asChild>
+    <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
+      <Users size={16} className="text-[#1C1E59]" />
+      <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
+    </button>
+  </DialogTrigger>
+  {/* Ajusté el ancho máximo y padding para mejor visualización */}
+  <DialogContent className="sm:max-w-5xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden h-[600px] flex flex-col">
+    <div className="px-8 py-5 border-b border-gray-100 bg-slate-50/30 flex items-center gap-3 shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center">
+            <Users className={cn("w-5 h-5", COLORS.NAVY)} />
+        </div>
+        <div>
+            <DialogTitle className={cn("text-lg font-black uppercase italic tracking-tight", COLORS.NAVY)}>Gestión de Usuarios</DialogTitle>
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">Administración de accesos y roles</p>
+        </div>
+    </div>
+    
+    <div className="flex-1 p-8 overflow-y-auto">
+      <Tabs defaultValue="usuarios" className="h-full flex flex-col">
+        <TabsList className="bg-slate-100 p-1 rounded-xl h-11 w-fit mb-6 self-start border border-gray-200">
+          <TabsTrigger value="usuarios" className="rounded-lg px-6 h-full text-xs font-bold uppercase data-[state=active]:bg-white data-[state=active]:text-[#ff6b00] data-[state=active]:shadow-sm transition-all">Administración de Usuarios</TabsTrigger>
+          <TabsTrigger value="perfiles" className="rounded-lg px-6 h-full text-xs font-bold uppercase data-[state=active]:bg-white data-[state=active]:text-[#ff6b00] data-[state=active]:shadow-sm transition-all">Administración de Perfiles</TabsTrigger>
+        </TabsList>
+        
+        <div className="flex-1">
+          <TabsContent value="usuarios " className="mt-0 h-full"><UsuariosTable /></TabsContent>
+          <TabsContent value="perfiles" className="mt-0 h-full"><PerfilesTabContent /></TabsContent>
+        </div>
+      </Tabs>
+    </div>
+  </DialogContent>
+</Dialog>
 
                       <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
                         <DialogTrigger asChild>
