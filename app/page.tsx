@@ -7,17 +7,17 @@ import { TablesSection } from "@/components/dashboard/tables-section";
 
 export default function DashboardPage() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
-  const [selectedDockGroupId, setSelectedDockGroupId] = useState<string | null>(null);
+  // Renombramos el estado para que tenga sentido semántico (ahora es un ID de muelle específico)
+  const [selectedDockId, setSelectedDockId] = useState<string | null>(null);
 
-  const handleFilterChange = useCallback((locationId: string | null, dockGroupId: string | null) => {
+  const handleFilterChange = useCallback((locationId: string | null, dockId: string | null) => {
     setSelectedLocationId(locationId);
-    setSelectedDockGroupId(dockGroupId);
+    setSelectedDockId(dockId);
   }, []);
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
    
-
       {/* Location Filter Bar */}
       <LocationFilter onFilterChange={handleFilterChange} />
 
@@ -27,7 +27,7 @@ export default function DashboardPage() {
         <section className="h-1/2 min-h-0 bg-slate-50">
           <DockManager 
             locationId={selectedLocationId} 
-            dockGroupId={selectedDockGroupId} 
+            selectedDockId={selectedDockId} // <-- Aquí estaba el error, ahora usamos el nombre correcto
           />
         </section>
 
@@ -35,7 +35,7 @@ export default function DashboardPage() {
         <section className="h-1/2 min-h-0">
           <TablesSection 
             locationId={selectedLocationId}
-            dockGroupId={selectedDockGroupId}
+            dockGroupId={selectedDockId} // Mantenemos el nombre antiguo si TablesSection no se ha actualizado, o pasamos el ID
           />
         </section>
       </main>

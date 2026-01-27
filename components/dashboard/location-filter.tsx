@@ -61,6 +61,8 @@ const COLORS = {
   ORANGE_LIGHT_BG: "bg-[#FFEAD5]",
 };
 
+
+
 // --- ICONOS ---
 function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -1127,6 +1129,33 @@ const locationsData: Location[] = [
   },
 ];
 
+const MenuGridButton = ({ 
+  icon: Icon, 
+  label, 
+  onClick, 
+  variant = "navy" 
+}: { 
+  icon: any, 
+  label: string, 
+  onClick?: () => void,
+  variant?: "navy" | "orange"
+}) => (
+  <button
+    onClick={onClick}
+    className="flex flex-col items-center justify-center gap-2 p-3 rounded-2xl hover:bg-slate-50 transition-all group active:scale-95"
+  >
+    <div className={cn(
+      "w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 group-hover:shadow-md transition-all",
+      variant === "orange" ? "bg-orange-50 text-[#ff6b00] group-hover:bg-[#ff6b00] group-hover:text-white" : "bg-slate-50 text-[#1e2b58] group-hover:bg-[#1e2b58] group-hover:text-white"
+    )}>
+      <Icon size={24} strokeWidth={2.5} />
+    </div>
+    <span className="text-[10px] font-black uppercase tracking-tight text-center leading-tight text-gray-500 group-hover:text-[#1e2b58]">
+      {label}
+    </span>
+  </button>
+);
+
 interface LocationFilterProps {
   onFilterChange: (locationId: string | null, dockGroupId: string | null) => void;
 }
@@ -1367,45 +1396,47 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
     }
   };
 
-  return (
-       <div className="bg-white flex flex-col w-full border-none shadow-sm">
-    {/* --- FILA PRINCIPAL: Logo + Filtros + Botones --- */}
-    <div className="px-6 py-4 flex items-center gap-8"> {/* gap-8 mantiene una separación elegante */}
-      
-      {/* 1. LOGO */}
-      <div className="flex-shrink-0">
-        <img 
-          src="/ControlT.png" 
-          alt="Logo"
-          className="h-10 w-auto object-contain" 
-        />
-      </div>
-
-      {/* 2. SELECTOR LOCALIDAD (Agrupado cerca del logo) */}
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-yms-gray">
-          <MapPinIcon className="w-5 h-5 text-yms-secondary" />
-          <span className="font-bold text-sm text-gray-600">Localidad:</span>
+ return (
+    <div className="bg-white flex flex-col w-full border-none shadow-sm">
+      {/* --- FILA PRINCIPAL: Logo + Filtros + Botones --- */}
+      <div className="px-6 py-4 flex items-center gap-8">
+        
+        {/* 1. LOGO */}
+        <div className="flex-shrink-0">
+          <img 
+            src="/ControlT.png" 
+            alt="Logo"
+            className="h-10 w-auto object-contain" 
+          />
         </div>
-        <Select value={selectedLocationId || ""} onValueChange={handleLocationChange}>
-          <SelectTrigger className={cn(
-            "w-[320px] h-10 rounded-full border-gray-200 bg-white focus:ring-2 focus:ring-yms-cyan transition-all text-sm", 
-            !selectedLocationId && "text-gray-400"
-          )}>
-            <SelectValue placeholder="Seleccionar localidad..." />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl border-gray-100 shadow-xl">
-            {locationsData.map((location) => (
-              <SelectItem key={location.id} value={location.id} className="cursor-pointer focus:bg-gray-100 focus:text-gray-900 rounded-lg m-1">
-                <div className="flex flex-col py-1">
-                  <span className="font-bold text-yms-primary">{location.name}</span>
-                  <span className="text-[10px] text-gray-400 leading-tight">{location.address}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+
+        {/* 2. SELECTOR LOCALIDAD */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 text-yms-gray">
+            <MapPinIcon className="w-5 h-5 text-yms-secondary" />
+            <span className="font-bold text-sm text-gray-600">Localidad:</span>
+          </div>
+          <Select value={selectedLocationId || ""} onValueChange={handleLocationChange}>
+            <SelectTrigger className={cn(
+              "w-[320px] h-10 rounded-full border-gray-200 bg-white focus:ring-2 focus:ring-yms-cyan transition-all text-sm", 
+              !selectedLocationId && "text-gray-400"
+            )}>
+              <SelectValue placeholder="Seleccionar localidad..." />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-gray-100 shadow-xl">
+              {locationsData.map((location) => (
+                <SelectItem key={location.id} value={location.id} className="cursor-pointer focus:bg-gray-100 focus:text-gray-900 rounded-lg m-1">
+                  <div className="flex flex-col py-1">
+                    <span className="font-bold text-yms-primary">{location.name}</span>
+                    <span className="text-[10px] text-gray-400 leading-tight">{location.address}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* 3. SELECTOR DE MUELLES (Solo se muestra si hay localidad, esto está bien) */}
         {selectedLocationId && (
           <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-300">
             <div className="w-px h-8 bg-yms-border" />
@@ -1435,187 +1466,150 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           </div>
         )}
 
-      {/* 3. BOTÓN ÚNICO DE ITEMS (ACCIONES) */}
-        {isLoaded && selectedLocation && (
-          <div className="ml-auto flex items-center gap-4">
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 h-10 w-48 bg-gray-50 border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
-            </div>
+        {/* 4. BOTONES DE ACCIÓN (AHORA VISIBLES SIEMPRE) */}
+        {/* Se eliminó la condición {isLoaded && selectedLocation && (...)} */}
+        <div className="ml-auto flex items-center gap-4">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 h-10 w-48 bg-gray-50 border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
+          </div>
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-orange-200">
-                  <LayoutGrid size={20} />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 p-3 rounded-[1.5rem] shadow-2xl border-gray-100 bg-white" align="end">
-                <div className="space-y-4">
-                  {/* SECCIÓN REGISTROS RÁPIDOS */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-orange-200">
+                <LayoutGrid size={20} />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-3 rounded-[1.5rem] shadow-2xl border-gray-100 bg-white" align="end">
+              <div className="space-y-4">
+                {/* SECCIÓN REGISTROS RÁPIDOS */}
                   <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-2 block">Registros</span>
-                    <div className="grid grid-cols-1 gap-1">
+                    <div className="flex items-center gap-2 px-3 mb-4">
+                      <div className="h-1 w-6 bg-[#ff6b00] rounded-full" />
+                      <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Registros de Patio</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
                       {REGISTRO_OPCIONES.map((opt) => (
-                        <button
+                        <MenuGridButton
                           key={opt.id}
+                          icon={opt.icon}
+                          label={opt.label}
+                          variant="orange"
                           onClick={() => handleOpenRegistro(opt.id)}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-50 text-gray-600 hover:text-[#ff6b00] transition-all group text-left"
-                        >
-                          <opt.icon size={16} className="text-gray-400 group-hover:text-[#ff6b00]" />
-                          <span className="text-xs font-bold">{opt.label}</span>
-                        </button>
+                        />
                       ))}
                     </div>
                   </div>
 
-                  <div className="h-px bg-gray-100 mx-2" />
+                <div className="h-px bg-gray-100 mx-2" />
 
-                  {/* SECCIÓN HERRAMIENTAS */}
-                  <div>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 mb-2 block">Herramientas</span>
-                    <div className="flex flex-col gap-1">
-                      {/* CADA BOTÓN ACTIVA SU PROPIO DIALOG */}
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-                            <HistoryIcon size={16} className="text-[#1C1E59]" />
-                            <span className="text-xs font-bold text-[#1C1E59]">Historial de Auditoría</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl overflow-hidden max-h-[95vh]">
-                          <AuditHistoryContent />
-                        </DialogContent>
-                      </Dialog>
+                {/* SECCIÓN HERRAMIENTAS */}
+                <div>
+                  <div className="flex items-center gap-2 px-3 mb-4">
+                    <div className="h-1 w-6 bg-[#1C1E59] rounded-full" />
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Administración</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="contents"><MenuGridButton icon={HistoryIcon} label="Auditoría" /></div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl max-h-[95vh]">
+                        <AuditHistoryContent />
+                      </DialogContent>
+                    </Dialog>
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-                            <BarChart3 size={16} className="text-[#1C1E59]" />
-                            <span className="text-xs font-bold text-[#1C1E59]">Filtros y Reportes</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-4xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
-                          <DialogHeader><DialogTitle className={cn("text-center text-2xl font-black uppercase mb-2", COLORS.NAVY)}>Filtros de Búsqueda</DialogTitle></DialogHeader>
-                          <ReportFiltersContent />
-                        </DialogContent>
-                      </Dialog>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="contents"><MenuGridButton icon={BarChart3} label="Reportes" /></div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-4xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
+                        <DialogHeader><DialogTitle className={cn("text-center text-2xl font-black uppercase mb-2", COLORS.NAVY)}>Filtros de Búsqueda</DialogTitle></DialogHeader>
+                        <ReportFiltersContent />
+                      </DialogContent>
+                    </Dialog>
 
-                      {/* GESTIÓN DE USUARIOS */}
-                     {/* GESTIÓN DE USUARIOS */}
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-                              <Users size={16} className="text-[#1C1E59]" />
-                              <span className="text-xs font-bold text-[#1C1E59]">Gestión de Usuarios</span>
-                            </button>
-                          </DialogTrigger>
-                          
-                          <DialogContent className="sm:max-w-[90vw] w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden h-[80vh] flex flex-col">
-                            {/* Header */}
-                            <div className="px-8 py-5 border-b border-gray-100 bg-white flex items-center gap-4 shrink-0">
-                                <div className="w-12 h-12 rounded-full bg-slate-50 border border-gray-100 flex items-center justify-center">
-                                    <Users className="w-6 h-6 text-[#1e2b58]" />
-                                </div>
-                                <div>
-                                    <DialogTitle className="text-lg font-black uppercase italic tracking-tight text-[#1e2b58]">Gestión de Usuarios</DialogTitle>
-                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Administración de accesos y roles</p>
-                                </div>
-                                <DialogPrimitive.Close className="ml-auto text-gray-400 hover:text-gray-600">
-                                    <X size={24} />
-                                </DialogPrimitive.Close>
-                            </div>
-                            
-                            <div className="flex-1 p-8 bg-[#F8FAFC] overflow-hidden flex flex-col">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="contents"><MenuGridButton icon={Users} label="Usuarios" /></div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[90vw] w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl h-[80vh] flex flex-col overflow-hidden">
+                          {/* Header Usuarios */}
+                          <div className="px-8 py-5 border-b border-gray-100 bg-white flex items-center gap-4 shrink-0">
+                              <div className="w-12 h-12 rounded-full bg-slate-50 border border-gray-100 flex items-center justify-center">
+                                  <Users className="w-6 h-6 text-[#1e2b58]" />
+                              </div>
+                              <div>
+                                  <DialogTitle className="text-lg font-black uppercase italic tracking-tight text-[#1e2b58]">Gestión de Usuarios</DialogTitle>
+                                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Administración de accesos</p>
+                              </div>
+                              <DialogPrimitive.Close className="ml-auto text-gray-400 hover:text-gray-600"><X size={24} /></DialogPrimitive.Close>
+                          </div>
+                          <div className="flex-1 p-8 bg-[#F8FAFC] overflow-hidden">
                               <Tabs defaultValue="usuarios" className="h-full flex flex-col">
-                                {/* Tabs List */}
-                                <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit mb-6 self-start border border-gray-100 shadow-sm">
-                                  <TabsTrigger 
-                                    value="usuarios" 
-                                    className="rounded-xl px-6 h-full text-[11px] font-black uppercase text-gray-400 data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
-                                  >
-                                    Administración de Usuarios
-                                  </TabsTrigger>
-                                  <TabsTrigger 
-                                    value="perfiles" 
-                                    className="rounded-xl px-6 h-full text-[11px] font-black uppercase text-gray-400 data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
-                                  >
-                                    Administración de Perfiles
-                                  </TabsTrigger>
+                                <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit mb-6 border border-gray-100">
+                                  <TabsTrigger value="usuarios" className="rounded-xl px-6 h-full text-[11px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white">Usuarios</TabsTrigger>
+                                  <TabsTrigger value="perfiles" className="rounded-xl px-6 h-full text-[11px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white">Perfiles</TabsTrigger>
                                 </TabsList>
-                                
-                                {/* Content Area */}
-                                <div className="flex-1 min-h-0">
-                                  {/* AQUÍ ESTABA EL ERROR: Asegúrate que value sea "usuarios" (sin espacios extra) */}
-                                  <TabsContent value="usuarios" className="mt-0 h-full data-[state=active]:flex flex-col">
-                                    <UsuariosTable />
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="perfiles" className="mt-0 h-full data-[state=active]:flex flex-col">
-                                    <PerfilesTabContent />
-                                  </TabsContent>
-                                </div>
+                                <TabsContent value="usuarios" className="flex-1 min-h-0"><UsuariosTable /></TabsContent>
+                                <TabsContent value="perfiles" className="flex-1 min-h-0"><PerfilesTabContent /></TabsContent>
                               </Tabs>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                          </div>
+                      </DialogContent>
+                    </Dialog>
 
-                      <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-                        <DialogTrigger asChild>
-                          <button className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 text-gray-600 transition-all text-left">
-                            <Upload size={16} className="text-[#1C1E59]" />
-                            <span className="text-xs font-bold text-[#1C1E59]">Carga de Archivos</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-6xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-                          <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
-                            <Upload className={cn("w-5 h-5", COLORS.NAVY)} />
-                            <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Carga de Archivos</DialogTitle>
-                          </div>
-                          <div className="px-8 pb-8">
-                            <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                    <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+                      <DialogTrigger asChild>
+                        <div className="contents"><MenuGridButton icon={Upload} label="Cargar" /></div>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-6xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
+                        <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
+                          <Upload className={cn("w-5 h-5", COLORS.NAVY)} />
+                          <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Carga de Archivos</DialogTitle>
+                        </div>
+                        <div className="px-8 pb-8">
+                          <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
                   </div>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </div>
+            </PopoverContent>
+          </Popover>
 
-            {/* MODAL REGISTROS (FUERA DEL POPOVER PARA EVITAR CONFLICTOS DE ENFOQUE) */}
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
-                {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
-              </DialogContent>
-            </Dialog>
+          {/* MODAL REGISTROS */}
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
+              {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
+            </DialogContent>
+          </Dialog>
 
-            {/* MODAL RESULTADOS DE CARGA */}
-            <Dialog open={isResultsModalOpen} onOpenChange={setIsResultsModalOpen}>
-              <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-                <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Resultados de Carga</DialogTitle>
-                </div>
-                <div className="px-8 pb-8">
-                  <UploadResultsContent onClose={() => setIsResultsModalOpen(false)} />
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+          {/* MODAL RESULTADOS DE CARGA */}
+          <Dialog open={isResultsModalOpen} onOpenChange={setIsResultsModalOpen}>
+            <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
+              <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500" />
+                <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Resultados de Carga</DialogTitle>
+              </div>
+              <div className="px-8 pb-8">
+                <UploadResultsContent onClose={() => setIsResultsModalOpen(false)} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     
-    
-       {/* --- 3. IMAGEN DEL RECTÁNGULO (BORDE INFERIOR REAL) --- */}
+      {/* --- BORDE INFERIOR --- */}
       <div className="w-full leading-[0]">
         <img 
           src="/rectangle.jpg" 
           alt="Decorative border"
-          className="w-full h-[4px] object-fill block" // 
+          className="w-full h-[4px] object-fill block" 
         />
       </div>
-    
-    
     </div>
   );
 }
