@@ -38,7 +38,24 @@ import {
   MapPin,
   Trash2,
   BarChart3,
+  RefreshCcw,
 } from "lucide-react";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 /* ---------------- PROPS ---------------- */
 interface TablesSectionProps {
@@ -75,6 +92,91 @@ const TablePagination = ({ total }: { total: number }) => (
     </div>
   </div>
 );
+
+function FilterModal() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50">
+          <Filter className="w-4 h-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden border-0 rounded-[2rem] shadow-2xl">
+        {/* Encabezado */}
+        <DialogHeader className="px-8 py-5 border-b border-gray-100 flex flex-row items-center justify-between bg-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center border border-gray-100 shadow-sm">
+              <Search className="w-5 h-5 text-[#1C1E59]" />
+            </div>
+            <DialogTitle className="text-xl font-black text-[#1C1E59] tracking-tight">Filtros</DialogTitle>
+          </div>
+        </DialogHeader>
+
+        {/* Cuerpo del Formulario */}
+        <div className="p-8 bg-white space-y-6">
+          <div className="grid grid-cols-2 gap-6">
+            {/* Columna 1 */}
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">ID Cita</label>
+                <Input placeholder="999" className="h-11 rounded-xl border-slate-200 text-sm focus:ring-[#FF6B00] focus:border-[#FF6B00]" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Estado de Cita</label>
+                <Select>
+                  <SelectTrigger className="h-11 rounded-xl border-slate-200 text-slate-500">
+                    <SelectValue placeholder="Seleccionar estado" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="confirmado">Confirmado</SelectItem>
+                    <SelectItem value="en_proceso">En Proceso</SelectItem>
+                    <SelectItem value="retrasado">Retrasado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Desde</label>
+                <div className="relative">
+                  <Input type="text" placeholder="dd/mm/aaaa" className="h-11 rounded-xl border-slate-200 text-sm pr-10" />
+                  <CalendarDays className="absolute right-3 top-3 w-4 h-4 text-slate-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Columna 2 */}
+            <div className="space-y-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Proveedor</label>
+                <Input placeholder="Nombre del proveedor" className="h-11 rounded-xl border-slate-200 text-sm focus:ring-[#FF6B00]" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Transportista</label>
+                <Input placeholder="Empresa transportadora" className="h-11 rounded-xl border-slate-200 text-sm focus:ring-[#FF6B00]" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Hasta</label>
+                <div className="relative">
+                  <Input type="text" placeholder="dd/mm/aaaa" className="h-11 rounded-xl border-slate-200 text-sm pr-10" />
+                  <CalendarDays className="absolute right-3 top-3 w-4 h-4 text-slate-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer de Acciones */}
+        <div className="px-8 py-6 bg-white border-t border-gray-100 flex items-center justify-end gap-4">
+          <Button variant="outline" className="h-11 px-8 rounded-xl border-slate-200 font-bold text-[11px] uppercase tracking-widest text-[#1C1E59] hover:bg-slate-50 transition-all">
+            Limpiar
+          </Button>
+          <Button className="h-11 px-8 rounded-xl bg-[#FF6B00] hover:bg-[#e65c00] font-black text-[11px] uppercase tracking-widest text-white shadow-lg shadow-orange-200 transition-all active:scale-95">
+            Aplicar Filtros
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 /* ---------------- COMPONENT ---------------- */
 export function TablesSection({ locationId }: TablesSectionProps) {
@@ -152,16 +254,14 @@ export function TablesSection({ locationId }: TablesSectionProps) {
             </div>
 
             <div className="flex items-center gap-3">
-                <div className="relative group hidden xl:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-orange-500" />
-                    <Input placeholder="Buscar..." className="h-9 w-48 pl-10 rounded-xl border-slate-200 text-xs focus:ring-1 focus:ring-orange-500" />
-                </div>
+                
                 <Button className="h-9 gap-2 bg-[#FF6B00] hover:bg-[#e65c00] text-white rounded-xl px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-200">
                     <PlusIcon className="w-4 h-4" /> New Entry
                 </Button>
                 <div className="h-6 w-px bg-slate-200 mx-1" />
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><RefreshCcw className="w-4 h-4"/></Button>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><Download className="w-4 h-4"/></Button>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400 hover:bg-slate-50"><Filter className="w-4 h-4"/></Button>
+                <FilterModal />
                 <Button 
                     variant="ghost" size="icon" 
                     className={cn("h-9 w-9 rounded-xl transition-all", isExpanded ? "text-orange-500 bg-orange-50" : "text-slate-400 hover:bg-slate-50")}
