@@ -531,14 +531,71 @@ function AppointmentEditModal({
 }
 
 function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: Appointment, onClose: () => void }) {
-    return (
-        <Dialog open={!!appointment} onOpenChange={onClose}>
-            <DialogContent>
-                <DialogHeader><DialogTitle>Detalles OC: {appointment.id}</DialogTitle></DialogHeader>
-                <div className="p-4"><p>Detalles técnicos...</p></div>
-            </DialogContent>
-        </Dialog>
-    )
+  const DataItem = ({ label, value }: { label: string, value: any }) => (
+    <div className="flex flex-col py-1.5 border-b border-slate-50 last:border-0 group">
+      <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter group-hover:text-[#ff6b00] transition-colors">{label}</span>
+      <span className="text-[11px] font-bold text-slate-700 truncate">{value}</span>
+    </div>
+  );
+
+  return (
+    <Dialog open={!!appointment} onOpenChange={onClose}>
+      <DialogContent className="max-w-3xl p-0 overflow-hidden border-none rounded-[2rem] shadow-2xl bg-white">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Detalles Técnicos OC: {appointment.id}</DialogTitle>
+        </DialogHeader>
+
+        {/* Cabecera compacta */}
+        <div className="bg-[#1C1E59] px-6 py-4 text-white flex justify-between items-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-5"><FileText size={100} /></div>
+          <div className="relative z-10 flex items-center gap-3">
+             <div className="p-2 bg-white/10 rounded-xl"><LayoutList size={18} className="text-orange-400" /></div>
+             <div>
+                <p className="text-[9px] font-bold text-orange-400 uppercase tracking-[0.2em] leading-none">Maestro de Documento</p>
+                <h3 className="text-lg font-black mt-1">OC: {appointment.id}</h3>
+             </div>
+          </div>
+          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors z-20 p-2 hover:bg-white/10 rounded-full">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Cuerpo con datos poblados */}
+        <div className="p-8 bg-white grid grid-cols-3 gap-x-10 gap-y-2">
+          <div className="space-y-1">
+            <DataItem label="Producto" value={appointment.product || "INSUMOS VARIOS"} />
+            <DataItem label="Nit Proveedor" value={appointment.nit || "900742771-9"} />
+            <DataItem label="Descripción Company" value={appointment.descripcionCompany || "Logística Integral SAS"} />
+            <DataItem label="Estado Documento" value="ACTIVO" />
+            <DataItem label="Unidad de Negocio" value={appointment.unidadNegocio || "CONSUMO MASIVO"} />
+            <DataItem label="Canal" value={appointment.canal || "MODERNO"} />
+          </div>
+          <div className="space-y-1 border-x border-slate-100 px-6">
+            <DataItem label="Fecha Inicio" value={appointment.date || "27/01/2026"} />
+            <DataItem label="Fecha Fin" value={appointment.date || "29/01/2026"} />
+            <DataItem label="Tipo de Operación" value={appointment.operationType || "DESCARGUE"} />
+            <DataItem label="Tipo Mercancía" value={appointment.tipoMercancia || "GENERAL NO PERECEDERA"} />
+            <DataItem label="Tipo de Cargue" value={appointment.loadType || "A GRANEL"} />
+            <DataItem label="Código Artículo" value={appointment.codigoArticulo || "SKU-882910"} />
+          </div>
+          <div className="space-y-1">
+            <DataItem label="Peso" value={appointment.peso || "1,240.00 KG"} />
+            <DataItem label="Volumen" value={appointment.volumen || "4.50 M3"} />
+            <DataItem label="Litros" value={appointment.litros || "0.00"} />
+            <DataItem label="Cantidad Pedida" value={appointment.quantityOrdered || "400"} />
+            <DataItem label="Cantidad Recibida" value={appointment.quantityDelivered || "0"} />
+            <DataItem label="U. Medida" value={appointment.unidadMedida || "UNIDADES (UND)"} />
+          </div>
+        </div>
+
+        <div className="p-6 bg-slate-50/50 flex justify-end rounded-b-[2rem]">
+          <Button onClick={onClose} className="bg-[#1C1E59] hover:bg-[#25286e] text-white text-[10px] font-bold uppercase px-10 rounded-2xl h-12 shadow-xl shadow-blue-900/20 transition-all active:scale-95">
+            Cerrar Detalle
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 
