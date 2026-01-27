@@ -209,14 +209,50 @@ function getTimelineAppointmentStyle(status: AppointmentStatus) {
 }
 
 function getStatusConfig(status: AppointmentStatus) {
-  const baseClasses = "text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide w-full text-center border shadow-sm";
+  const baseClasses = "text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide w-full text-center border shadow-sm transition-all";
+  
   switch (status) {
-    case "in-progress": return { label: "EN PROCESO", className: cn(baseClasses, "bg-yms-cyan text-white border-yms-cyan") };
-    case "completed": return { label: "COMPLETADO", className: cn(baseClasses, "bg-green-500 text-white border-green-600") };
-    case "delayed": return { label: "RETRASADO", className: cn(baseClasses, "bg-red-500 text-white border-red-600") };
-    case "scheduled": return { label: "PROGRAMADO", className: cn(baseClasses, "bg-yms-primary text-white border-yms-primary") };
-    case "pending": return { label: "PENDIENTE", className: cn(baseClasses, "bg-slate-200 text-slate-600 border-slate-300") };
-    default: return { label: status, className: cn(baseClasses, "bg-gray-400 text-white") };
+    // NARANJA CORPORATIVO (Vibrante) - Indica acción actual
+    case "in-progress": 
+      return { 
+        label: "EN PROCESO", 
+        className: cn(baseClasses, "bg-[#FF6C01] text-white border-[#e66101]") 
+      };
+
+    // NARANJA CLARO / CREMA (Éxito suave) - Indica finalización limpia
+    case "completed": 
+      return { 
+        label: "COMPLETADO", 
+        className: cn(baseClasses, "bg-orange-50 text-orange-600 border-orange-200") 
+      };
+
+    // NARANJA OSCURO / QUEMADO (Alerta) - Indica urgencia o retraso
+    case "delayed": 
+      return { 
+        label: "RETRASADO", 
+        className: cn(baseClasses, "bg-orange-700 text-white border-orange-800") 
+      };
+
+    // NARANJA MEDIO (Informativo) - Indica algo ya planeado
+    case "scheduled": 
+      return { 
+        label: "PROGRAMADO", 
+        className: cn(baseClasses, "bg-orange-400 text-white border-orange-500") 
+      };
+
+    // NARANJA MUY PÁLIDO (Neutral) - Indica espera
+    case "pending": 
+      return { 
+        label: "PENDIENTE", 
+        className: cn(baseClasses, "bg-[#FFF7ED] text-[#C2410C] border-[#FED7AA]") 
+      };
+
+    // ÁMBAR (Genérico)
+    default: 
+      return { 
+        label: status, 
+        className: cn(baseClasses, "bg-amber-100 text-amber-700 border-amber-200") 
+      };
   }
 }
 
