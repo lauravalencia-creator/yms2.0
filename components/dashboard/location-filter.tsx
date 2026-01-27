@@ -22,7 +22,9 @@ import { cn } from "@/lib/utils";
 import { 
   Search, BarChart3, ClipboardList, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
-  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle, Check, Package, X, QrCode, ArrowRight, ArrowLeft,
+  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle,
+  Package, X, QrCode, ArrowRight, 
+  Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
@@ -709,86 +711,187 @@ interface LocationFilterProps {
 
 function RegistrosModalContent({ registroId }: { registroId: string }) {
   const opcion = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
+  
+  // ESTADOS DE FLUJO: 'form' | 'scanner' | 'result'
+  const [step, setStep] = useState<'form' | 'scanner' | 'result'>('form');
   const [codigo, setCodigo] = useState("");
-  const esValido = codigo.trim().length > 3;
 
-  return (
-    <div className="flex flex-col h-full w-full bg-[#FDFDFD] overflow-hidden">
-      {/* HEADER NAVY */}
-      <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-        <div className="flex items-center gap-3">
-          <Package className="text-white" size={20} />
-          <h2 className="text-sm font-bold text-white uppercase tracking-tight">
-            Gestión de Registros
-          </h2>
-        </div>
-        <DialogPrimitive.Close className="text-white/40 hover:text-white transition-colors outline-none p-1.5 hover:bg-white/10 rounded-full">
-          <X size={20} />
-        </DialogPrimitive.Close>
-      </div>
+  const handleSimularEscaneo = () => {
+    setStep('scanner');
+    // Simulamos que encuentra un QR después de 2 segundos
+    setTimeout(() => {
+      setStep('result');
+    }, 2500);
+  };
 
-      {/* CONTENIDO CENTRAL */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4 bg-slate-50/30 overflow-y-auto">
-        <div className="w-full max-w-md flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
-          
-          <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 border border-gray-100">
-            <opcion.icon className="text-[#4CCAC8]" size={28} />
+  // --- VISTA 1: FORMULARIO ---
+  if (step === 'form') {
+    return (
+      <div className="flex flex-col h-full w-full bg-[#FDFDFD] overflow-hidden">
+        <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+          <div className="flex items-center gap-3">
+            <Package className="text-white" size={20} />
+            <h2 className="text-sm font-bold text-white uppercase tracking-tight">Gestión de Registros</h2>
           </div>
+          <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full">
+            <X size={20} />
+          </DialogPrimitive.Close>
+        </div>
 
-          <h3 className="text-xl font-bold text-[#1C1E59] uppercase tracking-tight mb-6 text-center">
-            {opcion.label}
-          </h3>
-
-          {/* CARD DE FORMULARIO */}
-          <div className="bg-white p-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] w-full border border-gray-100 mb-8">
-            <div className="space-y-6">
-              <div className="space-y-3 text-center">
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">
-                  Número de Cita / Código
-                </label>
-                <Input 
-                  placeholder="Ej: CITA-9982-24"
-                  value={codigo}
-                  onChange={(e) => setCodigo(e.target.value)}
-                  className="h-14 rounded-xl border-none bg-gray-50/50 text-center text-lg font-bold placeholder:text-gray-300 focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500 transition-all shadow-inner"
-                />
+        <div className="flex-1 flex flex-col items-center justify-center p-4 bg-slate-50/30">
+          <div className="w-full max-w-md flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 border border-gray-100">
+              <opcion.icon className="text-[#4CCAC8]" size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-[#1C1E59] uppercase tracking-tight mb-6 text-center">{opcion.label}</h3>
+            
+            <div className="bg-white p-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.03)] w-full border border-gray-100 mb-8">
+              <div className="space-y-6">
+                <div className="space-y-3 text-center">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Número de Cita / Código</label>
+                  <Input 
+                    placeholder="Ej: CITA-9982-24"
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value)}
+                    className="h-14 rounded-xl border-none bg-gray-50/50 text-center text-lg font-bold shadow-inner"
+                  />
+                </div>
+                <Button 
+                  disabled={codigo.length < 3}
+                  className={cn("w-full h-14 font-bold uppercase rounded-xl text-xs transition-all", 
+                  codigo.length >= 3 ? "bg-[#1C1E59] text-white shadow-md" : "bg-[#F1F5F9] text-gray-400")}
+                  onClick={() => setStep('result')}
+                >
+                  Confirmar Registro
+                </Button>
               </div>
+            </div>
 
-              <Button 
-                disabled={!esValido}
-                className={cn(
-                  "w-full h-14 font-bold uppercase tracking-wider rounded-xl text-xs shadow-md transition-all border-none",
-                  esValido 
-                    ? "bg-[#1C1E59] text-white hover:bg-[#151744] active:scale-[0.98]" 
-                    : "bg-[#F1F5F9] text-gray-400 cursor-not-allowed"
-                )}
-              >
-                Confirmar Registro
+            <div className="text-center w-full flex flex-col items-center space-y-4">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">¿Deseas agilizar el proceso?</p>
+              <Button onClick={handleSimularEscaneo} className="h-12 px-8 rounded-2xl bg-[#ff6b00] hover:bg-[#e66000] flex items-center gap-3 shadow-lg shadow-orange-200">
+                <QrCode size={18} className="text-white" />
+                <span className="font-bold uppercase text-[11px] text-white">Escanear Código QR</span>
               </Button>
             </div>
           </div>
-
-          {/* SECCIÓN QR - Botón de tamaño normal y centrado */}
-          <div className="text-center w-full flex flex-col items-center space-y-4">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-              ¿Deseas agilizar el proceso?
-            </p>
-            
-            <Button 
-              className={cn(
-                "h-12 px-8 rounded-2xl bg-[#ff6b00] hover:bg-[#e66000] border-none",
-                "flex items-center justify-center gap-3 transition-all duration-300",
-                "shadow-lg shadow-orange-200 active:scale-[0.95]"
-              )}
-            >
-              <QrCode size={18} className="text-white" />
-              <span className="font-bold uppercase text-[11px] tracking-tight text-white">
-                Escanear Código QR
-              </span>
-            </Button>
-          </div>
         </div>
       </div>
+    );
+  }
+
+  // --- VISTA 2: ESCÁNER ---
+  if (step === 'scanner') {
+    return (
+      <div className="flex flex-col h-full w-full bg-white items-center p-6 animate-in fade-in duration-300">
+        <div className="text-center mb-8 border border-gray-100 p-4 rounded-xl w-full max-w-sm">
+           <h3 className="text-[#1C1E59] font-bold text-lg">Escáner QR Para Conductores</h3>
+           <p className="text-gray-400 text-[11px]">Escanea el código QR del documento para iniciar la gestión de eventos</p>
+        </div>
+
+        {/* BOX DEL LECTOR */}
+        <div className="relative w-full max-w-[320px] aspect-square bg-black rounded-[2rem] overflow-hidden shadow-2xl flex items-center justify-center">
+            {/* Esquinas Cyan */}
+            <div className="absolute top-8 left-8 w-8 h-8 border-t-4 border-l-4 border-cyan-400 rounded-tl-lg"></div>
+            <div className="absolute top-8 right-8 w-8 h-8 border-t-4 border-r-4 border-cyan-400 rounded-tr-lg"></div>
+            <div className="absolute bottom-8 left-8 w-8 h-8 border-b-4 border-l-4 border-cyan-400 rounded-bl-lg"></div>
+            <div className="absolute bottom-8 right-8 w-8 h-8 border-b-4 border-r-4 border-cyan-400 rounded-br-lg"></div>
+
+            {/* Línea de Escaneo (Animada) */}
+           <div className="absolute left-[10%] w-[80%] h-1 bg-cyan-400 shadow-[0_0_15px_#22d3ee] animate-scan-loop"></div>
+        </div>
+
+        {/* Badge Escaneando */}
+        <div className="mt-8 bg-blue-600 px-6 py-2 rounded-full flex items-center gap-3 shadow-lg shadow-blue-200">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            <span className="text-white text-[11px] font-bold uppercase tracking-wider">Escaneando...</span>
+        </div>
+
+        {/* Botón Cancelar */}
+        <Button 
+          variant="outline" 
+          onClick={() => setStep('form')}
+          className="mt-12 w-full max-w-[320px] h-12 border-red-200 text-red-500 hover:bg-red-50 font-bold gap-2 uppercase text-xs"
+        >
+          <X size={16} /> CANCELAR
+        </Button>
+      </div>
+    );
+  }
+
+  // --- VISTA 3: RESULTADOS ---
+  return (
+    <div className="flex flex-col h-full w-full bg-slate-50/50 items-center p-6 overflow-y-auto animate-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-white text-center mb-6 p-4 rounded-xl w-full max-w-lg border border-gray-100">
+           <h3 className="text-[#1C1E59] font-bold text-lg">Escáner QR Para Conductores</h3>
+           <p className="text-gray-400 text-[11px]">Escanea el código QR del documento para iniciar la gestión de eventos</p>
+        </div>
+
+        {/* FEEDBACK ÉXITO */}
+        <div className="bg-white w-full max-w-lg rounded-2xl p-6 border border-gray-100 flex flex-col items-center shadow-sm mb-4">
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+                <Check className="text-white" size={28} />
+            </div>
+            <div className="flex items-center gap-2 mb-1 text-blue-600">
+                <CheckCircle2 size={16} />
+                <span className="font-bold text-sm uppercase">Cita Escaneada</span>
+            </div>
+            <p className="text-gray-400 text-[10px]">Información de la cita cargada correctamente</p>
+        </div>
+
+        {/* INFORMACIÓN DE LA CITA */}
+        <div className="bg-white w-full max-w-lg rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center gap-3 bg-slate-50/30">
+                <Calendar size={18} className="text-[#1C1E59]" />
+                <span className="font-bold text-[#1C1E59] text-sm uppercase">Información de la Cita</span>
+            </div>
+
+            <div className="p-6 space-y-5">
+                {[
+                    { icon: Hash, label: "ID Cita", val: "3381589" },
+                    { icon: Calendar, label: "Fecha", val: "MAR 23 ABR 2024" },
+                    { icon: Truck, label: "Tipo de Vehículo", val: "CARRY (500 KILOS)" },
+                    { icon: Box, label: "Tipo de Carga", val: "Mercado" },
+                    { icon: Building2, label: "Proveedor", val: "13203" }
+                ].map((row, i) => (
+                    <div key={i} className="flex items-center justify-between group">
+                        <div className="flex items-center gap-4">
+                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-[#1C1E59]">
+                                <row.icon size={16} />
+                            </div>
+                            <span className="text-gray-400 text-[11px] font-medium uppercase">{row.label}</span>
+                        </div>
+                        <span className="text-[#1C1E59] font-bold text-xs">{row.val}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* JSON ACCORDION MOCK */}
+            <div className="bg-slate-50/80 px-6 py-3 border-t border-gray-100 flex items-center justify-between text-gray-400 cursor-pointer">
+                <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px]">&lt; &gt;</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Ver JSON completo</span>
+                </div>
+                <ChevronDown size={14} />
+            </div>
+        </div>
+
+        {/* FOOTER ACCIONES */}
+        <div className="w-full max-w-lg grid grid-cols-2 gap-3 mt-6">
+            <Button 
+                onClick={() => setStep('scanner')}
+                className="h-14 bg-[#1C1E59] hover:bg-[#151744] text-white font-bold rounded-xl gap-3 text-xs"
+            >
+                <RefreshCw size={16} /> ESCANEAR OTRO QR
+            </Button>
+            <Button 
+                variant="outline"
+                onClick={() => setStep('form')}
+                className="h-14 border-gray-200 text-gray-500 font-bold rounded-xl gap-3 text-xs"
+            >
+                <ArrowLeft size={16} /> VOLVER
+            </Button>
+        </div>
     </div>
   );
 }
