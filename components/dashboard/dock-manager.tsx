@@ -22,10 +22,10 @@ import {
   ArrowUpCircle,   
   ArrowRightLeft,
   Package, Search, Boxes, ArrowRight, ListFilter, 
-  ChevronLeft, LayoutList, Truck, CheckCircle, Info, FileText
+  ChevronLeft, LayoutList, Truck, CheckCircle, Info, FileText, Plus, ChevronDown,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -284,7 +284,10 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
 // ... [Mantén los modales RequestAppointmentModal, CreateAppointmentModal, AppointmentEditModal, OrderDetailsTechnicalModal igual que antes] ...
 // (Para ahorrar espacio, asumo que estos componentes se mantienen idénticos al código proporcionado anteriormente)
 
-function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: () => void }) {
+function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: (data: any) => void }) {
+  // Estado para la cantidad, inicializado con el cálculo
+  const [quantity, setQuantity] = useState((appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0));
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
@@ -296,18 +299,28 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
               <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-indigo-900 uppercase">Detalles de entrega</h4></div>
               <div className="grid grid-cols-2 text-sm">
-                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Documento</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
-                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
-                 <div className="px-4 py-3 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50"><span className="font-semibold text-slate-600 px-4">CANTIDAD POR ENTREGAR</span><span className="font-bold text-orange-600 text-right px-4">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span></div>
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4 items-center"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
+                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4 items-center"><span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
+                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
+                 
+                 {/* CAMPO EDITABLE: CANTIDAD POR ENTREGAR */}
+                 <div className="px-4 py-2 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50 items-center">
+                    <span className="font-semibold text-slate-600 px-4">CANTIDAD POR ENTREGAR</span>
+                    <Input 
+                      type="number" 
+                      className="font-bold text-orange-600 text-right h-8 border-orange-200 focus:border-orange-500 bg-white"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                    />
+                 </div>
               </div>
            </div>
         </div>
         <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
-           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onContinue}>CONTINUAR</Button>
+           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={() => onContinue({ ...appointment, quantityToDeliver: quantity })}>CONTINUAR</Button>
            <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>CANCELAR</button>
         </div>
       </div>
@@ -316,142 +329,255 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
 }
 
 
-function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: () => void }) {
+function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: (updatedData: Appointment) => void }) {
+  
+  // Estados para controlar si estamos creando un registro nuevo (+)
+  const [isNewCarrier, setIsNewCarrier] = useState(false);
+  const [isNewDriver, setIsNewDriver] = useState(false);
+
+  const [formData, setFormData] = useState({
+    transportCompany: appointment.transportCompany || appointment.carrier || "",
+    // Campos nuevos para Transportista
+    carrierEmail: "",
+    carrierPhone: "",
+    carrierId: "",
+    
+    loadType: appointment.loadType || "A granel",
+    vehicleType: appointment.vehicleType || "Tipología de remolque 1",
+    loadDate: appointment.loadDate || "2026-01-28",
+    loadTime: appointment.loadTime || "12:00",
+    unloadDate: appointment.unloadDate || "2026-01-28",
+    unloadTime: appointment.unloadTime || "10:00",
+    
+    // Campos para Conductor
+    driver: appointment.driver || "",
+    driverId: appointment.driverId || "",
+    driverPhone: appointment.driverPhone || "",
+    driverEmail: appointment.driverEmail || "",
+    truckId: appointment.truckId || "", // Placa editable
+    comments: ""
+  });
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const inputClass = "h-9 text-xs border-slate-200 focus:border-orange-500 focus:ring-orange-500/20";
+  const labelClass = "font-semibold text-slate-600 text-[11px]";
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[95vh]">
+        
+        {/* HEADER */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
            <div className="flex items-center gap-3">
-              <div className="bg-slate-100 p-2 rounded-lg border border-slate-200">
-                <ClipboardList className="w-6 h-6 text-indigo-900" />
+              <div className="bg-indigo-50 p-2 rounded-lg border border-indigo-100">
+                <ClipboardList className="w-6 h-6 text-[#1C1E59]" />
               </div>
-              <h3 className="text-lg font-bold text-indigo-900">SOLICITUD DE CITAS</h3>
+              <h3 className="text-lg font-bold text-[#1C1E59] uppercase tracking-tight">Solicitud de Citas</h3>
            </div>
-           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-              x
+           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+              <X className="w-6 h-6" />
            </button>
         </div>
-        <div className="p-8 bg-white space-y-6">
-           <div className="rounded-lg border border-slate-200 overflow-hidden">
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
+           
+           {/* SECCIÓN: DETALLES DE LA CITA */}
+           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-sm font-bold text-indigo-900">Detalles de la cita</h4>
+                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Detalles de la cita</h4>
               </div>
-              <div className="grid grid-cols-2 text-sm">
-                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Destino</span>
-                    <span className="font-medium text-slate-900">{appointment.locationName}</span>
+              <div className="grid grid-cols-2 gap-x-0">
+                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
+                    <span className={labelClass}>Destino</span>
+                    <span className="font-medium text-slate-900 text-xs">{appointment.locationName || "DICAL"}</span>
                  </div>
-                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">ID de la cita</span>
-                    <span className="font-medium text-slate-900">{appointment.appointmentIdRef || '---'}</span>
+                 <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <span className={labelClass}>ID de la cita</span>
+                    <span className="font-medium text-slate-400 text-xs">---</span>
                  </div>
-                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Transportista de la cita</span>
-                    <span className="font-medium text-slate-900">SI</span>
+                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
+                    <span className={labelClass}>Transportista de la cita</span>
+                    <span className="font-bold text-indigo-900 text-xs">SI</span>
                  </div>
-                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Transportista</span>
-                    <span className="font-medium text-slate-900">{appointment.transportCompany || appointment.carrier}</span>
+
+                 {/* TRANSPORTISTA (+) */}
+                 <div className="px-4 py-2 border-b border-slate-100 flex flex-col gap-2 bg-indigo-50/30">
+                    <div className="flex justify-between items-center">
+                        <span className={labelClass}>Transportista</span>
+                        <button 
+                            onClick={() => setIsNewCarrier(!isNewCarrier)}
+                            className={cn("p-1 rounded-md transition-colors", isNewCarrier ? "bg-orange-500 text-white" : "bg-white border border-slate-200 text-orange-500 hover:bg-orange-50")}
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+                    {isNewCarrier ? (
+                        <div className="grid grid-cols-2 gap-2 pb-2">
+                            <Input placeholder="Razón Social" className={inputClass} value={formData.transportCompany} onChange={(e)=>handleChange('transportCompany', e.target.value)} />
+                            <Input placeholder="Identificación/ID" className={inputClass} value={formData.carrierId} onChange={(e)=>handleChange('carrierId', e.target.value)} />
+                            <Input placeholder="Correo" className={inputClass} value={formData.carrierEmail} onChange={(e)=>handleChange('carrierEmail', e.target.value)} />
+                            <Input placeholder="Teléfono" className={inputClass} value={formData.carrierPhone} onChange={(e)=>handleChange('carrierPhone', e.target.value)} />
+                        </div>
+                    ) : (
+                        <Input className={inputClass} value={formData.transportCompany} onChange={(e) => handleChange('transportCompany', e.target.value)} />
+                    )}
                  </div>
-                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Tipo de carga</span>
-                    <span className="font-medium text-slate-900">{appointment.loadType}</span>
+
+                 {/* TIPO DE CARGA (SELECT) */}
+                 <div className="px-4 py-2 border-b border-r border-slate-100 flex items-center justify-between">
+                    <span className={labelClass}>Tipo de carga</span>
+                    <div className="relative w-2/3">
+                        <select 
+                            className="w-full h-9 text-xs border border-slate-200 rounded-md px-3 appearance-none focus:border-orange-500 outline-none bg-white font-medium"
+                            value={formData.loadType}
+                            onChange={(e) => handleChange('loadType', e.target.value)}
+                        >
+                            <option value="pallet">Pallet</option>
+                            <option value="A granel">A granel</option>
+                            <option value="arrume">Arrume</option>
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    </div>
                  </div>
-                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Vehículo</span>
-                    <span className="font-medium text-slate-900">{appointment.vehicleType}</span>
+
+                 {/* VEHÍCULO (SELECT) */}
+                 <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                    <span className={labelClass}>Vehículo</span>
+                    <div className="relative w-2/3">
+                        <select 
+                            className="w-full h-9 text-xs border border-slate-200 rounded-md px-3 appearance-none focus:border-orange-500 outline-none bg-white font-medium"
+                            value={formData.vehicleType}
+                            onChange={(e) => handleChange('vehicleType', e.target.value)}
+                        >
+                            <option value="Tipología de remolque 1">Tipología de remolque 1</option>
+                            <option value="Tipología de remolque 2">Tipología de remolque 2</option>
+                            <option value="Camión Sencillo">Camión Sencillo</option>
+                            <option value="Turbo">Turbo</option>
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    </div>
                  </div>
-                 <div className="px-4 py-2 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Fecha de cargue</span>
-                    <span className="font-medium text-slate-900">{appointment.loadDate}</span>
+
+                 {/* FECHAS Y HORAS */}
+                 <div className="px-4 py-2 border-b border-r border-slate-100 flex items-center justify-between">
+                    <span className={labelClass}>Fecha inicio de la cita</span>
+                    <Input type="date" className="w-2/3 h-9 text-xs" value={formData.loadDate} onChange={(e) => handleChange('loadDate', e.target.value)} />
                  </div>
-                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Hora de cargue</span>
-                    <span className="font-medium text-slate-900">{appointment.loadTime}</span>
+                 <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                    <span className={labelClass}>Hora inicio de la cita</span>
+                    <Input type="time" className="w-2/3 h-9 text-xs" value={formData.loadTime} onChange={(e) => handleChange('loadTime', e.target.value)} />
                  </div>
-                 <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Fecha de descargue</span>
-                    <span className="font-medium text-slate-900">{appointment.unloadDate}</span>
+                 <div className="px-4 py-2 border-r border-slate-100 flex items-center justify-between">
+                    <span className={labelClass}>Fecha termino de la cita</span>
+                    <Input type="date" className="w-2/3 h-9 text-xs" value={formData.unloadDate} onChange={(e) => handleChange('unloadDate', e.target.value)} />
                  </div>
-                 <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Hora de descargue</span>
-                    <span className="font-medium text-slate-900">{appointment.unloadTime}</span>
+                 <div className="px-4 py-2 flex items-center justify-between">
+                    <span className={labelClass}>Hora termino de la cita</span>
+                    <Input type="time" className="w-2/3 h-9 text-xs" value={formData.unloadTime} onChange={(e) => handleChange('unloadTime', e.target.value)} />
                  </div>
               </div>
            </div>
-           <div className="rounded-lg border border-slate-200 overflow-hidden">
+
+           {/* SECCIÓN: CONDUCTOR */}
+           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-sm font-bold text-indigo-900">Conductor</h4>
+                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Conductor</h4>
               </div>
-              <div className="grid grid-cols-2 text-sm">
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
-                    <span className="font-semibold text-slate-600">Nombre del conductor</span>
-                    <span className="font-medium text-slate-900">{appointment.driver}</span>
+              <div className="grid grid-cols-2">
+                 {/* NOMBRE CONDUCTOR (+) */}
+                 <div className="px-4 py-3 border-b border-r border-slate-100 flex flex-col gap-2 bg-indigo-50/30">
+                    <div className="flex justify-between items-center">
+                        <span className={labelClass}>Nombre del conductor</span>
+                        <button 
+                            onClick={() => setIsNewDriver(!isNewDriver)}
+                            className={cn("p-1 rounded-md transition-colors", isNewDriver ? "bg-orange-500 text-white" : "bg-white border border-slate-200 text-orange-500 hover:bg-orange-50")}
+                        >
+                            <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+                    {isNewDriver ? (
+                        <div className="grid grid-cols-1 gap-2">
+                            <Input placeholder="Nombre Completo" className={inputClass} value={formData.driver} onChange={(e)=>handleChange('driver', e.target.value)} />
+                            <div className="grid grid-cols-2 gap-2">
+                                <Input placeholder="Teléfono" className={inputClass} value={formData.driverPhone} onChange={(e)=>handleChange('driverPhone', e.target.value)} />
+                                <Input placeholder="Correo" className={inputClass} value={formData.driverEmail} onChange={(e)=>handleChange('driverEmail', e.target.value)} />
+                            </div>
+                        </div>
+                    ) : (
+                        <Input className={inputClass} value={formData.driver} onChange={(e) => handleChange('driver', e.target.value)} />
+                    )}
                  </div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
-                    <span className="font-semibold text-slate-600">Documento del conductor</span>
-                    <span className="font-medium text-slate-900">{appointment.driverId}</span>
+
+                 {/* DOCUMENTO CONDUCTOR (+) */}
+                 <div className="px-4 py-3 border-b border-slate-100 flex flex-col justify-center">
+                    <div className="flex justify-between items-center mb-1">
+                        <span className={labelClass}>Documento del conductor</span>
+                        <Plus className="w-4 h-4 text-orange-500 cursor-pointer" />
+                    </div>
+                    <Input className={inputClass} value={formData.driverId} onChange={(e) => handleChange('driverId', e.target.value)} />
                  </div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
-                    <span className="font-semibold text-slate-600">Teléfono del conductor</span>
-                    <span className="font-medium text-slate-900">{appointment.driverPhone}</span>
+
+                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
+                    <span className={labelClass}>Teléfono del conductor</span>
+                    <span className="text-xs font-medium text-slate-600">{formData.driverPhone || '---'}</span>
                  </div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center">
-                    <span className="font-semibold text-slate-600">Correo electrónico del conductor</span>
-                    <span className="font-medium text-slate-900">{appointment.driverEmail}</span>
+                 <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                    <span className={labelClass}>Correo electrónico</span>
+                    <span className="text-xs font-medium text-slate-600">{formData.driverEmail || '---'}</span>
                  </div>
-                 <div className="px-4 py-3 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center col-span-2">
-                    <span className="font-semibold text-slate-600">Placa del vehículo</span>
-                    <span className="font-medium text-slate-900">{appointment.truckId}</span>
-                 </div>
-              </div>
-           </div>
-           <div className="rounded-lg border border-slate-200 overflow-hidden">
-              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-sm font-bold text-indigo-900">Comentarios</h4>
-              </div>
-              <div className="text-sm">
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600 pt-2">Escribe comentarios</span>
-                    <textarea 
-                       className="w-full border border-slate-200 rounded p-2 text-slate-600 text-sm focus:outline-none focus:border-orange-400 placeholder:text-slate-300"
-                       placeholder="Añadir observaciones aquí..."
-                       rows={2}
+
+                 {/* PLACA (INPUT EDITABLE) */}
+                 <div className="px-4 py-3 border-r border-slate-100 col-span-2 flex items-center gap-10">
+                    <span className={labelClass}>Placa del vehículo</span>
+                    <Input 
+                        className="w-40 h-9 text-xs font-bold uppercase tracking-widest border-orange-200 bg-orange-50/20" 
+                        value={formData.truckId} 
+                        onChange={(e) => handleChange('truckId', e.target.value)} 
                     />
                  </div>
-                 <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Documento</span>
-                    <span className="font-medium text-slate-900">{appointment.id}</span>
+              </div>
+           </div>
+
+           {/* SECCIÓN: COMENTARIOS */}
+           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
+                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Comentarios</h4>
+              </div>
+              <div className="p-4 space-y-4">
+                 <div className="flex gap-4">
+                    <span className={cn(labelClass, "w-32 pt-2")}>Escribe comentarios</span>
+                    <textarea 
+                       className="flex-1 border border-slate-200 rounded-lg p-3 text-slate-600 text-xs focus:outline-none focus:border-orange-400 placeholder:text-slate-300 min-h-[80px]"
+                       placeholder="Añadir observaciones aquí..."
+                       value={formData.comments}
+                       onChange={(e) => handleChange('comments', e.target.value)}
+                    />
                  </div>
-                 <div className="grid grid-cols-2">
-                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                       <span className="font-semibold text-slate-600">Muelle sugerido</span>
-                       <span className="font-medium text-slate-900">2</span>
+                 <div className="flex justify-between items-center px-4 py-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <div className="flex gap-2 items-center text-xs">
+                        <span className="font-bold text-slate-500 uppercase">Muelle Sugerido:</span> 
+                        <span className="bg-indigo-900 text-white px-2 py-0.5 rounded text-[10px]">2</span>
                     </div>
-                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
-                       <span className="font-semibold text-slate-600">Mercancía</span>
-                       <span className="font-medium text-slate-900">{appointment.merchandiseCode}</span>
-                    </div>
-                 </div>
-                 <div className="grid grid-cols-2 border-t border-slate-100">
-                    <div className="px-4 py-2 border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                       <span className="font-semibold text-slate-600">Cantidad a entregar</span>
-                       <span className="font-medium text-slate-900">{(appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0)}</span>
-                    </div>
-                    <div className="px-4 py-2 grid grid-cols-[140px_1fr] gap-4">
-                       <span className="font-semibold text-slate-600">Tipo de mercancía</span>
-                       <span className="font-medium text-slate-900">{appointment.product || 'No Alimentos'}</span>
+                    <div className="flex gap-2 items-center text-xs">
+                        <span className="font-bold text-slate-500 uppercase">Cantidad:</span> 
+                        <span className="font-bold text-orange-600">{appointment.quantityOrdered || 10000}</span>
                     </div>
                  </div>
               </div>
            </div>
         </div>
-        <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
-           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={onConfirm}>
+
+        {/* FOOTER ACCIONES */}
+        <div className="px-8 py-5 flex items-center gap-4 bg-white border-t">
+           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-black text-xs px-10 h-11 rounded-xl shadow-lg shadow-orange-500/20" 
+             onClick={() => onConfirm({ ...appointment, ...formData })}>
              CREAR CITA
            </Button>
-           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>
-             ATRÁS
+           <button className="text-orange-500 font-bold text-xs hover:underline uppercase" onClick={onClose}>
+             Atrás
            </button>
         </div>
       </div>
@@ -1033,7 +1159,57 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
   return (
     <div className={expandedClasses}>
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
-      {requestModalAppointment && <RequestAppointmentModal appointment={requestModalAppointment} onClose={() => setRequestModalAppointment(null)} onContinue={() => { setCreateModalAppointment(requestModalAppointment); setRequestModalAppointment(null); }} />}
+      // Dentro del return de DockManager:
+
+{requestModalAppointment && (
+  <RequestAppointmentModal 
+    appointment={requestModalAppointment} 
+    onClose={() => setRequestModalAppointment(null)} 
+    // Actualizamos el modal de creación con los datos (ej: cantidad) del primer modal
+    onContinue={(updatedData) => { 
+      setCreateModalAppointment(updatedData); 
+      setRequestModalAppointment(null); 
+    }} 
+  />
+)}
+
+{createModalAppointment && (
+  <CreateAppointmentModal 
+    appointment={createModalAppointment} 
+    onClose={() => setCreateModalAppointment(null)} 
+    onConfirm={(finalAppointmentData) => { 
+        // 1. Encontrar el Muelle A-02 (o el objetivo)
+        const targetDockId = "dock-1a-2"; 
+
+        setAllDocksState(prev => prev.map(dock => {
+            if (dock.id === targetDockId) {
+                return {
+                    ...dock,
+                    status: "occupied", 
+                    occupancy: 50,
+                    // Aquí usamos los datos finales editados por el usuario
+                    currentAppointment: {
+                        ...finalAppointmentData, // Usamos los datos que vienen del modal
+                        status: "scheduled",
+                        dockGroupId: dock.dockGroupId,
+                        locationId: dock.locationId,
+                        // Usamos la hora definida en el formulario
+                        time: finalAppointmentData.loadTime || "10:00" 
+                    }
+                };
+            }
+            return dock;
+        }));
+
+        // 2. Quitamos la cita de la lista de pendientes
+        setAllAppointmentsState(prev => prev.filter(a => a.id !== finalAppointmentData.id));
+        
+        // 3. Limpiamos estados
+        setCreateModalAppointment(null); 
+        setSelectedAppointment(null);
+    }} 
+  />
+)}
      {createModalAppointment && (
   <CreateAppointmentModal 
     appointment={createModalAppointment} 
