@@ -983,17 +983,12 @@ function FileUploadContent({ onUpload }: { onUpload: () => void }) {
           >
             Cargar Documentos
           </TabsTrigger>
-          <TabsTrigger 
-            value="legacy" 
-            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-[3px] data-[state=active]:border-[#ff6b00] data-[state=active]:text-[#ff6b00] rounded-none px-0 py-3 font-bold text-gray-400 uppercase text-[11px] tracking-wide"
-          >
-            Carga de Documentos Legacy
-          </TabsTrigger>
+    
           <TabsTrigger 
             value="citas" 
             className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-[3px] data-[state=active]:border-[#ff6b00] data-[state=active]:text-[#ff6b00] rounded-none px-0 py-3 font-bold text-gray-400 uppercase text-[11px] tracking-wide"
           >
-            Carga de Citas
+            Carga de Citas Fijas
           </TabsTrigger>
         </TabsList>
 
@@ -1005,7 +1000,7 @@ function FileUploadContent({ onUpload }: { onUpload: () => void }) {
                  
                  <div className="text-center space-y-2">
                     <h3 className={cn("text-lg font-black uppercase tracking-wide", COLORS.NAVY)}>Carga tus documentos</h3>
-                    <p className="text-gray-400 text-sm">Arrastra aquí o usa el botón para explorar archivos locales (.txt)</p>
+                    <p className="text-gray-400 text-sm">Arrastra aquí o usa el botón para explorar archivos locales (.txt) o Excel</p>
                  </div>
 
                  <Button className={cn("font-bold uppercase tracking-wider px-8 h-12 rounded-xl shadow-lg shadow-orange-500/20", COLORS.ORANGE_BG, COLORS.ORANGE_HOVER)}>

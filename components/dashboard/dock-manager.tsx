@@ -296,7 +296,7 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
               <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-indigo-900 uppercase">Detalles de entrega</h4></div>
               <div className="grid grid-cols-2 text-sm">
-                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Documento</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
                  <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
                  <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
                  <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
@@ -420,7 +420,7 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
                     />
                  </div>
                  <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Orden de compra</span>
+                    <span className="font-semibold text-slate-600">Documento</span>
                     <span className="font-medium text-slate-900">{appointment.id}</span>
                  </div>
                  <div className="grid grid-cols-2">
@@ -660,7 +660,18 @@ function AppointmentEditModal({
   );
 }
 
-function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: Appointment, onClose: () => void }) {
+// Debes asegurarte de que este modal reciba también la función onOpenRequest
+// para poder abrir el flujo de solicitud desde aquí.
+
+function OrderDetailsTechnicalModal({ 
+  appointment, 
+  onClose, 
+  onRequestAppointment 
+}: { 
+  appointment: Appointment, 
+  onClose: () => void, 
+  onRequestAppointment: () => void 
+}) {
   const DataItem = ({ label, value }: { label: string, value: any }) => (
     <div className="flex flex-col py-1.5 border-b border-slate-50 last:border-0 group">
       <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter group-hover:text-[#ff6b00] transition-colors">{label}</span>
@@ -697,7 +708,7 @@ function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: App
             <DataItem label="Nit Proveedor" value={appointment.nit || "900742771-9"} />
             <DataItem label="Descripción Company" value={appointment.descripcionCompany || "Logística Integral SAS"} />
             <DataItem label="Estado Documento" value="ACTIVO" />
-            <DataItem label="Unidad de Negocio" value={appointment.unidadNegocio || "CONSUMO MASIVO"} />
+            <DataItem label="Localidad" value={appointment.unidadNegocio || "CENTRO DISTRIBUCIÓN NORTE"} />
             <DataItem label="Canal" value={appointment.canal || "MODERNO"} />
           </div>
           <div className="space-y-1 border-x border-slate-100 px-6">
@@ -718,8 +729,25 @@ function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: App
           </div>
         </div>
 
-        <div className="p-6 bg-slate-50/50 flex justify-end rounded-b-[2rem]">
-          <Button onClick={onClose} className="bg-[#1C1E59] hover:bg-[#25286e] text-white text-[10px] font-bold uppercase px-10 rounded-2xl h-12 shadow-xl shadow-blue-900/20 transition-all active:scale-95">
+        {/* FOOTER CON DOS BOTONES */}
+        <div className="p-6 bg-slate-50/50 flex justify-end gap-3 rounded-b-[2rem] border-t border-slate-100">
+          
+          {/* BOTÓN SOLICITAR CITA (NUEVO) */}
+          {/* Solo mostramos este botón si la cita aún no está lista/asignada */}
+          {!appointment.isReadyForAssignment && (
+            <Button 
+              onClick={() => {
+                onClose(); // Cerramos este modal primero
+                onRequestAppointment(); // Abrimos el flujo de solicitud
+              }} 
+              className="bg-[#FF6C01] hover:bg-[#e66000] text-white text-[10px] font-bold uppercase px-8 rounded-2xl h-12 shadow-lg shadow-orange-500/20 transition-all active:scale-95"
+            >
+              Solicitar Cita
+            </Button>
+          )}
+
+          {/* BOTÓN CERRAR DETALLE */}
+          <Button onClick={onClose} className="bg-[#1C1E59] hover:bg-[#25286e] text-white text-[10px] font-bold uppercase px-8 rounded-2xl h-12 shadow-xl shadow-blue-900/20 transition-all active:scale-95">
             Cerrar Detalle
           </Button>
         </div>
@@ -727,7 +755,6 @@ function OrderDetailsTechnicalModal({ appointment, onClose }: { appointment: App
     </Dialog>
   );
 }
-
 
 function DockTimeline({ 
   docks, 
@@ -1058,7 +1085,7 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
             <div className="p-1.5 bg-orange-500/20 rounded-lg">
               <LayoutList className="w-4 h-4 text-orange-400" />
             </div>
-            <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Asignaciones</h2>
+            <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1261,12 +1288,18 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
         </div>
 
         {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
-          {selectedAppointment && isTechnicalModalOpen && (
-            <OrderDetailsTechnicalModal 
-              appointment={selectedAppointment} 
-              onClose={() => setIsTechnicalModalOpen(false)} 
-            />
-          )}
+         {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
+{selectedAppointment && isTechnicalModalOpen && (
+  <OrderDetailsTechnicalModal 
+    appointment={selectedAppointment} 
+    onClose={() => setIsTechnicalModalOpen(false)} 
+    onRequestAppointment={() => {
+        // Al hacer clic, configuramos el modal de solicitud con la cita actual
+        setRequestModalAppointment(selectedAppointment);
+    }}
+  />
+)}
+       
       </div>
     </div>
   );

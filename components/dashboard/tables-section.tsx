@@ -161,7 +161,7 @@ function RequestAppointmentModal({ appointment, onClose, onContinue }: { appoint
            <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
               <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-[#1C1E59] uppercase">Detalles de entrega</h4></div>
               <div className="grid grid-cols-2 text-sm">
-                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
+                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Documento</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
                  <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
                  <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
                  <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
@@ -285,7 +285,7 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
                     />
                  </div>
                  <div className="px-4 py-2 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4">
-                    <span className="font-semibold text-slate-600">Orden de compra</span>
+                    <span className="font-semibold text-slate-600">Documento</span>
                     <span className="font-medium text-slate-900">{appointment.id}</span>
                  </div>
                  <div className="grid grid-cols-2">
@@ -608,7 +608,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                               <TableRow className="hover:bg-transparent border-none h-11">
                                 {[
                                   "ID Cita", "Hora Cita", "Proveedor", "ID Proveedor", "Transportadora", 
-                                  "GEN", "Estado", "Placa", "Entrada", "Salida", "Taller"
+                                  "Tipo de Producto", "Estado", "Placa", "Entrada", "Salida", "Taller"
                                 ].map((h) => (
                                   <TableHead key={h} className="text-white font-bold text-[10px] uppercase tracking-wider px-4 h-11 whitespace-nowrap">{h}</TableHead>
                                 ))}
@@ -858,7 +858,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                               <Table>
                                 <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
                                   <TableRow className="border-none hover:bg-transparent">
-                                    {["Acciones", "ID Cita", "Estado", "Tipo de Producto", "Orden de Compra", "Fecha Cita", "Hora Cita", "Proveedor", "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"].map((header) => (
+                                    {["Acciones", "ID Cita", "Estado", "Tipo de Producto", "Documento", "Fecha Cita", "Hora Cita", "Proveedor", "Transportista", "Conductor", "Placa", "Vehículo", "Talleres Entrega"].map((header) => (
                                       <TableHead key={header} className="text-white/90 font-bold text-[10px] uppercase tracking-wider h-11 whitespace-nowrap px-4 border-none text-center">{header}</TableHead>
                                     ))}
                                   </TableRow>
