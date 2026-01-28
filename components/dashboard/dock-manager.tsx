@@ -284,44 +284,102 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
 // ... [Mantén los modales RequestAppointmentModal, CreateAppointmentModal, AppointmentEditModal, OrderDetailsTechnicalModal igual que antes] ...
 // (Para ahorrar espacio, asumo que estos componentes se mantienen idénticos al código proporcionado anteriormente)
 
-function RequestAppointmentModal({ appointment, onClose, onContinue }: { appointment: Appointment, onClose: () => void, onContinue: (data: any) => void }) {
-  // Estado para la cantidad, inicializado con el cálculo
-  const [quantity, setQuantity] = useState((appointment.quantityOrdered || 0) - (appointment.quantityDelivered || 0));
+function RequestAppointmentModal({ 
+  appointments, 
+  onClose, 
+  onContinue 
+}: { 
+  appointments: Appointment[], 
+  onClose: () => void, 
+  onContinue: (data: any) => void 
+}) {
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>(() => {
+    const initial: { [key: string]: number } = {};
+    appointments.forEach(apt => {
+      initial[apt.id] = (apt.quantityOrdered || 0) - (apt.quantityDelivered || 0);
+    });
+    return initial;
+  });
+
+  const groupedByCarrier = useMemo(() => {
+    const groups: { [key: string]: Appointment[] } = {};
+    appointments.forEach(apt => {
+      if (!groups[apt.carrier]) groups[apt.carrier] = [];
+      groups[apt.carrier].push(apt);
+    });
+    return groups;
+  }, [appointments]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-           <div className="flex items-center gap-3"><div className="bg-slate-100 p-2 rounded-lg border border-slate-200"><ClipboardList className="w-6 h-6 text-indigo-900" /></div><h3 className="text-lg font-bold text-indigo-900 uppercase">SOLICITUD DE CITAS</h3></div>
-           <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
+          <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Detalle del Cargue</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
         </div>
-        <div className="p-8 bg-gray-50/50">
-           <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
-              <div className="bg-slate-50 px-4 py-3 border-b border-slate-200"><h4 className="text-sm font-bold text-indigo-900 uppercase">Detalles de entrega</h4></div>
-              <div className="grid grid-cols-2 text-sm">
-                 <div className="col-span-2 px-4 py-3 border-b border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Orden de compra</span><span className="font-medium text-slate-900">{appointment.id}</span></div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Proveedor</span><span className="font-medium text-slate-900 uppercase">{appointment.carrier}</span></div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4 items-center"><span className="font-semibold text-slate-600">Cantidad ordenada</span><span className="font-medium text-slate-900 text-right">{appointment.quantityOrdered || 0}</span></div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">NIT</span><span className="font-medium text-slate-900">{appointment.nit || '---'}</span></div>
-                 <div className="px-4 py-3 border-b border-slate-100 grid grid-cols-[1fr_100px] gap-4 items-center"><span className="font-semibold text-slate-600 truncate">Cantidad entregada prev.</span><span className="font-medium text-slate-900 text-right">{appointment.quantityDelivered || 0}</span></div>
-                 <div className="px-4 py-3 grid grid-cols-[140px_1fr] gap-4 items-center"><span className="font-semibold text-slate-600">Lugar</span><span className="font-medium text-slate-900">{appointment.locationName}</span></div>
-                 
-                 {/* CAMPO EDITABLE: CANTIDAD POR ENTREGAR */}
-                 <div className="px-4 py-2 border-l border-slate-100 grid grid-cols-[1fr_100px] gap-4 bg-slate-50/50 items-center">
-                    <span className="font-semibold text-slate-600 px-4">CANTIDAD POR ENTREGAR</span>
-                    <Input 
-                      type="number" 
-                      className="font-bold text-orange-600 text-right h-8 border-orange-200 focus:border-orange-500 bg-white"
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                    />
-                 </div>
-              </div>
-           </div>
+
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          <div className="border border-slate-200 rounded-sm overflow-hidden text-[11px]">
+            <table className="w-full text-left border-collapse">
+              <tbody>
+                {Object.entries(groupedByCarrier).map(([carrier, items]) => (
+                  <React.Fragment key={carrier}>
+                    <tr className="bg-slate-100 text-center font-bold border-b border-slate-300">
+                      <td colSpan={2} className="py-2 text-slate-700 uppercase">Detalle del Cargue</td>
+                    </tr>
+                    <tr className="border-b border-slate-200">
+                      <td colSpan={2}>
+                        <div className="grid grid-cols-3 bg-white py-2 px-4 gap-4">
+                          <div><span className="font-bold">Proveedor: </span>{carrier}</div>
+                          <div><span className="font-bold">Nit: </span>{items[0].nit}</div>
+                          <div><span className="font-bold">Lugar de entrega: </span>{items[0].locationName}</div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr className="bg-slate-50 font-bold text-slate-600 border-b border-slate-200">
+                      <td className="px-4 py-2 border-r w-1/3">Orden de compra</td>
+                      <td className="p-0">
+                        <div className="grid grid-cols-3 text-center">
+                          <div className="py-2 border-r">Cantidad pedida</div>
+                          <div className="py-2 border-r">Cantidad entregada</div>
+                          <div className="py-2">Cantidad a entregar</div>
+                        </div>
+                      </td>
+                    </tr>
+                    {items.map(apt => (
+                      <tr key={apt.id} className="border-b border-slate-200">
+                        <td className="px-4 py-3 border-r font-medium text-slate-800">{apt.id}</td>
+                        <td className="p-0">
+                          <div className="grid grid-cols-3 items-center text-center">
+                            <div className="py-3 border-r">{apt.quantityOrdered}</div>
+                            <div className="py-3 border-r">{apt.quantityDelivered}</div>
+                            <div className="px-2">
+                              <Input 
+                                type="number"
+                                className="h-7 text-right text-xs border-slate-300"
+                                value={quantities[apt.id]}
+                                onChange={(e) => setQuantities({...quantities, [apt.id]: Number(e.target.value)})}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="px-8 py-6 flex items-center gap-6 bg-white border-t">
-           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 h-10 shadow-md shadow-orange-500/20" onClick={() => onContinue({ ...appointment, quantityToDeliver: quantity })}>CONTINUAR</Button>
-           <button className="text-orange-500 font-bold text-sm hover:underline" onClick={onClose}>CANCELAR</button>
+
+        <div className="px-8 py-5 flex justify-center gap-4 bg-slate-50 border-t">
+          <Button 
+            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-bold px-10 h-10"
+            onClick={() => onContinue({ items: appointments, quantities })}
+          >
+            Confirmar
+          </Button>
+          <Button variant="destructive" className="px-10 h-10" onClick={onClose}>Cancelar</Button>
         </div>
       </div>
     </div>
@@ -1067,6 +1125,30 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
   const [requestModalAppointment, setRequestModalAppointment] = useState<any>(null);
   const [createModalAppointment, setCreateModalAppointment] = useState<any>(null);
 
+  const [selectedAptIds, setSelectedAptIds] = useState<string[]>([]);
+  
+const selectedAppointments = useMemo(() => {
+  return allAppointmentsState.filter(apt => selectedAptIds.includes(apt.id));
+}, [allAppointmentsState, selectedAptIds]);
+
+ const [requestModalAppointments, setRequestModalAppointments] = useState<Appointment[] | null>(null);
+
+  // Función para alternar selección
+  const toggleAptSelection = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Para que no se abra el detalle al hacer clic en el checkbox
+    setSelectedAptIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  // Función para abrir el modal con lo seleccionado
+  const handleBulkRequest = () => {
+    const selected = allAppointmentsState.filter(a => selectedAptIds.includes(a.id));
+    if (selected.length > 0) {
+      setRequestModalAppointments(selected);
+    }
+  };
+
   useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
 
   // CAMBIO 3: Efecto para cambiar vista basado en selectedDockId
@@ -1161,14 +1243,14 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
       // Dentro del return de DockManager:
 
-{requestModalAppointment && (
+{requestModalAppointments && (
   <RequestAppointmentModal 
-    appointment={requestModalAppointment} 
-    onClose={() => setRequestModalAppointment(null)} 
-    // Actualizamos el modal de creación con los datos (ej: cantidad) del primer modal
-    onContinue={(updatedData) => { 
-      setCreateModalAppointment(updatedData); 
-      setRequestModalAppointment(null); 
+    appointments={requestModalAppointments} 
+    onClose={() => setRequestModalAppointments(null)} 
+    onContinue={(data) => { 
+      // data contiene los items y las cantidades editadas
+      setCreateModalAppointment(data.items[0]); // Pasamos al siguiente modal con la info base
+      setRequestModalAppointments(null); 
     }} 
   />
 )}
@@ -1177,238 +1259,222 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
   <CreateAppointmentModal 
     appointment={createModalAppointment} 
     onClose={() => setCreateModalAppointment(null)} 
-    onConfirm={(finalAppointmentData) => { 
-        // 1. Encontrar el Muelle A-02 (o el objetivo)
-        const targetDockId = "dock-1a-2"; 
-
+    onConfirm={(finalData) => { 
+        const targetDockId = "dock-1a-2"; // Muelle ejemplo
         setAllDocksState(prev => prev.map(dock => {
             if (dock.id === targetDockId) {
                 return {
                     ...dock,
                     status: "occupied", 
-                    occupancy: 50,
-                    // Aquí usamos los datos finales editados por el usuario
+                    occupancy: 100,
                     currentAppointment: {
-                        ...finalAppointmentData, // Usamos los datos que vienen del modal
+                        ...finalData,
                         status: "scheduled",
-                        dockGroupId: dock.dockGroupId,
-                        locationId: dock.locationId,
-                        // Usamos la hora definida en el formulario
-                        time: finalAppointmentData.loadTime || "10:00" 
+                        time: finalData.loadTime || "10:00"
                     }
                 };
             }
             return dock;
         }));
-
-        // 2. Quitamos la cita de la lista de pendientes
-        setAllAppointmentsState(prev => prev.filter(a => a.id !== finalAppointmentData.id));
-        
-        // 3. Limpiamos estados
+        // Quitamos de la lista todas las OCs que estaban seleccionadas
+        setAllAppointmentsState(prev => prev.filter(a => !selectedAptIds.includes(a.id)));
+        setSelectedAptIds([]); // Limpiamos selección
         setCreateModalAppointment(null); 
         setSelectedAppointment(null);
     }} 
   />
 )}
-     {createModalAppointment && (
-  <CreateAppointmentModal 
-    appointment={createModalAppointment} 
-    onClose={() => setCreateModalAppointment(null)} 
-    onConfirm={() => { 
-        // 1. Encontrar el Muelle A-02 (o el primero disponible) para asignar la cita
-        // Simulamos que asignamos automáticamente al muelle "dock-1a-2"
-        const targetDockId = "dock-1a-2"; 
-
-        setAllDocksState(prev => prev.map(dock => {
-            if (dock.id === targetDockId) {
-                return {
-                    ...dock,
-                    status: "occupied", // Cambia estado a ocupado o programado
-                    occupancy: 50, // Ocupación parcial
-                    currentAppointment: {
-                        ...createModalAppointment,
-                        status: "scheduled", // Estado: Programado
-                        dockGroupId: dock.dockGroupId,
-                        locationId: dock.locationId,
-                        // Ajustamos hora para demostración
-                        time: "10:00" 
-                    }
-                };
-            }
-            return dock;
-        }));
-
-        // 2. Quitamos la cita de la lista de pendientes (barra izquierda)
-        setAllAppointmentsState(prev => prev.filter(a => a.id !== createModalAppointment.id));
-        
-        // 3. Limpiamos estados
-        setCreateModalAppointment(null); 
-        setSelectedAppointment(null);
-    }} 
-  />
-)}
-
       {isExpanded && <div className="p-2 border-b flex justify-end"><Button variant="ghost" size="sm" onClick={() => setIsExpanded(false)}><Minimize2 className="mr-2 w-4 h-4"/> Salir de pantalla completa</Button></div>}
       
       <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
     
        {/* PANEL ASIGNACIONES  */}
-      <div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
-        
-        {/* Cabezal Navy con esquinas onduladas */}
-        <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem]">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 bg-orange-500/20 rounded-lg">
-              <LayoutList className="w-4 h-4 text-orange-400" />
-            </div>
-            <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
+     {/* PANEL ASIGNACIONES */}
+<div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
+  
+  {/* Cabezal Navy con esquinas onduladas - DINÁMICO */}
+  <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem] transition-all">
+    {selectedAptIds.length > 0 ? (
+      /* VISTA CUANDO HAY SELECCIONADOS */
+      <div className="flex items-center justify-between w-full animate-in fade-in slide-in-from-top-1">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Seleccionados</span>
+          <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} OC</span>
+        </div>
+        <Button 
+          size="sm" 
+          onClick={() => setRequestModalAppointments(selectedAppointments)}
+          className="bg-[#FF6C01] hover:bg-[#e66000] text-white text-[9px] font-black uppercase px-3 h-8 rounded-xl shadow-lg shadow-orange-500/20 border-none"
+        >
+          Solicitar Cita
+        </Button>
+      </div>
+    ) : (
+      /* VISTA DEFAULT */
+      <>
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 bg-orange-500/20 rounded-lg">
+            <LayoutList className="w-4 h-4 text-orange-400" />
           </div>
-
-          <div className="flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all active:scale-90" disabled={!locationId}>
-                  <ListFilter className="w-4 h-4" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
-                <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="text" 
-                      placeholder="OC o Proveedor..." 
-                      className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
-                      value={searchQuery} 
-                      onChange={(e) => setSearchQuery(e.target.value)} 
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-            
-            <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/40">
-              {filteredAppointments.length}
-            </Badge>
-          </div>
+          <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
         </div>
 
-        {/* Contenido del Panel - Fondo sutil */}
-        <div className="flex-1 overflow-y-auto p-3 custom-scrollbar relative">
-         {!locationId ? (
-            <SelectLocationState minimalist={true} />
-         ) : selectedAppointment ? (
-            /* DETALLE DE CITA */
-            <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
-              <button 
-                onClick={() => setSelectedAppointment(null)} 
-                className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase transition-all ml-2 group"
-              >
-                <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all active:scale-90" disabled={!locationId}>
+                <ListFilter className="w-4 h-4" />
               </button>
-
-              <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
-                <div className="bg-[#1C1E59] p-4 text-white relative">
-                  <span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span>
-                  <h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4>
-                </div>
-                
-                <div className="p-4 space-y-3">
-                  <div className="space-y-2.5">
-                    <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span>
-                      <p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">
-                        {selectedAppointment.carrier}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Producto</span>
-                      <p className="text-[10px] font-bold text-slate-600 truncate max-w-[150px]">
-                        {selectedAppointment.product || 'Insumos Varios'}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-1">
-                    {!selectedAppointment.isReadyForAssignment ? (
-                      <Button 
-                        className="flex-1 bg-[#FF6C01] hover:bg-[#e66000] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-95 border-none" 
-                        onClick={() => setRequestModalAppointment(selectedAppointment)}
-                      >
-                        Solicitar Cita
-                      </Button>
-                    ) : (
-                      <div 
-                        draggable 
-                        onDragStart={(e) => { 
-                          e.dataTransfer.setData("appointmentId", selectedAppointment.id); 
-                          setDraggingId(selectedAppointment.id); 
-                        }} 
-                        onDragEnd={() => setDraggingId(null)}
-                        className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <ArrowRight className="w-3 h-3 text-emerald-600 rotate-90 animate-bounce" />
-                          <span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">
-                            Arrastrar a Muelle
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    <Button 
-                      variant="outline"
-                      className="px-4 border-none bg-slate-50/80 text-[#1C1E59] hover:bg-slate-200 rounded-2xl h-11 transition-all active:scale-95 shadow-sm"
-                      onClick={() => setIsTechnicalModalOpen(true)}
-                      title="Ver más información"
-                    >
-                      <Info size={18} />
-                    </Button>
-                  </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input 
+                    type="text" 
+                    placeholder="OC o Proveedor..." 
+                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
+                    value={searchQuery} 
+                    onChange={(e) => setSearchQuery(e.target.value)} 
+                  />
                 </div>
               </div>
+            </PopoverContent>
+          </Popover>
+          
+          <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/40">
+            {filteredAppointments.length}
+          </Badge>
+        </div>
+      </>
+    )}
+  </div>
+
+  {/* Contenido del Panel */}
+  <div className="flex-1 overflow-y-auto p-3 custom-scrollbar relative">
+    {!locationId ? (
+      <SelectLocationState minimalist={true} />
+    ) : selectedAppointment ? (
+      /* DETALLE DE UNA SOLA CITA (VISTA INDIVIDUAL) */
+      <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
+        <button 
+          onClick={() => setSelectedAppointment(null)} 
+          className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase transition-all ml-2 group"
+        >
+          <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER
+        </button>
+
+        <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
+          <div className="bg-[#1C1E59] p-4 text-white relative">
+            <span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span>
+            <h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4>
+          </div>
+          
+          <div className="p-4 space-y-3">
+            <div className="space-y-2.5">
+              <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span>
+                <p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">
+                  {selectedAppointment.carrier}
+                </p>
+              </div>
+              <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
+                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Producto</span>
+                <p className="text-[10px] font-bold text-slate-600 truncate max-w-[150px]">
+                  {selectedAppointment.product || 'Insumos Varios'}
+                </p>
+              </div>
             </div>
-          ) : (
-                /* LISTADO DE ITEMS */
-                <div className="grid grid-cols-1 gap-2">
-                  {filteredAppointments.length === 0 && searchQuery === "" ? (
-                     <div className="text-center p-4 text-slate-400 text-xs mt-10">No hay asignaciones pendientes</div>
-                  ) : filteredAppointments.map(apt => (
-                    <div 
-                      key={apt.id} 
-                      onClick={() => setSelectedAppointment(apt)} 
-                      className={cn(
-                        "group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300",
-                        "hover:shadow-lg hover:border-orange-500/30 hover:-translate-y-0.5",
-                        apt.isReadyForAssignment && "border-l-4 border-l-emerald-500"
-                      )}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={cn(
-                            "p-2 rounded-xl shrink-0 transition-colors",
-                            apt.isReadyForAssignment ? "bg-emerald-50 text-emerald-600" : "bg-slate-50 text-slate-400 group-hover:bg-orange-50 group-hover:text-orange-500"
-                          )}>
-                            <Package size={16} strokeWidth={2.5} />
-                          </div>
-                          <div className="min-w-0">
-                            <h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">
-                              {apt.carrier}
-                            </h4>
-                            <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
-                              <span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </div>
-                  ))}
+
+            <div className="flex gap-2 pt-1">
+              {!selectedAppointment.isReadyForAssignment ? (
+                <Button 
+                  className="flex-1 bg-[#FF6C01] hover:bg-[#e66000] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-95 border-none" 
+                  onClick={() => setRequestModalAppointments([selectedAppointment])}
+                >
+                  Solicitar Cita
+                </Button>
+              ) : (
+                <div 
+                  draggable 
+                  onDragStart={(e) => { 
+                    e.dataTransfer.setData("appointmentId", selectedAppointment.id); 
+                    setDraggingId(selectedAppointment.id); 
+                  }} 
+                  onDragEnd={() => setDraggingId(null)}
+                  className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    <ArrowRight className="w-3 h-3 text-emerald-600 rotate-90 animate-bounce" />
+                    <span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">
+                      Arrastrar a Muelle
+                    </span>
+                  </div>
                 </div>
               )}
+
+              <Button 
+                variant="outline"
+                className="px-4 border-none bg-slate-50/80 text-[#1C1E59] hover:bg-slate-200 rounded-2xl h-11 transition-all active:scale-95 shadow-sm"
+                onClick={() => setIsTechnicalModalOpen(true)}
+              >
+                <Info size={18} />
+              </Button>
             </div>
           </div>
+        </div>
+      </div>
+    ) : (
+      /* LISTADO DE ITEMS CON CHECKBOX */
+      <div className="grid grid-cols-1 gap-2">
+        {filteredAppointments.length === 0 && searchQuery === "" ? (
+          <div className="text-center p-4 text-slate-400 text-xs mt-10">No hay asignaciones pendientes</div>
+        ) : filteredAppointments.map(apt => (
+          <div 
+            key={apt.id} 
+            onClick={() => setSelectedAppointment(apt)} 
+            className={cn(
+              "group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300",
+              "hover:shadow-lg hover:-translate-y-0.5",
+              selectedAptIds.includes(apt.id) ? "border-orange-500/50 bg-orange-50/30" : "hover:border-orange-500/30",
+              apt.isReadyForAssignment && "border-l-4 border-l-emerald-500"
+            )}
+          >
+            <div className="flex items-center gap-3">
+              {/* CHECKBOX CUSTOM */}
+              <div 
+                onClick={(e) => {
+                  e.stopPropagation(); // IMPORTANTE
+                  toggleAptSelection(apt.id, e);
+                }}
+                className={cn(
+                  "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
+                  selectedAptIds.includes(apt.id) 
+                    ? "bg-orange-500 border-orange-500 shadow-sm" 
+                    : "border-slate-200 bg-white group-hover:border-orange-300"
+                )}
+              >
+                {selectedAptIds.includes(apt.id) && <CheckCircle className="w-4 h-4 text-white" />}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">
+                  {apt.carrier}
+                </h4>
+                <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
+                  <span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span>
+                </div>
+              </div>
+              
+              <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
 
         {/* PANEL DERECHO (MUELLES) */}
         <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">
