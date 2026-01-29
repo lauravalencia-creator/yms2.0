@@ -23,8 +23,8 @@ import { cn } from "@/lib/utils";
 import { 
   Search, BarChart3, Settings, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
-  RotateCw, Filter, ChevronLeft, ChevronRight, AlertTriangle,
-  Package, X, QrCode, ArrowRight, LayoutGrid, Type,
+  RotateCw, Filter, UserPlus, ChevronRight, AlertTriangle,MapPin,
+  Package, X, QrCode, ArrowRight, LayoutGrid, Type,  Plus,
   Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
@@ -61,7 +61,47 @@ const COLORS = {
   ORANGE_LIGHT_BG: "bg-[#FFEAD5]",
 };
 
+const SettingsIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg 
+    viewBox="0 0 223 205" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    {...props}
+  >
+    <path
+      fill="currentColor"
+      d="M111.5 131.333C103.339 131.333 95.5123 128.137 89.7417 122.449C83.971 116.76 80.7291 109.045 80.7291 101C80.7291 92.955 83.971 85.2396 89.7417 79.551C95.5123 73.8624 103.339 70.6666 111.5 70.6666C119.661 70.6666 127.488 73.8624 133.258 79.551C139.029 85.2396 142.271 92.955 142.271 101C142.271 109.045 139.029 116.76 133.258 122.449C127.488 128.137 119.661 131.333 111.5 131.333ZM176.822 109.407C177.174 106.633 177.437 103.86 177.437 101C177.437 98.1399 177.174 95.2799 176.822 92.3333L195.372 78.2066C197.043 76.9066 197.482 74.5666 196.427 72.6599L178.844 42.6733C177.789 40.7666 175.415 39.9866 173.481 40.7666L151.59 49.4333C147.018 46.0533 142.271 43.1066 136.732 40.9399L133.479 17.9733C133.301 16.9525 132.761 16.027 131.957 15.3607C131.152 14.6945 130.134 14.3305 129.083 14.3333H93.9166C91.7187 14.3333 89.8724 15.8933 89.5208 17.9733L86.2678 40.9399C80.7291 43.1066 75.9816 46.0533 71.4099 49.4333L49.5187 40.7666C47.5845 39.9866 45.2108 40.7666 44.1558 42.6733L26.5724 72.6599C25.4295 74.5666 25.957 76.9066 27.6274 78.2066L46.1779 92.3333C45.8262 95.2799 45.5624 98.1399 45.5624 101C45.5624 103.86 45.8262 106.633 46.1779 109.407L27.6274 123.793C25.957 125.093 25.4295 127.433 26.5724 129.34L44.1558 159.327C45.2108 161.233 47.5845 161.927 49.5187 161.233L71.4099 152.48C75.9816 155.947 80.7291 158.893 86.2678 161.06L89.5208 184.027C89.8724 186.107 91.7187 187.667 93.9166 187.667H129.083C131.281 187.667 133.127 186.107 133.479 184.027L136.732 161.06C142.271 158.807 147.018 155.947 151.59 152.48L173.481 161.233C175.415 161.927 177.789 161.233 178.844 159.327L196.427 129.34C197.482 127.433 197.043 125.093 195.372 123.793L176.822 109.407Z"
+    />
+  </svg>
+);
 
+// --- 2. COMPONENTE: BOTÓN DASHBOARD EXPANDIBLE (REDISEÑADO) ---
+const DashboardNavButton = React.forwardRef(({ 
+  icon: Icon, 
+  label, 
+  onClick, 
+  variant = "orange",
+  className 
+}: any, ref: any) => {
+  return (
+    <button
+      ref={ref}
+      onClick={onClick}
+      className={cn(
+        "flex items-center h-10 rounded-xl transition-all duration-300 ease-in-out overflow-hidden group shadow-sm border-none text-white",
+        variant === "orange" ? "bg-[#ff6b00] hover:bg-[#e66000]" : "bg-[#1e2b58] hover:bg-[#151f40]",
+        "w-10 hover:w-36 px-2.5 shrink-0", 
+        className
+      )}
+    >
+      <Icon size={18} className="shrink-0" strokeWidth={2.5} />
+      <span className="ml-3 font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+        {label}
+      </span>
+    </button>
+  );
+});
+DashboardNavButton.displayName = "DashboardNavButton";
 
 // --- ICONOS ---
 function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -90,6 +130,44 @@ function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+// --- MODAL: PERMISOS (TOGGLES) ---
+function PermissionsConfigModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-2xl p-0 border-0 rounded-[2.5rem] overflow-hidden shadow-2xl z-[150] bg-[#f8fafc] [&>button]:hidden">
+        <div className="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+           <h3 className="text-[#1C1E59] font-black italic uppercase text-lg flex items-center gap-3">
+             <div className="w-1.5 h-6 bg-[#ff6b00] rounded-full" />
+             Configuración de Permisos
+           </h3>
+           <button onClick={onClose} className="text-gray-300 hover:text-gray-500"><X size={20} /></button>
+        </div>
+        <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+           {["Acceso", "Menú Catálogos"].map((cat) => (
+             <div key={cat} className="space-y-3">
+               <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{cat}</h4>
+               <div className="bg-white rounded-3xl border border-gray-100 divide-y divide-gray-50">
+                 {[1, 2, 3].map((i) => (
+                   <div key={i} className="flex items-center justify-between p-4 px-6 hover:bg-gray-50/50 transition-colors">
+                     <span className="text-xs font-bold text-gray-600">Registros ➝ Entrada {i}</span>
+                     <CustomSwitch checked={true} onChange={() => {}} />
+                   </div>
+                 ))}
+               </div>
+             </div>
+           ))}
+        </div>
+        <div className="p-6 bg-white border-t border-gray-100 flex justify-end">
+           <Button onClick={onClose} className="bg-[#ff6b00] hover:bg-[#e66000] text-white font-black uppercase text-xs px-10 h-12 rounded-xl shadow-lg shadow-orange-100">Guardar Cambios</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+
+
   const REGISTRO_OPCIONES = [
   { id: "entrada", label: "Registro de entrada", icon: ArrowRight },
   { id: "salida", label: "Registro de salida", icon: ArrowLeft },
@@ -99,6 +177,93 @@ function LayersIcon(props: React.SVGProps<SVGSVGElement>) {
   { id: "fin-cargue", label: "Fin de Cargue", icon: Check },
 ];
 
+// --- MODAL: GENERAR / EDITAR PERFIL ---
+function ProfileFormModal({ isOpen, onClose, mode = "create" }: { isOpen: boolean; onClose: () => void; mode?: "create" | "edit" }) {
+  const [showPermissions, setShowPermissions] = useState(false);
+  const isEdit = mode === "edit";
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[2.5rem] overflow-hidden shadow-2xl z-[140] [&>button]:hidden">
+          <div className={cn("px-8 py-6 text-white flex items-center justify-between", isEdit ? "bg-[#1e2b58]" : "bg-[#ff6b00]")}>
+            <div className="flex items-center gap-3">
+              {isEdit ? <Settings size={22} className="text-[#4CCAC8]" /> : <UserPlus size={22} />}
+              <h3 className="font-black italic uppercase tracking-wider text-sm">
+                {isEdit ? "Actualización de Perfil" : "Generar Nuevo Perfil"}
+              </h3>
+            </div>
+            <button onClick={onClose} className="text-white/60 hover:text-white"><X size={20} /></button>
+          </div>
+
+          <div className="p-8 bg-white space-y-6">
+            {isEdit && (
+               <div className="flex gap-2">
+                 <Badge variant="outline" className="text-[10px] font-bold text-gray-400">ID: 1229</Badge>
+                 <Badge className="bg-emerald-100 text-emerald-600 text-[9px] font-black border-none">ACTIVO</Badge>
+               </div>
+            )}
+            
+            <div className="grid grid-cols-3 gap-4">
+              <div className="col-span-2 space-y-1.5">
+                <FilterLabel>Descripción</FilterLabel>
+                <Input placeholder="Ej: Administrador" className="h-12 rounded-xl bg-gray-50/50 border-gray-100 font-bold text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <FilterLabel>Tipo</FilterLabel>
+                <Select defaultValue="admin">
+                  <SelectTrigger className="h-12 rounded-xl bg-gray-50/50 border-gray-100 font-bold text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="admin">Admin</SelectItem></SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <FilterLabel>Tiempo Sesión (Min)</FilterLabel>
+                <Input type="number" defaultValue={120} className="h-12 rounded-xl bg-gray-50/50 border-gray-100 font-bold text-sm" />
+              </div>
+              <div className="space-y-1.5">
+                <FilterLabel>Terminal</FilterLabel>
+                <ToggleCard icon={LayoutGrid} title="Modo Terminal" checked={true} onChange={() => {}} />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <FilterLabel>Configuración Avanzada</FilterLabel>
+              <div className="grid grid-cols-2 gap-3">
+                <ToggleCard icon={Type} title="Autocompletar" checked={false} onChange={() => {}} />
+                <ToggleCard icon={Package} title="Cant. Entrega" checked={false} onChange={(v:any) => {}} />
+              </div>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50/50 border-t border-gray-100 flex gap-4">
+            {isEdit ? (
+              <>
+                <Button variant="outline" onClick={() => setShowPermissions(true)} className="flex-1 h-14 rounded-2xl border-gray-200 font-black uppercase text-[10px] text-[#1e2b58]">Modificar Permisos</Button>
+                <Button className="flex-1 h-14 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black uppercase text-[10px] rounded-2xl shadow-xl">Actualizar Datos</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" onClick={onClose} className="flex-1 h-14 font-black uppercase text-[10px] text-gray-400">Cancelar</Button>
+                <Button className="flex-1 h-14 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black uppercase text-[10px] rounded-2xl shadow-xl shadow-orange-100">Generar y Asignar</Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <PermissionsConfigModal isOpen={showPermissions} onClose={() => setShowPermissions(false)} />
+    </>
+  );
+}
+
+// 1. Agrega este pequeño componente arriba para tener la tuerca exacta
+const CustomGearIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-1.728-4.256c.266-.88 1.19-1.494 2.15-1.494.96 0 1.884.614 2.15 1.494l.26 1.037c.184.733.9 1.135 1.57.945l1.045-.295c.915-.258 1.942.146 2.422.978.48.832.39 1.914-.216 2.656l-.693.85c-.443.543-.377 1.343.155 1.804l.824.713c.723.625.962 1.636.586 2.47-.376.834-1.272 1.34-2.196 1.24l-1.073-.116c-.754-.082-1.417.472-1.524 1.2l-.155 1.057c-.135.922-.92 1.62-1.848 1.62-.927 0-1.713-.698-1.848-1.62l-.155-1.057c-.107-.728-.77-1.282-1.524-1.2l-1.073.116c-.924.1-1.82-.406-2.196-1.24-.376-.834-.137-1.845.586-2.47l.824-.713c.532-.461.598-1.261.155-1.804l-.693-.85c-.606-.742-.696-1.824-.216-2.656.48-.832 1.507-1.236 2.422-.978l1.045.295c.67.19 1.386-.212 1.57-.945l.26-1.037Z" />
+  </svg>
+);
 
 // --- UTILS UI ---
 const FilterLabel = ({ children }: { children: React.ReactNode }) => (
@@ -199,7 +364,7 @@ function CreateProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white">
+      <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white [&>button]:hidden">
         {/* Header Compacto */}
         <div className="bg-[#ff6b00] px-6 py-4 flex items-center justify-between text-white">
           <div className="flex items-center gap-2">
@@ -360,7 +525,7 @@ function EditProfileModal({ isOpen, onClose, profileData }: { isOpen: boolean; o
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white">
+        <DialogContent className="sm:max-w-lg p-0 border-0 rounded-[1.5rem] overflow-hidden shadow-2xl bg-white ">
           {/* ... (Todo el Header y Body del EditProfileModal se mantiene igual) ... */}
           <div className="bg-[#1e2b58] px-6 py-4 flex items-center justify-between text-white">
             <div className="flex items-center gap-2">
@@ -434,174 +599,116 @@ function EditProfileModal({ isOpen, onClose, profileData }: { isOpen: boolean; o
 }
 
 function UsuariosTable() {
-  // Datos de ejemplo
-  const USERS_DATA = [
-    {
-      id: 1,
-      usuario: "UNIDADES",
-      perfil: "Administrador",
-      tipo: "Interno",
-      nivel: "Corporativo",
-      localidad: "Todas",
-      proveedor: "N/A",
-      telefono: "3001234567",
-      estatus: "Activo",
-      email: "unidades@example.com"
-    },
-    {
-      id: 2,
-      usuario: "JUAN.PEREZ",
-      perfil: "Operativo",
-      tipo: "Externo",
-      nivel: "Localidad",
-      localidad: "Bogotá",
-      proveedor: "TransCarga",
-      telefono: "3109876543",
-      estatus: "Activo",
-      email: "juan.perez@example.com"
-    }
-  ];
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-full space-y-6">
+    <div className="flex flex-col h-full bg-[#f8fafc]">
+      {/* MODAL GENERAR USUARIO */}
+      <ProfileFormModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} mode="create" />
       
-      {/* --- BARRA SUPERIOR (BOTÓN + BUSCADORES) --- */}
-      <div className="flex items-center gap-4 flex-wrap px-1">
-        {/* Botón Generar Usuario */}
+      {/* TOOLBAR: Elementos flotando sin recuadro blanco */}
+      <div className="flex items-center gap-4 py-6 px-2 shrink-0">
         <Button 
-          className="bg-[#1C1E59] hover:bg-[#e66000] text-white text-[11px] font-bold uppercase tracking-wide rounded-xl h-10 px-6 shadow-lg shadow-orange-100 flex items-center gap-2 transition-all hover:scale-105"
+          onClick={() => setIsCreateOpen(true)}
+          className="bg-[#1e2b58] hover:bg-[#151f40] text-white text-[10px] font-black uppercase tracking-widest h-12 px-8 rounded-2xl shadow-xl flex items-center gap-3 transition-all active:scale-95"
         >
-           <div className="text-lg leading-none mb-0.5">+</div> 
-           Generar Usuario
+          <Plus size={18} strokeWidth={3} /> Generar Usuario
         </Button>
 
-        {/* Buscador Usuario */}
-        <div className="relative w-64 group">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
-           <Input 
-             placeholder="Buscar Usuario" 
-             className="pl-10 h-10 text-xs rounded-full border-cyan-100 bg-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20 transition-all placeholder:text-gray-400 font-medium" 
-           />
+        <div className="relative group flex-1 max-w-sm">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500" size={16} />
+          <Input placeholder="BUSCAR USUARIO..." className="h-12 rounded-2xl bg-white border-none shadow-sm pl-12 text-[10px] font-black tracking-widest uppercase focus-visible:ring-1 focus-visible:ring-orange-200 transition-all" />
         </div>
 
-        {/* Buscador Perfil */}
-        <div className="relative w-64 group">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
-           <Input 
-             placeholder="Buscar Perfil" 
-             className="pl-10 h-10 text-xs rounded-full border-cyan-100 bg-white focus:border-[#ff6b00] focus:ring-[#ff6b00]/20 transition-all placeholder:text-gray-400 font-medium" 
-           />
+        <div className="relative group flex-1 max-w-sm">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-500" size={16} />
+          <Input placeholder="BUSCAR PERFIL..." className="h-12 rounded-2xl bg-white border-none shadow-sm pl-12 text-[10px] font-black tracking-widest uppercase focus-visible:ring-1 focus-visible:ring-orange-200 transition-all" />
         </div>
       </div>
 
-      {/* --- TABLA --- */}
-      <div className="rounded-[1.5rem] border border-gray-100 overflow-hidden shadow-sm flex-1 bg-white flex flex-col">
-        <div className="overflow-auto flex-1 custom-scrollbar">
-            <Table>
+      {/* TABLA CON FONDO PROPIO */}
+      <div className="flex-1 bg-white rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-auto custom-scrollbar">
+          <Table>
             <TableHeader className="bg-[#1e2b58] sticky top-0 z-10">
-                <TableRow className="border-none hover:bg-transparent">
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 pl-6">Usuario</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Perfil</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Tipo de Usuario</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Nivel Visibilidad</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Localidad</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Proveedor</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12">Teléfono</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 text-center">Estatus</TableHead>
-                <TableHead className="text-white font-black uppercase tracking-wider text-[10px] h-12 pr-6">E-mail</TableHead>
-                </TableRow>
+              <TableRow className="h-14 border-none">
+                <TableHead className="text-white text-[9px] font-black uppercase pl-8">Usuario</TableHead>
+                <TableHead className="text-white text-[9px] font-black uppercase">Perfil</TableHead>
+                <TableHead className="text-white text-[9px] font-black uppercase">Localidad</TableHead>
+                <TableHead className="text-white text-[9px] font-black uppercase text-center">Estatus</TableHead>
+                <TableHead className="text-white text-[9px] font-black uppercase pr-8">Email</TableHead>
+              </TableRow>
             </TableHeader>
-
             <TableBody>
-                {USERS_DATA.map((row) => (
-                <TableRow key={row.id} className="group hover:bg-orange-50/30 border-b border-gray-50 transition-colors">
-                    <TableCell className="font-bold text-[#1e2b58] text-xs py-4 pl-6 uppercase">{row.usuario}</TableCell>
-                    <TableCell className="text-gray-600 text-xs font-medium">{row.perfil}</TableCell>
-                    <TableCell className="text-gray-600 text-xs">{row.tipo}</TableCell>
-                    <TableCell className="text-gray-600 text-xs">{row.nivel}</TableCell>
-                    <TableCell className="text-gray-600 text-xs">{row.localidad}</TableCell>
-                    <TableCell className="text-gray-500 text-xs italic">{row.proveedor}</TableCell>
-                    <TableCell className="text-gray-600 text-xs font-mono">{row.telefono}</TableCell>
-                    <TableCell className="text-center">
-                    <Badge className={cn("border-none shadow-none text-[9px] font-bold px-2 py-0.5", row.estatus === "Activo" ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-500")}>
-                        {row.estatus}
-                    </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-500 text-xs pr-6">{row.email}</TableCell>
+              {[1, 2, 3].map((i) => (
+                <TableRow key={i} className="group border-b border-gray-50 h-16 hover:bg-orange-50/30 transition-colors cursor-pointer">
+                  <TableCell className="pl-8 font-black text-[#1e2b58] text-xs">USUARIO_PRO_{i}</TableCell>
+                  <TableCell className="text-gray-500 text-xs font-bold uppercase italic">Administrador</TableCell>
+                  <TableCell className="text-gray-400 text-xs">CEDI Norte</TableCell>
+                  <TableCell className="text-center">
+                    <Badge className="bg-emerald-100 text-emerald-600 border-none shadow-none text-[8px] font-black px-3">ACTIVO</Badge>
+                  </TableCell>
+                  <TableCell className="text-gray-400 text-xs pr-8 font-mono">unidades@controlt.com</TableCell>
                 </TableRow>
-                ))}
+              ))}
             </TableBody>
-            </Table>
+          </Table>
         </div>
       </div>
     </div>
   );
 }
+
 // --- CONTENIDO TAB PERFILES (CON LÓGICA DE MODALES) ---
 function PerfilesTabContent() {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<any>(null);
-
-  const handleRowClick = (profile: any) => {
-    setSelectedProfile(profile);
-    setIsEditOpen(true);
-  };
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-full min-h-[400px]">
-      <CreateProfileModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
-      {isEditOpen && <EditProfileModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} profileData={selectedProfile} />}
+    <div className="space-y-6 h-full flex flex-col">
+      {/* MODALES */}
+      <ProfileFormModal isOpen={isEditOpen} onClose={() => setIsEditOpen(false)} mode="edit" />
+      <ProfileFormModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} mode="create" />
 
-      {/* Toolbar Superior */}
-      <div className="flex items-center justify-between mb-6">
-         <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input placeholder="Buscar perfil..." className="pl-9 h-10 text-xs rounded-xl border-gray-200 bg-gray-50 focus:bg-white transition-all" />
-         </div>
-         <Button 
-            onClick={() => setIsCreateOpen(true)}
-            className="bg-[#ff6b00] hover:bg-[#e66000] text-white text-xs font-bold uppercase tracking-wide rounded-xl h-10 px-5 shadow-lg shadow-orange-100 flex items-center gap-2"
-         >
-            <Users size={16} />
-            Generar Perfil
-         </Button>
+      <div className="flex items-center justify-between px-1">
+        <div className="relative group w-96">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+          <Input placeholder="BUSCAR PERFIL..." className="h-12 rounded-2xl bg-white border-none shadow-sm pl-12 text-[10px] font-black uppercase focus-visible:ring-1 focus-visible:ring-orange-200 transition-all" />
+        </div>
+        <Button 
+          onClick={() => setIsCreateOpen(true)} 
+          className="bg-[#ff6b00] hover:bg-[#e66000] text-white text-[10px] font-black uppercase h-12 px-8 rounded-2xl shadow-xl shadow-orange-100 flex items-center gap-3 transition-all active:scale-95"
+        >
+          <Plus size={18} strokeWidth={3} /> Generar Perfil
+        </Button>
       </div>
 
-      {/* Tabla Mejorada */}
-      <div className="rounded-2xl border border-gray-100 overflow-hidden shadow-sm flex-1">
+      <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 flex-1 overflow-hidden">
         <Table>
-          <TableHeader className="bg-[#1e2b58] hover:bg-[#1e2b58]">
-            <TableRow className="border-none hover:bg-transparent">
-              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Perfil</TableHead>
-              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Descripción</TableHead>
-              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11 text-center">Usuarios</TableHead>
-              <TableHead className="text-white font-black uppercase tracking-wider text-[10px] italic h-11">Estado</TableHead>
-              <TableHead className="w-10"></TableHead>
+          <TableHeader className="bg-[#1e2b58]">
+            <TableRow className="h-14 border-none">
+              <TableHead className="text-white text-[9px] font-black uppercase pl-8">Perfil</TableHead>
+              <TableHead className="text-white text-[9px] font-black uppercase">Descripción</TableHead>
+              <TableHead className="text-white text-[9px] font-black uppercase text-center w-32">Estado</TableHead>
+              <TableHead className="w-16"></TableHead>
             </TableRow>
           </TableHeader>
-
           <TableBody>
-            {[
-              { id: 1, name: "Administrador", desc: "Acceso total al sistema y configuración", count: 5, status: "active" },
-              { id: 2, name: "Operador de Patio", desc: "Gestión de entradas y salidas de vehículos", count: 12, status: "active" },
-              { id: 3, name: "Consulta Externa", desc: "Solo visualización de reportes", count: 3, status: "active" },
-            ].map((row) => (
+            {["Administrador", "Operador de Patio"].map((name) => (
               <TableRow 
-                key={row.id} 
-                onClick={() => handleRowClick(row)}
-                className="group cursor-pointer hover:bg-orange-50/30 border-b border-gray-50 transition-colors"
+                key={name} 
+                onClick={() => setIsEditOpen(true)} // ESTO HACE QUE LA FILA SEA CLICKEABLE
+                className="group border-b border-gray-50 h-20 hover:bg-orange-50/30 cursor-pointer transition-colors"
               >
-                <TableCell className="font-bold text-[#1e2b58] text-xs py-4">{row.name}</TableCell>
-                <TableCell className="text-gray-500 text-xs">{row.desc}</TableCell>
+                <TableCell className="pl-8 font-black text-[#1e2b58] text-sm uppercase italic tracking-tighter">{name}</TableCell>
+                <TableCell className="text-gray-400 text-xs font-medium">Control total sobre los módulos de acceso y configuración del sistema.</TableCell>
                 <TableCell className="text-center">
-                  <Badge variant="secondary" className="bg-gray-100 text-gray-600 font-bold">{row.count}</Badge>
+                   <Badge className="bg-emerald-100 text-emerald-600 border-none text-[8px] font-black px-3">ACTIVO</Badge>
                 </TableCell>
-                <TableCell>
-                  <Badge className="bg-emerald-100 text-emerald-600 hover:bg-emerald-200 border-none shadow-none text-[10px] font-bold px-2">Activo</Badge>
-                </TableCell>
-                <TableCell>
-                   <ChevronRight size={16} className="text-gray-300 group-hover:text-[#ff6b00] transition-colors" />
+                <TableCell className="pr-8">
+                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300 group-hover:bg-[#ff6b00] group-hover:text-white transition-all shadow-sm">
+                    <ChevronRight size={16} strokeWidth={3} />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -673,76 +780,79 @@ function ReportFiltersContent() {
 }
 
 function LogAnalysisModal({ docId, onClose }: { docId: string, onClose: () => void }) {
+  if (!docId) return null;
   return (
     <Dialog open={!!docId} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-0 rounded-[1.5rem] shadow-2xl">
-        {/* Header Compacto */}
-        <div className="relative bg-[#1C1E59] p-5 text-white">
-          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }}></div>
-          <div className="relative z-10 flex justify-between items-center">
+      <DialogContent className="sm:max-w-xl p-0 overflow-hidden border-0 rounded-[2rem] shadow-2xl z-[120] [&>button]:hidden">
+        {/* Header con patrón de cuadrícula Navy */}
+        <div className="relative bg-[#0A0E3F] p-7 text-white overflow-hidden">
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '15px 15px' }}></div>
+          <div className="relative z-10 flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-black italic tracking-tighter flex items-center gap-2">
+              <h2 className="text-2xl font-black italic tracking-tighter flex items-center gap-2">
                 ANÁLISIS DE <span className="text-[#4CCAC8]">LOGS</span>
               </h2>
-              <p className="text-cyan-400 font-mono text-[10px] uppercase tracking-widest">Expediente: {docId}</p>
+              <p className="text-cyan-400 font-bold text-[10px] uppercase tracking-widest mt-1">EXPEDIENTE: {docId}</p>
             </div>
-            <button onClick={onClose} className="text-white/50 hover:text-white">x</button>
+            <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
+               <X size={24} strokeWidth={3} />
+            </button>
           </div>
         </div>
 
-        <div className="p-5 bg-white space-y-5">
-          {/* Info General Compacta */}
-          <div className="grid grid-cols-2 gap-4 border-b pb-4">
-            <div className="space-y-0.5">
-              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Validación</span>
-              <div><Badge className="bg-red-50 text-red-500 text-[9px] py-0 px-2 shadow-none font-bold">FAILED</Badge></div>
+        <div className="p-8 bg-white space-y-8">
+          {/* Grid de Información Meta */}
+          <div className="grid grid-cols-2 gap-y-6 gap-x-12">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-gray-400 uppercase italic">Validación</span>
+              <div><Badge className="bg-red-50 text-red-500 text-[10px] py-0.5 px-3 shadow-none font-bold rounded-full">FAILED</Badge></div>
             </div>
-            <div className="space-y-0.5">
-              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Timestamp</span>
-              <p className="text-[#1C1E59] font-bold text-xs">26/01/2026, 5:27 PM</p>
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-gray-400 uppercase italic">Timestamp</span>
+              <p className="text-[#1C1E59] font-black text-sm">26/01/2026, 5:27 PM</p>
             </div>
-            <div className="space-y-0.5">
-              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Auditor</span>
-              <p className="text-[#1C1E59] font-bold text-xs">J.GARCIA</p>
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-gray-400 uppercase italic">Auditor</span>
+              <p className="text-[#1C1E59] font-black text-sm uppercase">J.GARCIA</p>
             </div>
-            <div className="space-y-0.5">
-              <span className="text-[9px] font-bold text-gray-400 uppercase italic">Categoría</span>
-              <p className="text-[#1C1E59] font-bold text-xs uppercase">Packing List</p>
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-gray-400 uppercase italic">Categoría</span>
+              <p className="text-[#1C1E59] font-black text-sm uppercase italic">Packing List</p>
             </div>
           </div>
 
-          {/* Ruta Logística Compacta */}
-          <div className="space-y-3">
+          {/* Ruta de Datos */}
+          <div className="space-y-4">
             <h4 className="text-[#1C1E59] text-xs font-black italic uppercase tracking-tighter flex items-center gap-2">
-              <div className="w-1 h-4 bg-cyan-400 rounded-full"></div> Ruta de Datos
+              <div className="w-1.5 h-4 bg-cyan-400 rounded-full"></div> RUTA DE DATOS
             </h4>
-            <div className="relative pl-6 space-y-4 before:absolute before:left-[9px] before:top-1 before:bottom-1 before:w-0.5 before:bg-gray-100">
-              <div className="relative text-[11px]">
-                <div className="absolute -left-[21px] w-4 h-4 rounded-full bg-white border-2 border-cyan-400 z-10"></div>
-                <p className="font-bold text-[#1C1E59]">GENERACIÓN DOCUMENTAL</p>
-                <p className="text-gray-400 text-[10px]">Procesado por motor YMS.</p>
+            <div className="relative pl-6 space-y-6 before:absolute before:left-[9px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-100">
+              <div className="relative">
+                <div className="absolute -left-[22px] w-4.5 h-4.5 rounded-full bg-white border-2 border-cyan-400 z-10 flex items-center justify-center"></div>
+                <p className="text-[11px] font-black text-[#1C1E59] uppercase">Generación Documental</p>
+                <p className="text-gray-400 text-[10px] font-medium">Procesado por motor YMS.</p>
               </div>
-              <div className="relative text-[11px]">
-                <div className="absolute -left-[21px] w-4 h-4 rounded-full bg-white border-2 border-orange-500 z-10"></div>
-                <p className="font-bold text-[#1C1E59]">SINCRONIZACIÓN API</p>
-                <p className="text-gray-400 text-[10px]">Transmisión a infraestructura central.</p>
+              <div className="relative">
+                <div className="absolute -left-[22px] w-4.5 h-4.5 rounded-full bg-white border-2 border-orange-500 z-10"></div>
+                <p className="text-[11px] font-black text-[#1C1E59] uppercase">Sincronización API</p>
+                <p className="text-gray-400 text-[10px] font-medium">Transmisión a infraestructura central.</p>
               </div>
             </div>
           </div>
 
-          {/* Anomalía Compacta */}
-          <div className="bg-red-50 border border-red-100 p-3 rounded-xl flex items-center gap-3 text-red-600">
-             <AlertTriangle size={16} />
-             <p className="text-[10px] font-bold italic">Connection timeout with external API endpoint 504</p>
+          {/* Caja de Error */}
+          <div className="bg-red-50/50 border border-red-100 p-4 rounded-2xl flex items-center gap-4 text-red-600">
+             <div className="bg-red-100 p-1.5 rounded-lg"><AlertTriangle size={18} /></div>
+             <p className="text-[11px] font-bold italic leading-tight">Connection timeout with external API endpoint 504</p>
           </div>
         </div>
 
-        {/* Footer Compacto */}
-        <div className="p-4 bg-slate-50 flex gap-3 border-t border-gray-100">
-          <Button className="flex-1 h-10 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold uppercase rounded-xl shadow-md">
+        {/* Footer con botones grandes */}
+        <div className="p-6 bg-slate-50/50 border-t border-gray-100 flex gap-4">
+          <Button className="flex-1 h-14 bg-[#ff6b00] hover:bg-[#e66000] text-white text-xs font-black uppercase rounded-2xl shadow-lg shadow-orange-100">
             Reproceso Manual
           </Button>
-          <Button variant="outline" className="flex-1 h-10 border-[#1C1E59] text-[#1C1E59] text-xs font-bold uppercase rounded-xl">
+          <Button variant="outline" onClick={onClose} className="flex-1 h-14 border-[#1C1E59] text-[#1C1E59] text-xs font-black uppercase rounded-2xl hover:bg-white transition-all">
             Exportar
           </Button>
         </div>
@@ -751,50 +861,40 @@ function LogAnalysisModal({ docId, onClose }: { docId: string, onClose: () => vo
   );
 }
 
+
 // --- COMPONENTE: MODAL DE CONFIRMACIÓN DE REPROCESO ---
 function ReprocessConfirmModal({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0 rounded-[2rem] shadow-2xl">
-        {/* Cabecera Naranja */}
-        <div className="bg-[#FF6C01] p-8 flex flex-col items-center text-white relative">
-          <button onClick={onClose} className="absolute right-4 top-4 text-white/80 hover:text-white">
-            x
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden border-0 rounded-[2.5rem] shadow-2xl z-[130] [&>button]:hidden">
+        {/* Cabecera Naranja Intensa */}
+        <div className="bg-[#FF6C01] p-10 flex flex-col items-center text-white relative">
+          <button onClick={onClose} className="absolute right-6 top-6 text-white/60 hover:text-white transition-colors">
+            <X size={20} strokeWidth={3} />
           </button>
           
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-6 border border-white/30">
-            <AlertTriangle size={32} className="text-white" />
+          <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center mb-6 border border-white/30 rotate-45">
+            <div className="-rotate-45 text-white">
+               <AlertTriangle size={32} />
+            </div>
           </div>
           
-          <h2 className="text-2xl font-black italic tracking-tighter uppercase mb-1">
-            Confirmar Reproceso
-          </h2>
-          <p className="text-[10px] font-bold tracking-[0.2em] uppercase opacity-90">
-            Seguridad YMS • Protocolo Crítico
-          </p>
+          <h2 className="text-2xl font-black italic tracking-tighter uppercase mb-1">Confirmar Reproceso</h2>
+          <p className="text-[9px] font-black tracking-[0.2em] uppercase opacity-80">Seguridad YMS • Protocolo Crítico</p>
         </div>
 
-        {/* Cuerpo del Modal */}
-        <div className="p-8 bg-white text-center">
-          <p className="text-gray-500 text-sm leading-relaxed mb-6 italic">
-            Se ha iniciado una solicitud para reprocesar <span className="font-black text-[#1C1E59] tracking-tight">1 PAQUETE(S) DE DATOS</span>. Esta acción intentará registrar nuevamente los documentos en la base de datos central de CONTROLT.
+        <div className="p-10 bg-white text-center">
+          <p className="text-gray-500 text-sm leading-relaxed mb-10 italic">
+            Se ha iniciado una solicitud para reprocesar <span className="font-black text-[#1C1E59]">1 PAQUETE(S) DE DATOS</span>. Esta acción intentará registrar nuevamente los documentos en la base de datos central de CONTROLT.
           </p>
           
-          <p className="text-gray-600 font-bold text-sm italic mb-8">
-            ¿Desea proceder con el envío manual a la API?
-          </p>
+          <p className="text-[#1C1E59] font-black text-sm italic mb-10 uppercase tracking-tight">¿Desea proceder con el envío manual a la API?</p>
 
           <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              className="flex-1 h-14 border-gray-200 text-gray-400 font-black italic uppercase rounded-2xl text-xs hover:bg-gray-50"
-            >
+            <Button variant="ghost" onClick={onClose} className="flex-1 h-14 bg-gray-50 text-gray-400 font-black italic uppercase rounded-2xl text-[10px] hover:bg-gray-100">
               Abordar Operación
             </Button>
-            <Button 
-              className="flex-1 h-14 bg-[#1C1E59] hover:bg-[#151744] text-white font-black italic uppercase rounded-2xl text-xs shadow-xl shadow-blue-900/30"
-            >
+            <Button className="flex-1 h-14 bg-[#0A0E3F] hover:bg-[#050038] text-white font-black italic uppercase rounded-2xl text-[10px] shadow-2xl shadow-blue-900/30">
               Iniciar Ejecución
             </Button>
           </div>
@@ -805,167 +905,155 @@ function ReprocessConfirmModal({ isOpen, onClose }: { isOpen: boolean, onClose: 
 }
 
 // --- COMPONENTE: MODAL HISTORIAL (CON TOGGLE Y HEADER AZUL) ---
+// --- COMPONENTE: AUDITORÍA (CON TODA LA LÓGICA Y DATOS) ---
 function AuditHistoryContent() {
+  // 1. Estados para controlar qué modal se abre
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [isReprocessOpen, setIsReprocessOpen] = useState(false);
-  // NUEVO ESTADO: Controla la vista de Creación vs Actualización
   const [operationType, setOperationType] = useState<"creacion" | "actualizacion">("creacion");
 
-  // NUEVO: Datos actualizados con la propiedad `operation`
+  // 2. Datos de ejemplo (Asegúrate de que tengan la propiedad 'operation')
   const auditData = [
     { id: "DOC-1024", type: "PACKING LIST", status: "FAILED", auditor: "J.GARCIA", time: "26/01/2026, 17:27", operation: "creacion" },
     { id: "DOC-1025", type: "ASN", status: "SUCCESS", auditor: "M.RODRIGUEZ", time: "26/01/2026, 16:27", operation: "creacion" },
     { id: "DOC-2048", type: "WAYBILL", status: "SUCCESS", auditor: "A.MARTINEZ", time: "26/01/2026, 15:27", operation: "actualizacion" },
-    { id: "DOC-2049", type: "CUSTOMS DECLARATION", status: "FAILED", auditor: "L.GOMEZ", time: "26/01/2026, 14:15", operation: "actualizacion" },
-    { id: "DOC-1026", type: "INVOICE", status: "SUCCESS", auditor: "A.MARTINEZ", time: "26/01/2026, 15:27", operation: "creacion" },
-    { id: "DOC-1027", type: "PACKING LIST", status: "SUCCESS", auditor: "J.GARCIA", time: "26/01/2026, 14:27", operation: "creacion" },
+    { id: "DOC-2049", type: "CUSTOMS", status: "FAILED", auditor: "L.PEREZ", time: "26/01/2026, 12:27", operation: "actualizacion" },
   ];
 
-  // Filtramos los datos según el toggle seleccionado
+  // 3. Lógica de filtrado (Aquí se define filteredData)
   const filteredData = auditData.filter(row => row.operation === operationType);
 
   return (
-    <div className="flex flex-col h-full bg-[#f8fafc]">
+    <div className="flex flex-col h-full space-y-6 animate-in fade-in duration-500">
+      {/* RENDER DE MODALES HIJOS */}
       <LogAnalysisModal docId={selectedDoc || ""} onClose={() => setSelectedDoc(null)} />
       <ReprocessConfirmModal isOpen={isReprocessOpen} onClose={() => setIsReprocessOpen(false)} />
 
-      {/* Header Modal */}
-      <div className="flex items-center justify-between mb-8 px-2 shrink-0">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center border border-gray-100">
-            <HistoryIcon className="text-[#1C1E59]" size={20} />
-          </div>
-          <h2 className="text-xl font-black text-[#1C1E59] uppercase italic">Auditoría de documentos</h2>
-        </div>
-
-      
-      </div>
-
-      {/* TOOLBAR */}
-      <div className="flex items-center justify-between mb-6 px-2 shrink-0 gap-3">
+      {/* BARRA DE HERRAMIENTAS (TOOLBAR) */}
+      <div className="flex items-center justify-between px-1">
         {/* Buscador */}
-        <div className="relative w-full max-w-sm group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#FF6C01]" />
+        <div className="relative w-full max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
           <Input 
-            placeholder="Buscar por ID, Tipo o Auditor..." 
-            className="bg-white border-gray-200 pl-11 h-11 rounded-xl w-full shadow-sm focus:ring-[#FF6C01]/10" 
+            placeholder="Buscar por ID o Auditor..." 
+            className="bg-white border-none h-12 rounded-2xl w-full shadow-sm pl-12 text-sm font-medium focus-visible:ring-1 focus-visible:ring-orange-200" 
           />
         </div>
         
-        {/* ACCIONES DERECHA: Toggle + Filtros + Exportar */}
         <div className="flex items-center gap-3">
-          
-          {/* NUEVO AJUSTE: TOGGLE DE VISTA (Creación / Actualización) */}
-          <div className="bg-slate-100 p-1 rounded-2xl flex items-center border border-gray-200 shadow-sm h-11">
-            <button
-              onClick={() => setOperationType("creacion")}
+          {/* Selector Creación / Actualización */}
+          <div className="bg-white p-1.5 rounded-[1.25rem] flex items-center shadow-sm border border-gray-50 h-12">
+            <button 
+              onClick={() => setOperationType("creacion")} 
               className={cn(
-                "px-5 h-full rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
-                operationType === "creacion" 
-                  ? "bg-white text-[#1C1E59] shadow-md" 
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+                "px-6 h-full rounded-xl text-[10px] font-black uppercase transition-all", 
+                operationType === "creacion" ? "bg-slate-50 text-[#1C1E59] shadow-inner" : "text-gray-400 hover:text-gray-600"
               )}
             >
-              <div className={cn("w-1.5 h-1.5 rounded-full", operationType === "creacion" ? "bg-cyan-500" : "bg-transparent")} />
               Creación
             </button>
-            <button
-              onClick={() => setOperationType("actualizacion")}
+            <button 
+              onClick={() => setOperationType("actualizacion")} 
               className={cn(
-                "px-5 h-full rounded-xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center gap-1.5",
-                operationType === "actualizacion" 
-                  ? "bg-white text-[#1C1E59] shadow-md" 
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white/50"
+                "px-6 h-full rounded-xl text-[10px] font-black uppercase transition-all", 
+                operationType === "actualizacion" ? "bg-slate-50 text-[#1C1E59] shadow-inner" : "text-gray-400 hover:text-gray-600"
               )}
             >
-              <div className={cn("w-1.5 h-1.5 rounded-full", operationType === "actualizacion" ? "bg-orange-500" : "bg-transparent")} />
               Actualización
             </button>
           </div>
 
-          <div className="w-px h-6 bg-gray-200 mx-1"></div>
-
-          {/* Botón Filtros */}
+          {/* BOTÓN FILTROS (DISEÑO EXACTO IMAGEN) */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button className="h-11 px-4 rounded-xl bg-[#FF6C01] hover:bg-[#e66101] text-white font-bold gap-2 shadow-lg shadow-orange-200">
-                <Filter size={18} />
+              <Button className="h-12 px-6 rounded-[1.25rem] bg-[#ff6b00] hover:bg-[#e66000] text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg shadow-orange-100 transition-all active:scale-95">
+                <Filter size={18} strokeWidth={2.5} />
                 <span>Filtros</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-4 rounded-2xl shadow-2xl" align="end">
-              <div className="space-y-4">
-                <h4 className="font-black text-[#1C1E59] text-xs uppercase italic">Filtros Avanzados</h4>
-                <div className="grid grid-cols-2 gap-2">
-                   <Input type="date" className="text-xs h-9" />
-                   <Input type="date" className="text-xs h-9" />
+            <PopoverContent className="w-80 p-6 rounded-[2rem] shadow-2xl border-none z-[120]" align="end">
+              <div className="space-y-6">
+                <h4 className="font-black text-[#1C1E59] text-xs uppercase italic tracking-wider">Filtros Avanzados</h4>
+                <div className="grid grid-cols-2 gap-3">
+                   <div className="relative">
+                      <Input type="date" className="h-12 rounded-xl border-gray-100 bg-gray-50/50 text-[10px] font-bold uppercase" />
+                   </div>
+                   <div className="relative">
+                      <Input type="date" className="h-12 rounded-xl border-gray-100 bg-gray-50/50 text-[10px] font-bold uppercase" />
+                   </div>
                 </div>
-                <Button className="w-full bg-[#1C1E59] text-white text-[10px] font-bold uppercase rounded-lg">Aplicar</Button>
+                <Button className="w-full h-12 bg-[#1C1E59] hover:bg-[#0A0E3F] text-white text-[10px] font-black uppercase rounded-2xl shadow-xl transition-all">
+                  Aplicar
+                </Button>
               </div>
             </PopoverContent>
           </Popover>
 
-          {/* Botón Exportar */}
-          <Button className="h-11 w-11 p-0 bg-[#FF6C01] hover:bg-[#e66101] text-white rounded-xl shadow-lg shadow-orange-200">
+          <Button className="h-12 w-12 p-0 bg-[#ff6b00] text-white rounded-[1.25rem] shadow-lg shadow-orange-100 hover:bg-[#e66000] transition-all active:scale-95">
             <FileText size={20} />
           </Button>
         </div>
       </div>
 
       {/* TABLA PRINCIPAL */}
-      <div className="bg-white rounded-[1.5rem] border border-gray-100 shadow-xl overflow-hidden flex flex-col flex-1 min-h-0">
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <Table>
-            <TableHeader className="sticky top-0 bg-[#1C1E59] z-20">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="w-12 text-center"><input type="checkbox" className="rounded border-white/20 bg-transparent" /></TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic">Documento ID</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic">Tipo Logístico</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic text-center">Estado</TableHead>
-                <TableHead className="text-[10px] font-black uppercase text-white tracking-widest italic text-right pr-12">Acciones</TableHead>
+      <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-50 overflow-hidden flex flex-col flex-1">
+        <Table>
+          <TableHeader className="bg-[#1C1E59]">
+            <TableRow className="hover:bg-transparent border-none h-14">
+              <TableHead className="text-[10px] font-black uppercase text-white pl-8 tracking-widest">Documento ID</TableHead>
+              <TableHead className="text-[10px] font-black uppercase text-white tracking-widest">Tipo Logístico</TableHead>
+              <TableHead className="text-[10px] font-black uppercase text-white text-center tracking-widest">Estado</TableHead>
+              <TableHead className="text-[10px] font-black uppercase text-white text-right pr-12 tracking-widest">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="h-32 text-center text-gray-400 font-bold italic">No se encontraron registros</TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {/* Mapeamos filteredData en lugar de todos */}
-              {filteredData.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-32 text-gray-400 font-bold italic">No hay registros para esta vista.</TableCell>
-                </TableRow>
-              ) : (
-                filteredData.map((row) => (
-                  <TableRow key={row.id} className="hover:bg-slate-50/50 border-b border-gray-50 h-16">
-                    <TableCell className="text-center"><input type="checkbox" className="rounded" /></TableCell>
-                    <TableCell className="font-black text-xs text-[#1C1E59]">{row.id}</TableCell>
-                    <TableCell className="text-[10px] font-bold text-gray-500 uppercase">{row.type}</TableCell>
-                    <TableCell className="text-center">
-                      <Badge className={cn(
-                        "text-[8px] px-3 font-black rounded-full border-none shadow-none",
-                        row.status === "FAILED" ? "bg-red-50 text-red-500" : "bg-emerald-50 text-emerald-500"
-                      )}>{row.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => setSelectedDoc(row.id)} className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-cyan-500 shadow-sm transition-all"><Eye size={16} /></button>
-                        <button className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-400 hover:text-orange-500 shadow-sm transition-all"><Download size={16} /></button>
-                        {row.status === "FAILED" && <button onClick={() => setIsReprocessOpen(true)} className="p-2.5 rounded-xl bg-white border border-gray-100 text-[#FF6C01] shadow-sm hover:bg-orange-50 transition-all active:scale-90"><RotateCw size={16} /></button>}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+            ) : (
+              filteredData.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50/50 border-b border-gray-50 h-20 transition-colors">
+                  <TableCell className="font-black text-sm text-[#1C1E59] pl-8">{row.id}</TableCell>
+                  <TableCell className="text-[10px] font-bold text-gray-500 uppercase italic">{row.type}</TableCell>
+                  <TableCell className="text-center">
+                    <Badge className={cn(
+                      "text-[8px] px-3 py-1 font-black rounded-full border-none shadow-none", 
+                      row.status === "FAILED" ? "bg-red-50 text-red-400" : "bg-emerald-50 text-emerald-400"
+                    )}>
+                      {row.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right pr-8">
+                    <div className="flex items-center justify-end gap-2">
+                      {/* BOTÓN OJO -> Abre Análisis de Logs */}
+                      <button 
+                        onClick={() => setSelectedDoc(row.id)} 
+                        className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-300 hover:text-cyan-500 hover:border-cyan-100 transition-all bg-white shadow-sm active:scale-90"
+                      >
+                        <Eye size={18} />
+                      </button>
+                      
+                      <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-all bg-white shadow-sm active:scale-90">
+                        <Download size={18} />
+                      </button>
 
-        {/* PAGINACIÓN */}
-        <div className="px-6 py-3 bg-slate-50/50 border-t flex items-center justify-between shrink-0">
-           <span className="text-[9px] font-bold text-gray-400 uppercase italic">Mostrando {filteredData.length} registros</span>
-           <div className="flex items-center gap-1">
-              <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronLeft size={14} /></Button>
-              <Button className="h-7 w-7 bg-[#1C1E59] text-white text-[10px] font-bold rounded-lg shadow-md shadow-blue-900/20">1</Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7"><ChevronRight size={14} /></Button>
-           </div>
-        </div>
+                      {/* BOTÓN RECARGAR -> Abre Confirmar Reproceso (Solo si FAILED) */}
+                      {row.status === "FAILED" && (
+                        <button 
+                          onClick={() => setIsReprocessOpen(true)} 
+                          className="w-10 h-10 rounded-full border border-orange-100 flex items-center justify-center text-[#ff6b00] hover:bg-orange-50 transition-all bg-white shadow-sm active:scale-90"
+                        >
+                          <RotateCw size={18} />
+                        </button>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -1392,20 +1480,16 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   };
 
  return (
-    <div className="bg-white flex flex-col w-full border-none shadow-sm">
-      {/* --- FILA PRINCIPAL: Logo + Filtros + Botones --- */}
-      <div className="px-6 py-4 flex items-center gap-8">
+    <div className="bg-white flex flex-col w-full border-b border-gray-100 shadow-sm">
+      <div className="px-6 py-4 flex items-center justify-between gap-4">
         
-        {/* 1. LOGO */}
-        <div className="flex-shrink-0">
-          <img 
-            src="/ControlT.png" 
-            alt="Logo"
-            className="h-10 w-auto object-contain" 
-          />
-        </div>
+        {/* LADO IZQUIERDO: LOGO Y LOCALIDAD */}
+        <div className="flex items-center gap-6">
+          <img src="/ControlT.png" alt="Logo" className="h-9 w-auto object-contain" />
+          
+          <div className="h-8 w-px bg-gray-100 mx-2" />
 
-        {/* 2. SELECTOR LOCALIDAD */}
+              {/* 2. SELECTOR LOCALIDAD */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-yms-gray">
             <MapPinIcon className="w-5 h-5 text-yms-secondary" />
@@ -1430,192 +1514,232 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
             </SelectContent>
           </Select>
         </div>
+        </div>
 
-        {/* 3. SELECTOR DE MUELLES (Solo se muestra si hay localidad, esto está bien) */}
-        {selectedLocationId && (
-          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left-4 duration-300">
-            <div className="w-px h-8 bg-yms-border" />
-            <div className="flex items-center gap-2 text-yms-gray">
-              <LayersIcon className="w-5 h-5 text-yms-cyan" />
-              <span className="font-medium text-sm">Muelle:</span>
-            </div>
-            <Select value={selectedDockGroupId || ""} onValueChange={handleDockGroupChange}>
-              <SelectTrigger className={cn("w-[280px] rounded-[1.25rem] border-yms-border bg-white focus:ring-2 focus:ring-yms-cyan focus:border-yms-cyan hover:border-yms-cyan/50 transition-colors", !selectedDockGroupId && "text-yms-gray")}>
-                <SelectValue placeholder="Todos los Muelles..." />
-              </SelectTrigger>
-              <SelectContent className="rounded-[1rem] border-yms-border">
-                <SelectItem value="all" className="rounded-[0.75rem] cursor-pointer focus:bg-yms-cyan/10">
-                  <div className="flex items-center gap-2"><LayersIcon className="w-4 h-4 text-yms-primary" /><span className="font-medium">Todos los muelles</span></div>
-                </SelectItem>
-                {selectedLocation?.dockGroups.map((group) => (
-                  <SelectItem key={group.id} value={group.id} className="rounded-[0.75rem] cursor-pointer focus:bg-yms-cyan/10">
-                    <div className="flex items-center gap-3">
-                      <span className="font-medium text-yms-primary">{group.name}</span>
-                      <Badge variant="outline" className={cn("text-[10px] px-1.5 capitalize", getDockTypeColor(group.type))}>{group.type === "mixed" ? "Mixto" : group.type === "inbound" ? "Entrada" : "Salida"}</Badge>
-                      <span className="text-xs text-yms-gray ml-auto">{group.dockCount}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
+        {/* LADO DERECHO: BARRA DE ACCIONES DASHBOARD */}
+        <div className="ml-auto flex items-center gap-3">
 
-        {/* 4. BOTONES DE ACCIÓN (AHORA VISIBLES SIEMPRE) */}
-        {/* Se eliminó la condición {isLoaded && selectedLocation && (...)} */}
-        <div className="ml-auto flex items-center gap-4">
+
+          
+          {/* GRUPO 2: BUSCADOR */}
           <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input type="text" placeholder="Buscar..." className="pl-9 pr-4 py-2 h-10 w-48 bg-gray-50 border-none rounded-full text-sm outline-none focus:ring-2 focus:ring-yms-cyan/20 transition-all" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-[#ff6b00] transition-colors" />
+            <input 
+              type="text" 
+              placeholder="BUSCAR..." 
+              className="pl-9 pr-4 py-2 h-10 w-36 bg-white border border-gray-100 rounded-xl text-[10px] font-bold outline-none focus:ring-2 focus:ring-orange-100 focus:w-56 transition-all duration-500 uppercase tracking-widest" 
+            />
           </div>
-
+          
+          {/* BOTÓN ÚNICO DE REGISTROS (EXPANDIBLE + POPOVER) */}
           <Popover>
             <PopoverTrigger asChild>
-              <button className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#ff6b00] text-white hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-orange-200">
-                <LayoutGrid size={20} />
-              </button>
+              <DashboardNavButton icon={LayoutGrid} label="Registros" variant="orange" />
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-3 rounded-[1.5rem] shadow-2xl border-gray-100 bg-white" align="end">
-              <div className="space-y-4">
-                {/* SECCIÓN REGISTROS RÁPIDOS */}
-                  <div>
-                    <div className="flex items-center gap-2 px-3 mb-4">
-                      <div className="h-1 w-6 bg-[#ff6b00] rounded-full" />
-                      <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Registros de Patio</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {REGISTRO_OPCIONES.map((opt) => (
-                        <MenuGridButton
-                          key={opt.id}
-                          icon={opt.icon}
-                          label={opt.label}
-                          variant="orange"
-                          onClick={() => handleOpenRegistro(opt.id)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                <div className="h-px bg-gray-100 mx-2" />
-
-                {/* SECCIÓN HERRAMIENTAS */}
-                <div>
-                  <div className="flex items-center gap-2 px-3 mb-4">
-                    <div className="h-1 w-6 bg-[#1C1E59] rounded-full" />
-                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Administración</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="contents"><MenuGridButton icon={HistoryIcon} label="Auditoría" /></div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl max-h-[95vh]">
-                        <AuditHistoryContent />
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="contents"><MenuGridButton icon={BarChart3} label="Reportes" /></div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-4xl w-full p-8 bg-white rounded-[2rem] border-0 shadow-2xl">
-                        <DialogHeader><DialogTitle className={cn("text-center text-2xl font-black uppercase mb-2", COLORS.NAVY)}>Filtros de Búsqueda</DialogTitle></DialogHeader>
-                        <ReportFiltersContent />
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="contents"><MenuGridButton icon={Users} label="Usuarios" /></div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[90vw] w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl h-[80vh] flex flex-col overflow-hidden">
-                          {/* Header Usuarios */}
-                          <div className="px-8 py-5 border-b border-gray-100 bg-white flex items-center gap-4 shrink-0">
-                              <div className="w-12 h-12 rounded-full bg-slate-50 border border-gray-100 flex items-center justify-center">
-                                  <Users className="w-6 h-6 text-[#1e2b58]" />
-                              </div>
-                              <div>
-                                  <DialogTitle className="text-lg font-black uppercase italic tracking-tight text-[#1e2b58]">Gestión de Usuarios</DialogTitle>
-                                  <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Administración de accesos</p>
-                              </div>
-                              <DialogPrimitive.Close className="ml-auto text-gray-400 hover:text-gray-600"><X size={24} /></DialogPrimitive.Close>
-                          </div>
-                          <div className="flex-1 p-8 bg-[#F8FAFC] overflow-hidden">
-                              <Tabs defaultValue="usuarios" className="h-full flex flex-col">
-                                <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit mb-6 border border-gray-100">
-                                  <TabsTrigger value="usuarios" className="rounded-xl px-6 h-full text-[11px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white">Usuarios</TabsTrigger>
-                                  <TabsTrigger value="perfiles" className="rounded-xl px-6 h-full text-[11px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white">Perfiles</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="usuarios" className="flex-1 min-h-0"><UsuariosTable /></TabsContent>
-                                <TabsContent value="perfiles" className="flex-1 min-h-0"><PerfilesTabContent /></TabsContent>
-                              </Tabs>
-                          </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-                      <DialogTrigger asChild>
-                        <div className="contents"><MenuGridButton icon={Upload} label="Cargar" /></div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-6xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-                        <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
-                          <Upload className={cn("w-5 h-5", COLORS.NAVY)} />
-                          <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Carga de Archivos</DialogTitle>
-                        </div>
-                        <div className="px-8 pb-8">
-                          <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                      <Dialog>
-                      <DialogTrigger asChild>
-                        <div className="contents"><MenuGridButton icon={HistoryIcon} label="Catalogo" /></div>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-7xl w-full p-10 bg-[#f8fafc] rounded-[3rem] border-0 shadow-2xl max-h-[95vh]">
-                        
-                      </DialogContent>
-                    </Dialog>
-
-                  </div>
+            <PopoverContent className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100" align="center">
+              <div className="grid grid-cols-1 gap-1">
+                <div className="px-3 py-2 border-b border-gray-50 mb-1">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gestión de Patio</span>
                 </div>
+                {REGISTRO_OPCIONES.map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => { setSelectedRegistro(opt.id); setIsModalOpen(true); }}
+                    className="flex items-center gap-3 p-3 w-full hover:bg-orange-50 rounded-xl transition-colors group text-left"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
+                      <opt.icon size={16} />
+                    </div>
+                    <span className="text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter">{opt.label}</span>
+                  </button>
+                ))}
               </div>
             </PopoverContent>
           </Popover>
 
-          {/* MODAL REGISTROS */}
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
-              {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
+         
+
+         {/* AUDITORÍA */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <DashboardNavButton icon={HistoryIcon} label="Auditoría" variant="navy" />
+            </DialogTrigger>
+            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
+              {/* Header de Pantalla Completa */}
+              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+                <div className="flex items-center gap-3">
+                  <HistoryIcon className="text-white" size={20} />
+                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Auditoría General de Documentos</h2>
+                </div>
+                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+                  <X size={20} />
+                </DialogPrimitive.Close>
+              </div>
+
+              {/* Contenido con Scroll */}
+              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <div className="max-w-7xl mx-auto h-full">
+                   <AuditHistoryContent />
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
 
-          {/* MODAL RESULTADOS DE CARGA */}
-          <Dialog open={isResultsModalOpen} onOpenChange={setIsResultsModalOpen}>
-            <DialogContent className="sm:max-w-4xl w-full p-0 bg-white rounded-[2rem] border-0 shadow-2xl overflow-hidden">
-              <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-500" />
-                <DialogTitle className={cn("text-lg font-black uppercase", COLORS.NAVY)}>Resultados de Carga</DialogTitle>
+          {/* REPORTES (PANTALLA COMPLETA + FORM CENTRADO) */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <DashboardNavButton icon={BarChart3} label="Reportes" variant="navy" />
+            </DialogTrigger>
+            
+            {/* Contenedor Full Screen */}
+            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
+              
+              {/* Header Navy (Consistente con Auditoría) */}
+              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="text-white" size={20} />
+                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Módulo de Reportes y Estadísticas</h2>
+                </div>
+                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+                  <X size={20} />
+                </DialogPrimitive.Close>
               </div>
-              <div className="px-8 pb-8">
-                <UploadResultsContent onClose={() => setIsResultsModalOpen(false)} />
+
+              {/* Cuerpo del Modal: Centrado perfecto del Formulario */}
+              <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto custom-scrollbar">
+                
+                {/* Caja del Formulario Estilo Dashboard */}
+                <div className="w-full max-w-4xl bg-white p-12 rounded-[3rem] shadow-[0_20px_70px_rgba(0,0,0,0.05)] border border-gray-100 animate-in fade-in zoom-in-95 duration-500">
+                  <div className="mb-8 text-center">
+                    <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <BarChart3 className="text-[#ff6b00]" size={32} />
+                    </div>
+                    <h3 className="text-2xl font-black text-[#1C1E59] uppercase italic tracking-tighter">Filtros de Búsqueda</h3>
+                    <p className="text-gray-400 text-xs font-medium">Define los parámetros para generar tu reporte logístico</p>
+                  </div>
+
+                  {/* Tu componente original de filtros */}
+                  <ReportFiltersContent />
+                </div>
+
               </div>
             </DialogContent>
           </Dialog>
+
+          {/* USUARIOS (PANTALLA COMPLETA) */}
+         <Dialog>
+  <DialogTrigger asChild>
+    <DashboardNavButton icon={Users} label="Usuarios" variant="navy" />
+  </DialogTrigger>
+  <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
+    
+    <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+      <div className="flex items-center gap-3">
+        <Users className="text-white" size={20} />
+        <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Gestión de Usuarios y Accesos</h2>
+      </div>
+      <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+        <X size={20} />
+      </DialogPrimitive.Close>
+    </div>
+
+    <div className="flex-1 p-8 overflow-hidden flex flex-col">
+       <Tabs defaultValue="usuarios" className="h-full flex flex-col">
+          <div className="flex items-center justify-between mb-2 shrink-0">
+             <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit shadow-sm border border-gray-100">
+                <TabsTrigger value="usuarios" className="rounded-xl px-10 h-full text-[10px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white transition-all">Administración de Usuarios</TabsTrigger>
+                <TabsTrigger value="perfiles" className="rounded-xl px-10 h-full text-[10px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white transition-all">Administración de Perfiles</TabsTrigger>
+             </TabsList>
+             <Badge variant="outline" className="bg-white border-gray-100 text-gray-300 font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest">Control de accesos YMS v2.0</Badge>
+          </div>
+
+          <TabsContent value="usuarios" className="flex-1 min-h-0 m-0 outline-none">
+             <UsuariosTable />
+          </TabsContent>
+
+          <TabsContent value="perfiles" className="flex-1 min-h-0 m-0 outline-none py-6">
+             <PerfilesTabContent />
+          </TabsContent>
+       </Tabs>
+    </div>
+  </DialogContent>
+</Dialog>
+
+          {/* CARGA DOCUMENTOS */}
+          {/* CARGA DOCUMENTOS (PANTALLA COMPLETA) */}
+          <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+            <DialogTrigger asChild>
+              <DashboardNavButton icon={Upload} label="Cargar" variant="navy" />
+            </DialogTrigger>
+            
+            {/* Contenedor Full Screen: !fixed !inset-0 !w-screen !h-screen */}
+            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
+              
+              {/* Cabecera Navy Estilo Dashboard */}
+              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+                <div className="flex items-center gap-3">
+                  <Upload className="text-white" size={20} />
+                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Carga Masiva de Documentos</h2>
+                </div>
+                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+                  <X size={20} />
+                </DialogPrimitive.Close>
+              </div>
+
+              {/* Cuerpo del Modal: Contenedor de carga centrado */}
+              <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto custom-scrollbar">
+                
+                {/* Caja Blanca Premium para el Dropzone */}
+                <div className="w-full max-w-6xl bg-white rounded-[3rem] shadow-[0_20px_70px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+                  <div className="p-10">
+                    <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
+                  </div>
+                </div>
+
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+
+          <div className="w-px h-6 bg-gray-200 mx-1" />
+
+          {/* GRUPO 3: ICONOS DE PERFIL (SOLICITADOS) */}
+          <div className="flex items-center gap-5">
+              {/* ICONO COG (ENGRANAJE REAL) */}
+           
+
+  <button className="text-[#1e2b58] hover:scale-110 transition-transform active:scale-95">
+    <SettingsIcon 
+      className="w-[22px] h-[22px]" 
+    />
+  </button>
+
+            <button className="text-[#1e2b58] hover:scale-110 transition-transform">
+              <LayoutGrid size={22} strokeWidth={2.5} fill="#1e2b58" className="stroke-none" />
+            </button>
+
+            <button className="w-9 h-9 rounded-full bg-[#050038] flex items-center justify-center shadow-md hover:brightness-125 transition-all">
+              <span className="text-white text-sm font-bold tracking-tighter">AC</span>
+            </button>
+          </div>
         </div>
       </div>
-    
-      {/* --- BORDE INFERIOR --- */}
-      <div className="w-full leading-[0]">
-        <img 
-          src="/rectangle.jpg" 
-          alt="Decorative border"
-          className="w-full h-[4px] object-fill block" 
-        />
+
+      {/* MODAL FULL SCREEN DE REGISTROS (MANTENIENDO TU LÓGICA) */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
+          {selectedRegistro && <RegistrosModalContent registroId={selectedRegistro} />}
+        </DialogContent>
+      </Dialog>
+
+      {/* LÍNEA DECORATIVA */}
+      <div className="w-full h-[4px] leading-[0]">
+        <img src="/rectangle.jpg" alt="border" className="w-full h-full object-fill block" />
       </div>
     </div>
   );
 }
+
+
 
 export { locationsData };

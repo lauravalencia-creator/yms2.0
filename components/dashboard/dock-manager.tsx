@@ -131,6 +131,21 @@ function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" /></svg>;
 }
 
+const locationsData = [
+  {
+    id: "loc-1",
+    name: "Centro de Distribucion Norte",
+    dockGroups: [
+      { id: "dg-1a", name: "Muelle A" },
+      { id: "dg-1b", name: "Muelle B" },
+      { id: "dg-1c", name: "Muelle Despacho" },
+      { id: "dg-1d", name: "Muelle Mixto" },
+    ],
+  },
+  // ... resto de localidades
+];
+
+
 // --- DATOS COMPLETOS DE MUELLES ---
 const allDocks: Dock[] = [
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
@@ -213,6 +228,8 @@ function getTimelineAppointmentStyle(status: AppointmentStatus) {
   return "bg-slate-100 border-slate-400 text-slate-700 hover:bg-slate-200 cursor-pointer";
 }
 
+
+
 function getStatusConfig(status: AppointmentStatus) {
   const baseClasses = "text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide w-full text-center border shadow-sm transition-all";
   
@@ -243,6 +260,8 @@ const InfoField = ({ label, value }: { label: string, value?: string }) => (
     <div className="text-sm font-semibold text-gray-800 truncate" title={value}>{value || "---"}</div>
   </div>
 );
+
+
 
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); if (dock.status !== "maintenance" && dock.occupancy < 100) onDragOver(); };
@@ -1103,8 +1122,10 @@ function DockTimeline({
   );
 }
 
-// --- MAIN COMPONENT ---
-export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
+
+// ... (Mantén los imports y tipos iniciales igual)
+
+export function DockManager({ locationId, selectedDockId: propSelectedDockId }: DockManagerProps) {
   const [isTechnicalModalOpen, setIsTechnicalModalOpen] = useState(false);
   const [allDocksState, setAllDocksState] = useState(allDocks);
   const [allAppointmentsState, setAllAppointmentsState] = useState(pendingAppointments);
@@ -1113,10 +1134,8 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   
-  // CAMBIO 2: Lógica de vista automática
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("day");
-  
   const [isExpanded, setIsExpanded] = useState(false);
   const [highlightedDockId, setHighlightedDockId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -1124,60 +1143,85 @@ export function DockManager({ locationId, selectedDockId }: DockManagerProps) {
   const [editingAppointment, setEditingAppointment] = useState<any>(null);
   const [requestModalAppointment, setRequestModalAppointment] = useState<any>(null);
   const [createModalAppointment, setCreateModalAppointment] = useState<any>(null);
-
   const [selectedAptIds, setSelectedAptIds] = useState<string[]>([]);
-  
-const selectedAppointments = useMemo(() => {
-  return allAppointmentsState.filter(apt => selectedAptIds.includes(apt.id));
-}, [allAppointmentsState, selectedAptIds]);
+  const [requestModalAppointments, setRequestModalAppointments] = useState<Appointment[] | null>(null);
 
- const [requestModalAppointments, setRequestModalAppointments] = useState<Appointment[] | null>(null);
+  // --- NUEVOS ESTADOS PARA FECHA Y FILTRO LOCAL ---
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [localDockGroupId, setLocalDockGroupId] = useState<string>("all");
 
-  // Función para alternar selección
-  const toggleAptSelection = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Para que no se abra el detalle al hacer clic en el checkbox
-    setSelectedAptIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
+  // Obtener la data de la localidad actual para el select de muelles
+  const currentLocationData = useMemo(() => 
+    locationsData.find(l => l.id === locationId), 
+  [locationId]);
 
-  // Función para abrir el modal con lo seleccionado
-  const handleBulkRequest = () => {
-    const selected = allAppointmentsState.filter(a => selectedAptIds.includes(a.id));
-    if (selected.length > 0) {
-      setRequestModalAppointments(selected);
-    }
-  };
-
-  useEffect(() => { const timer = setInterval(() => setCurrentTime(new Date()), 60000); return () => clearInterval(timer); }, []);
-
-  // CAMBIO 3: Efecto para cambiar vista basado en selectedDockId
   useEffect(() => {
-    if (selectedDockId && selectedDockId !== 'all') {
-      // Si se selecciona un muelle específico, cambiar a timeline
-      setViewMode('timeline');
-      setHighlightedDockId(selectedDockId);
-    } else {
-      // Si es "all" o null (cambio de localidad), volver a grid
-      setViewMode('grid');
-      setHighlightedDockId(null);
-    }
-  }, [selectedDockId]);
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // CAMBIO 4: Filtrado por ID individual en lugar de grupo
+  // Sincronizar vista si cambia la selección desde el Navbar
+  useEffect(() => {
+    if (propSelectedDockId && propSelectedDockId !== 'all') {
+      setViewMode('timeline');
+      setHighlightedDockId(propSelectedDockId);
+    } else {
+      setViewMode('grid');
+    }
+  }, [propSelectedDockId]);
+
+  // --- LÓGICA DE NAVEGACIÓN DE FECHAS ---
+  const handleNavigate = (direction: 'next' | 'prev') => {
+    const newDate = new Date(currentDate);
+    const offset = direction === 'next' ? 1 : -1;
+
+    if (viewMode === 'grid' || timeFrame === 'day') {
+      newDate.setDate(newDate.getDate() + offset);
+    } else if (timeFrame === 'week') {
+      newDate.setDate(newDate.getDate() + (offset * 7));
+    } else if (timeFrame === 'month') {
+      newDate.setMonth(newDate.getMonth() + offset);
+    }
+    setCurrentDate(newDate);
+  };
+
+  const dateDisplayLabel = useMemo(() => {
+    const today = new Date();
+    const isSameDay = currentDate.toDateString() === today.toDateString();
+
+    if (viewMode === 'grid' || timeFrame === 'day') {
+      return isSameDay ? "Hoy" : currentDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+    }
+
+    if (timeFrame === 'week') {
+      const start = new Date(currentDate);
+      const day = start.getDay();
+      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+      start.setDate(diff);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+      return `${start.getDate()} - ${end.getDate()} ${end.toLocaleDateString('es-ES', { month: 'short' })}`;
+    }
+
+    if (timeFrame === 'month') {
+      return currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+    }
+
+    return "Hoy";
+  }, [currentDate, viewMode, timeFrame]);
+
+  // --- FILTRADO DE DATOS ---
   const filteredDocks = useMemo(() => {
     if (!locationId) return [];
-    
-    // Primero filtramos por localidad
     let filtered = allDocksState.filter((dock) => dock.locationId === locationId);
-    
-    // Luego filtramos por el muelle seleccionado específico (si no es 'all')
-    if (selectedDockId && selectedDockId !== "all") {
-      filtered = filtered.filter((dock) => dock.id === selectedDockId);
+    if (localDockGroupId !== "all") {
+      filtered = filtered.filter((dock) => dock.dockGroupId === localDockGroupId);
     }
-    
+    if (propSelectedDockId && propSelectedDockId !== "all" && propSelectedDockId.startsWith('dock')) {
+       filtered = filtered.filter(dock => dock.id === propSelectedDockId);
+    }
     return filtered;
-  }, [allDocksState, locationId, selectedDockId]);
+  }, [allDocksState, locationId, localDockGroupId, propSelectedDockId]);
 
   const filteredAppointments = useMemo(() => {
     if (!locationId) return [];
@@ -1189,7 +1233,42 @@ const selectedAppointments = useMemo(() => {
     return filtered;
   }, [allAppointmentsState, locationId, searchQuery]);
 
-  // Funciones de manejo de eventos (Drop, Click, etc.)
+  // --- LÓGICA DE ESTADO DINÁMICO POR FECHA (Pégalo aquí) ---
+  const docksWithTemporalStatus = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const viewedDate = new Date(currentDate);
+    viewedDate.setHours(0, 0, 0, 0);
+
+    return filteredDocks.map(dock => {
+      // 1. SI ES FUTURO: Todo vacío/disponible
+      if (viewedDate > today) {
+        return {
+          ...dock,
+          status: "available" as const,
+          occupancy: 0,
+          currentAppointment: undefined 
+        };
+      }
+
+      // 2. SI ES PASADO: Simular historial basado en el ID
+      if (viewedDate < today) {
+        const hash = dock.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const mockType = hash % 4; 
+        if (mockType === 0) return { ...dock, status: "occupied" as const, occupancy: 100 };
+        if (mockType === 1) return { ...dock, status: "available" as const, occupancy: 75 };
+        if (mockType === 2) return { ...dock, status: "available" as const, occupancy: 30 };
+        return { ...dock, status: "available" as const, occupancy: 0, currentAppointment: undefined };
+      }
+
+      // 3. SI ES HOY: Estado real
+      return dock;
+    });
+  }, [filteredDocks, currentDate]);
+
+
+  // --- HANDLERS ---
   const handleDrop = (appointmentId: string, dockId: string) => {
     const apt = allAppointmentsState.find((a) => a.id === appointmentId);
     if (!apt) return;
@@ -1219,330 +1298,262 @@ const selectedAppointments = useMemo(() => {
     setEditingAppointment(null);
   };
 
-  // --- COMPONENTE AUXILIAR PARA EL ESTADO SIN SELECCIÓN ---
+  const toggleAptSelection = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAptIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
+  };
+
   const SelectLocationState = ({ minimalist = false }: { minimalist?: boolean }) => (
     <div className="h-full flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in-95 duration-300">
       <div className={cn("rounded-full bg-slate-100 flex items-center justify-center mb-3", minimalist ? "w-12 h-12" : "w-16 h-16")}>
         <MapPin className={cn("text-slate-400", minimalist ? "w-6 h-6" : "w-8 h-8")} />
       </div>
-      <h3 className={cn("font-bold text-slate-700 uppercase", minimalist ? "text-xs" : "text-sm")}>
-        Selecciona una Localidad
-      </h3>
-      {!minimalist && (
-        <p className="text-xs text-slate-400 mt-1 max-w-[200px]">
-          Elige una ubicación en el filtro superior para visualizar la operación.
-        </p>
-      )}
+      <h3 className={cn("font-bold text-slate-700 uppercase", minimalist ? "text-xs" : "text-sm")}>Selecciona una Localidad</h3>
     </div>
   );
 
-  const expandedClasses = isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-4 gap-3 overflow-hidden";
-
   return (
-    <div className={expandedClasses}>
+    <div className={isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-4 gap-3 overflow-hidden"}>
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
-      // Dentro del return de DockManager:
 
-{requestModalAppointments && (
-  <RequestAppointmentModal 
-    appointments={requestModalAppointments} 
-    onClose={() => setRequestModalAppointments(null)} 
-    onContinue={(data) => { 
-      // data contiene los items y las cantidades editadas
-      setCreateModalAppointment(data.items[0]); // Pasamos al siguiente modal con la info base
-      setRequestModalAppointments(null); 
-    }} 
-  />
-)}
+      {requestModalAppointments && (
+        <RequestAppointmentModal 
+          appointments={requestModalAppointments} 
+          onClose={() => setRequestModalAppointments(null)} 
+          onContinue={(data) => { setCreateModalAppointment(data.items[0]); setRequestModalAppointments(null); }} 
+        />
+      )}
 
-{createModalAppointment && (
-  <CreateAppointmentModal 
-    appointment={createModalAppointment} 
-    onClose={() => setCreateModalAppointment(null)} 
-    onConfirm={(finalData) => { 
-        const targetDockId = "dock-1a-2"; // Muelle ejemplo
-        setAllDocksState(prev => prev.map(dock => {
-            if (dock.id === targetDockId) {
-                return {
-                    ...dock,
-                    status: "occupied", 
-                    occupancy: 100,
-                    currentAppointment: {
-                        ...finalData,
-                        status: "scheduled",
-                        time: finalData.loadTime || "10:00"
-                    }
-                };
-            }
-            return dock;
-        }));
-        // Quitamos de la lista todas las OCs que estaban seleccionadas
-        setAllAppointmentsState(prev => prev.filter(a => !selectedAptIds.includes(a.id)));
-        setSelectedAptIds([]); // Limpiamos selección
-        setCreateModalAppointment(null); 
-        setSelectedAppointment(null);
-    }} 
-  />
-)}
-      {isExpanded && <div className="p-2 border-b flex justify-end"><Button variant="ghost" size="sm" onClick={() => setIsExpanded(false)}><Minimize2 className="mr-2 w-4 h-4"/> Salir de pantalla completa</Button></div>}
-      
+      {createModalAppointment && (
+        <CreateAppointmentModal 
+          appointment={createModalAppointment} 
+          onClose={() => setCreateModalAppointment(null)} 
+          onConfirm={(finalData) => { 
+              const targetDockId = "dock-1a-2";
+              setAllDocksState(prev => prev.map(dock => dock.id === targetDockId ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: { ...finalData, status: "scheduled", time: finalData.loadTime || "10:00" } } : dock));
+              setAllAppointmentsState(prev => prev.filter(a => !selectedAptIds.includes(a.id)));
+              setSelectedAptIds([]);
+              setCreateModalAppointment(null); 
+              setSelectedAppointment(null);
+          }} 
+        />
+      )}
+
       <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
-    
-       {/* PANEL ASIGNACIONES  */}
-     {/* PANEL ASIGNACIONES */}
-<div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
-  
-  {/* Cabezal Navy con esquinas onduladas - DINÁMICO */}
-  <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem] transition-all">
-    {selectedAptIds.length > 0 ? (
-      /* VISTA CUANDO HAY SELECCIONADOS */
-      <div className="flex items-center justify-between w-full animate-in fade-in slide-in-from-top-1">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Seleccionados</span>
-          <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} OC</span>
-        </div>
-        <Button 
-          size="sm" 
-          onClick={() => setRequestModalAppointments(selectedAppointments)}
-          className="bg-[#FF6C01] hover:bg-[#e66000] text-white text-[9px] font-black uppercase px-3 h-8 rounded-xl shadow-lg shadow-orange-500/20 border-none"
-        >
-          Solicitar Cita
-        </Button>
-      </div>
-    ) : (
-      /* VISTA DEFAULT */
-      <>
-        <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-orange-500/20 rounded-lg">
-            <LayoutList className="w-4 h-4 text-orange-400" />
-          </div>
-          <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all active:scale-90" disabled={!locationId}>
-                <ListFilter className="w-4 h-4" />
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input 
-                    type="text" 
-                    placeholder="OC o Proveedor..." 
-                    className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
-                    value={searchQuery} 
-                    onChange={(e) => setSearchQuery(e.target.value)} 
-                  />
+        {/* PANEL IZQUIERDO (OCs) */}
+        <div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
+          <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem]">
+            {selectedAptIds.length > 0 ? (
+              <div className="flex items-center justify-between w-full animate-in fade-in slide-in-from-top-1">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Seleccionados</span>
+                  <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} OC</span>
                 </div>
+                <Button size="sm" onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))} className="bg-[#FF6C01] text-white text-[9px] font-black uppercase px-3 h-8 rounded-xl shadow-lg border-none">Solicitar Cita</Button>
               </div>
-            </PopoverContent>
-          </Popover>
-          
-          <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg shadow-orange-500/40">
-            {filteredAppointments.length}
-          </Badge>
-        </div>
-      </>
-    )}
-  </div>
-
-  {/* Contenido del Panel */}
-  <div className="flex-1 overflow-y-auto p-3 custom-scrollbar relative">
-    {!locationId ? (
-      <SelectLocationState minimalist={true} />
-    ) : selectedAppointment ? (
-      /* DETALLE DE UNA SOLA CITA (VISTA INDIVIDUAL) */
-      <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
-        <button 
-          onClick={() => setSelectedAppointment(null)} 
-          className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase transition-all ml-2 group"
-        >
-          <ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER
-        </button>
-
-        <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
-          <div className="bg-[#1C1E59] p-4 text-white relative">
-            <span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span>
-            <h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4>
+            ) : (
+              <>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-orange-500/20 rounded-lg"><LayoutList className="w-4 h-4 text-orange-400" /></div>
+                  <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild><button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all"><ListFilter className="w-4 h-4" /></button></PopoverTrigger>
+                    <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
+                      <div className="space-y-4">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                          <input type="text" placeholder="OC o Proveedor..." className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg">{filteredAppointments.length}</Badge>
+                </div>
+              </>
+            )}
           </div>
-          
-          <div className="p-4 space-y-3">
-            <div className="space-y-2.5">
-              <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span>
-                <p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">
-                  {selectedAppointment.carrier}
-                </p>
-              </div>
-              <div className="flex justify-between items-center border-b border-slate-50 pb-1.5">
-                <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Producto</span>
-                <p className="text-[10px] font-bold text-slate-600 truncate max-w-[150px]">
-                  {selectedAppointment.product || 'Insumos Varios'}
-                </p>
-              </div>
-            </div>
 
-            <div className="flex gap-2 pt-1">
-              {!selectedAppointment.isReadyForAssignment ? (
-                <Button 
-                  className="flex-1 bg-[#FF6C01] hover:bg-[#e66000] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg shadow-orange-500/20 transition-all active:scale-95 border-none" 
-                  onClick={() => setRequestModalAppointments([selectedAppointment])}
-                >
-                  Solicitar Cita
-                </Button>
-              ) : (
-                <div 
-                  draggable 
-                  onDragStart={(e) => { 
-                    e.dataTransfer.setData("appointmentId", selectedAppointment.id); 
-                    setDraggingId(selectedAppointment.id); 
-                  }} 
-                  onDragEnd={() => setDraggingId(null)}
-                  className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"
-                >
-                  <div className="flex items-center justify-center gap-2">
-                    <ArrowRight className="w-3 h-3 text-emerald-600 rotate-90 animate-bounce" />
-                    <span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">
-                      Arrastrar a Muelle
-                    </span>
+          <div className="flex-1 overflow-y-auto p-3 custom-scrollbar relative">
+            {!locationId ? (
+              <SelectLocationState minimalist={true} />
+            ) : selectedAppointment ? (
+              <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
+                <button onClick={() => setSelectedAppointment(null)} className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase ml-2 group"><ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER</button>
+                <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
+                  <div className="bg-[#1C1E59] p-4 text-white relative"><span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span><h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4></div>
+                  <div className="p-4 space-y-3">
+                    <div className="space-y-2.5">
+                      <div className="flex justify-between items-center border-b border-slate-50 pb-1.5"><span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span><p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">{selectedAppointment.carrier}</p></div>
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      {!selectedAppointment.isReadyForAssignment ? (
+                        <Button className="flex-1 bg-[#FF6C01] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg border-none" onClick={() => setRequestModalAppointments([selectedAppointment])}>Solicitar Cita</Button>
+                      ) : (
+                        <div draggable onDragStart={(e) => { e.dataTransfer.setData("appointmentId", selectedAppointment.id); setDraggingId(selectedAppointment.id); }} onDragEnd={() => setDraggingId(null)} className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"><span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">Arrastrar a Muelle</span></div>
+                      )}
+                      <Button variant="outline" className="px-4 border-none bg-slate-50/80 text-[#1C1E59] rounded-2xl h-11 transition-all active:scale-95 shadow-sm" onClick={() => setIsTechnicalModalOpen(true)}><Info size={18} /></Button>
+                    </div>
                   </div>
                 </div>
-              )}
-
-              <Button 
-                variant="outline"
-                className="px-4 border-none bg-slate-50/80 text-[#1C1E59] hover:bg-slate-200 rounded-2xl h-11 transition-all active:scale-95 shadow-sm"
-                onClick={() => setIsTechnicalModalOpen(true)}
-              >
-                <Info size={18} />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    ) : (
-      /* LISTADO DE ITEMS CON CHECKBOX */
-      <div className="grid grid-cols-1 gap-2">
-        {filteredAppointments.length === 0 && searchQuery === "" ? (
-          <div className="text-center p-4 text-slate-400 text-xs mt-10">No hay asignaciones pendientes</div>
-        ) : filteredAppointments.map(apt => (
-          <div 
-            key={apt.id} 
-            onClick={() => setSelectedAppointment(apt)} 
-            className={cn(
-              "group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300",
-              "hover:shadow-lg hover:-translate-y-0.5",
-              selectedAptIds.includes(apt.id) ? "border-orange-500/50 bg-orange-50/30" : "hover:border-orange-500/30",
-              apt.isReadyForAssignment && "border-l-4 border-l-emerald-500"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              {/* CHECKBOX CUSTOM */}
-              <div 
-                onClick={(e) => {
-                  e.stopPropagation(); // IMPORTANTE
-                  toggleAptSelection(apt.id, e);
-                }}
-                className={cn(
-                  "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                  selectedAptIds.includes(apt.id) 
-                    ? "bg-orange-500 border-orange-500 shadow-sm" 
-                    : "border-slate-200 bg-white group-hover:border-orange-300"
-                )}
-              >
-                {selectedAptIds.includes(apt.id) && <CheckCircle className="w-4 h-4 text-white" />}
               </div>
-
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">
-                  {apt.carrier}
-                </h4>
-                <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
-                  <span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span>
-                </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-2">
+                {filteredAppointments.map(apt => (
+                  <div key={apt.id} onClick={() => setSelectedAppointment(apt)} className={cn("group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300 hover:shadow-lg", selectedAptIds.includes(apt.id) ? "border-orange-500/50 bg-orange-50/30" : "hover:border-orange-500/30", apt.isReadyForAssignment && "border-l-4 border-l-emerald-500")}>
+                    <div className="flex items-center gap-3">
+                      <div onClick={(e) => toggleAptSelection(apt.id, e)} className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all", selectedAptIds.includes(apt.id) ? "bg-orange-500 border-orange-500 shadow-sm" : "border-slate-200 bg-white group-hover:border-orange-300")}>{selectedAptIds.includes(apt.id) && <CheckCircle className="w-4 h-4 text-white" />}</div>
+                      <div className="flex-1 min-w-0"><h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">{apt.carrier}</h4><span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span></div>
+                      <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 transition-all" />
+                    </div>
+                  </div>
+                ))}
               </div>
               
-              <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 group-hover:translate-x-1 transition-all" />
-            </div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-</div>
+        </div>
 
         {/* PANEL DERECHO (MUELLES) */}
         <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">
-           <div className="p-3 border-b flex justify-between items-center">
-              <Badge variant="outline" className="bg-slate-50 text-slate-600 font-bold">{filteredDocks.length} Muelles</Badge>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 bg-slate-50 border rounded-lg p-0.5">
-                   <Button size="icon" variant="ghost" className="h-7 w-7" disabled={!locationId}><ChevronLeft className="w-4 h-4" /></Button>
-                   <span className="font-bold text-xs px-2 text-yms-primary">Hoy</span>
-                   <Button size="icon" variant="ghost" className="h-7 w-7" disabled={!locationId}><ChevronRight className="w-4 h-4" /></Button>
-                </div>
-                <div className="flex items-center gap-2 bg-emerald-50 border rounded-lg px-3 py-2"><div className="relative flex h-2 w-2 "><span className="animate-ping absolute inline-flex h-full w-full  rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full  h-2 w-2 bg-emerald-500"></span></div><div className="flex flex-col leading-none"><span className="text-[9px] font-black text-emerald-700 tracking-wide uppercase">EN VIVO</span><span className="text-[10px] font-mono text-emerald-600 font-medium">{currentTime ? currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}</span></div></div>
-                {viewMode === 'timeline' && <div className="flex bg-slate-50 rounded-lg p-0.5 border py-1">{(['day', 'week', 'month'] as const).map(tf => <button key={tf} onClick={() => setTimeFrame(tf)} className={cn("px-3 py-1 text-[10px] font-medium rounded-md transition-all", timeFrame === tf ? "bg-white text-yms-primary shadow-sm" : "text-slate-400 hover:text-yms-primary")}>{tf === 'day' ? 'Día' : tf === 'week' ? 'Semana' : 'Mes'}</button>)}</div>}
-                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                  <Button disabled={!locationId} variant={viewMode === 'grid' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7", viewMode === 'grid' ? "bg-white text-yms-primary shadow-sm" : "text-slate-500")} onClick={() => setViewMode('grid')}><LayoutGrid className="w-4 h-4" /></Button>
-                  <Button disabled={!locationId} variant={viewMode === 'timeline' ? 'default' : 'ghost'} size="icon" className={cn("h-7 w-7", viewMode === 'timeline' ? "bg-white text-yms-primary shadow-sm" : "text-slate-500")} onClick={() => setViewMode('timeline')}><CalendarIcon className="w-4 h-4" /></Button>
-                  <div className="w-px h-4 bg-slate-300 mx-1" />
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:bg-white" onClick={() => setIsExpanded(!isExpanded)}>{isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}</Button>
-                </div>
-              </div>
-           </div>
-           
-           {/* Vista Grid de los muelles */}
-           <div className="flex-1 overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] relative">
+          <div className="p-3 border-b flex justify-between items-center bg-slate-50/20">
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="bg-white text-slate-600 font-bold px-3 py-1 border-slate-200 shadow-sm">{filteredDocks.length} Muelles</Badge>
               
-              {!locationId ? (
-                 <SelectLocationState minimalist={false} />
-              ) : viewMode === 'grid' ? (
-                <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/50 backdrop-blur-[1px]">
-                    {filteredDocks.map(dock => (
-                        <DockSlot 
-                            key={dock.id} 
-                            dock={dock} 
-                            isDragging={!!draggingId} 
-                            onDrop={handleDrop} 
-                            onDragOver={() => setDropTargetId(dock.id)} 
-                            onDragLeave={() => setDropTargetId(null)} 
-                            isDropTarget={dropTargetId === dock.id} 
-                            onClick={() => handleDockClick(dock.id)} 
-                        />
+              {/* --- SELECT DE MUELLES INTEGRADO --- */}
+              {locationId && (
+                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="w-px h-6 bg-slate-200" />
+                  <LayoutGrid className="w-4 h-4 text-yms-cyan" />
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Grupo:</span>
+                  <select 
+                    value={localDockGroupId} 
+                    onChange={(e) => setLocalDockGroupId(e.target.value)}
+                    className="text-xs font-bold text-[#1C1E59] bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-yms-cyan/20 cursor-pointer"
+                  >
+                    <option value="all">Todos los muelles</option>
+                    {currentLocationData?.dockGroups.map((group) => (
+                      <option key={group.id} value={group.id}>{group.name}</option>
                     ))}
+                  </select>
                 </div>
-              ) : (
-                  <DockTimeline 
-                      docks={filteredDocks} 
-                      timeFrame={timeFrame} 
-                      highlightedDockId={highlightedDockId} 
-                      onAppointmentClick={handleAppointmentClick} 
-                      currentTime={currentTime || new Date()} 
-                  />
               )}
-           </div>
-        </div>
+            </div>
 
-        {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
-         {/* RENDER DEL MODAL AL FINAL DEL DIV PRINCIPAL */}
-{selectedAppointment && isTechnicalModalOpen && (
-  <OrderDetailsTechnicalModal 
-    appointment={selectedAppointment} 
-    onClose={() => setIsTechnicalModalOpen(false)} 
-    onRequestAppointment={() => {
-        // Al hacer clic, configuramos el modal de solicitud con la cita actual
-        setRequestModalAppointment(selectedAppointment);
-    }}
-  />
-)}
-       
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+                 <Button size="icon" variant="ghost" className="h-7 w-7 hover:bg-slate-50" disabled={!locationId} onClick={() => handleNavigate('prev')}><ChevronLeft className="w-4 h-4" /></Button>
+                 <div className="min-w-[80px] text-center"><span className="font-black text-[10px] uppercase text-indigo-900 tracking-tight">{dateDisplayLabel}</span></div>
+                 <Button size="icon" variant="ghost" className="h-7 w-7 hover:bg-slate-50" disabled={!locationId} onClick={() => handleNavigate('next')}><ChevronRight className="w-4 h-4" /></Button>
+              </div>
+
+              
+
+
+              <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-1.5 shadow-sm">
+                <div className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></div>
+                <div className="flex flex-col leading-none"><span className="text-[8px] font-black text-emerald-700 tracking-wide uppercase">En Vivo</span><span className="text-[10px] font-mono text-emerald-600 font-bold">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div>
+              </div>
+
+              {/* ... dentro del panel derecho, donde están los botones de vista ... */}
+
+<div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+  {/* Selector de Modo de Vista (Grid / Timeline) */}
+  <Button 
+    disabled={!locationId} 
+    variant={viewMode === 'grid' ? 'default' : 'ghost'} 
+    size="icon" 
+    className={cn("h-7 w-7", viewMode === 'grid' ? "bg-white text-indigo-900 shadow-sm rounded-lg" : "text-slate-500")} 
+    onClick={() => setViewMode('grid')}
+  >
+    <LayoutGrid className="w-4 h-4" />
+  </Button>
+  <Button 
+    disabled={!locationId} 
+    variant={viewMode === 'timeline' ? 'default' : 'ghost'} 
+    size="icon" 
+    className={cn("h-7 w-7", viewMode === 'timeline' ? "bg-white text-indigo-900 shadow-sm rounded-lg" : "text-slate-500")} 
+    onClick={() => setViewMode('timeline')}
+  >
+    <CalendarIcon className="w-4 h-4" />
+  </Button>
+
+  {/* NUEVO: SELECTOR DÍA / SEMANA / MES (Aparece solo en Timeline) */}
+  {viewMode === 'timeline' && (
+    <>
+      <div className="w-px h-4 bg-slate-300 mx-1" />
+      <div className="flex items-center gap-1">
+        {(['day', 'week', 'month'] as const).map((frame) => (
+          <Button
+            key={frame}
+            variant={timeFrame === frame ? 'default' : 'ghost'}
+            className={cn(
+              "h-7 px-3 text-[9px] font-black uppercase tracking-tighter transition-all",
+              timeFrame === frame 
+                ? "bg-white text-[#ff6b00] shadow-sm rounded-lg" 
+                : "text-slate-400 hover:text-slate-600"
+            )}
+            onClick={() => setTimeFrame(frame)}
+          >
+            {frame === 'day' ? 'Día' : frame === 'week' ? 'Semana' : 'Mes'}
+          </Button>
+        ))}
       </div>
+    </>
+  )}
+
+  <div className="w-px h-4 bg-slate-300 mx-1" />
+  <Button 
+    variant="ghost" 
+    size="icon" 
+    className="h-7 w-7 text-slate-500 hover:bg-white rounded-lg" 
+    onClick={() => setIsExpanded(!isExpanded)}
+  >
+    {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+  </Button>
+</div>
+            </div>
+          </div>
+          
+          {/* VISTA CON FONDO CUADRICULADO */}
+<div className="flex-1 overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] relative">
+  {!locationId ? (
+    <SelectLocationState minimalist={false} />
+  ) : viewMode === 'grid' ? (
+    <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/20 backdrop-blur-[1px]">
+      {/* CAMBIO AQUÍ: Usar docksWithTemporalStatus */}
+      {docksWithTemporalStatus.map(dock => (
+        <DockSlot 
+          key={dock.id} 
+          dock={dock} 
+          isDragging={!!draggingId} 
+          onDrop={handleDrop} 
+          onDragOver={() => setDropTargetId(dock.id)} 
+          onDragLeave={() => setDropTargetId(null)} 
+          isDropTarget={dropTargetId === dock.id} 
+          onClick={() => handleDockClick(dock.id)} 
+        />
+      ))}
+    </div>
+  ) : (
+    /* CAMBIO AQUÍ: Usar docksWithTemporalStatus */
+    <DockTimeline 
+      docks={docksWithTemporalStatus} 
+      timeFrame={timeFrame} 
+      highlightedDockId={highlightedDockId} 
+      onAppointmentClick={handleAppointmentClick} 
+      currentTime={currentTime} 
+    />
+  )}
+</div>
+        </div>
+      </div>
+
+      {selectedAppointment && isTechnicalModalOpen && (
+        <OrderDetailsTechnicalModal appointment={selectedAppointment} onClose={() => setIsTechnicalModalOpen(false)} onRequestAppointment={() => setRequestModalAppointments([selectedAppointment])} />
+      )}
     </div>
   );
 }
