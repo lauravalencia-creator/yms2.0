@@ -91,6 +91,9 @@ export interface Appointment {
   cantidadPedida?: number;
   cantidadRecibida?: number;
   unidadMedida?: string;
+  route: string;
+  priority: string;
+  logisticProfile: string;
 }
 
 export interface Dock {
@@ -150,59 +153,131 @@ const locationsData = [
 const allDocks: Dock[] = [
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-1", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
-    driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue" }},
+    driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue",
+    route: "NORTE-01", priority: "ALTA", logisticProfile: "SECA" }}, // Campos agregados
+  
   { id: "dock-1a-2", name: "Muelle A-02", type: "inbound", status: "available", occupancy: 20, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-gray-1", carrier: "TransFuturo", truckId: "FUT-2026", time: "14:00", type: "inbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1a", duration: 60,
-    driver: "Esteban Quito", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Planta Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue" }},
+    driver: "Esteban Quito", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Planta Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
+    route: "BOG-02", priority: "MEDIA", logisticProfile: "FRIO" }}, // Campos agregados
+
   { id: "dock-1a-3", name: "Muelle A-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1a" },
+
   { id: "dock-1a-4", name: "Muelle A-04", type: "inbound", status: "available", occupancy: 15, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-completed-1", carrier: "Historic Logistics", truckId: "TRK-OLD", time: "05:00", type: "inbound", status: "completed", locationId: "loc-1", dockGroupId: "dg-1a", duration: 120, 
-    driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue" }
+    driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
+    route: "URBANA-01", priority: "NORMAL", logisticProfile: "FRIO" } // Campos agregados
   },
+
   { id: "dock-1b-1", name: "Muelle B-01", type: "inbound", status: "occupied", occupancy: 50, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-2", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
-    driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue" }},
+    driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue",
+    route: "SUR-05", priority: "MEDIA", logisticProfile: "SECA" }}, // Campos agregados
+
   { id: "dock-1b-2", name: "Muelle B-02", type: "inbound", status: "available", occupancy: 10, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-gray-2", carrier: "Andina Carga", truckId: "AND-99", time: "16:30", type: "inbound", status: "pending", locationId: "loc-1", dockGroupId: "dg-1b", duration: 90,
-    driver: "Julian Alvarez", city: "CALI", department: "VALLE", locationName: "Bodega B", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue" }},
+    driver: "Julian Alvarez", city: "CALI", department: "VALLE", locationName: "Bodega B", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
+    route: "EJE-01", priority: "NORMAL", logisticProfile: "GRANEL" }}, // Campos agregados
+
   { id: "dock-1b-3", name: "Muelle B-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1b" },
+
   { id: "dock-1b-4", name: "Muelle B-04", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-3", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
-    driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue" }},
+    driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
+    route: "LOCAL-04", priority: "ALTA", logisticProfile: "GRANEL" }}, // Campos agregados
+
   { id: "dock-1c-1", name: "Despacho 01", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-4", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
-    driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue" }},
+    driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue",
+    route: "NACIONAL-01", priority: "ALTA", logisticProfile: "SECA" }}, // Campos agregados
+
   { id: "dock-1c-2", name: "Despacho 02", type: "outbound", status: "maintenance", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c" },
-  { id: "dock-1c-3", name: "Despacho 03", type: "outbound", status: "available", occupancy: 35, locationId: "loc-1", dockGroupId: "dg-1c",
-    currentAppointment: { id: "apt-gray-3", carrier: "Envía Ya", truckId: "ENV-001", time: "11:00", type: "outbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
-    driver: "Pedro Picapiedra", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Despachos", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Sencillo", loadType: "Paqueteo", operationType: "Cargue" } },
-   { id: "dock-1c-4", name: "Despacho 04", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
-  { id: "dock-1c-5", name: "Despacho 05", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
-  { id: "dock-1c-6", name: "Despacho 06", type: "outbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1c" },
-    { id: "dock-1d-1", name: "Mixto 01", type: "both", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1d" },
+
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
-    currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane" } },
+    currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane",
+    route: "URBANA", priority: "NORMAL", logisticProfile: "PAQUETEO" } }, // Campos agregados
+
   { id: "dock-2a-1", name: "Norte 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
-    currentAppointment: { id: "apt-5", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola" }},
-  { id: "dock-2a-2", name: "Norte 02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
-  { id: "dock-2a-3", name: "Norte 03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
-  { id: "dock-2b-1", name: "Sur 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2b" },
+    currentAppointment: { id: "apt-5", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola",
+    route: "R-10", priority: "MEDIA", logisticProfile: "SECA" }}, // Campos agregados
+
   { id: "dock-2b-2", name: "Sur 02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
-    currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane" }},
+    currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane",
+    route: "EJE-11", priority: "NORMAL", logisticProfile: "SECA" }}, // Campos agregados
 ];
 
 // --- Citas pendientes ---
 const pendingAppointments: Appointment[] = [
   { 
-    id: "35252525", carrier: "BERHLAN DE COLOMBIA SAS", truckId: "TRN123", time: "12:00", type: "inbound", status: "pending", 
-    locationId: "loc-1", dockGroupId: "dg-1a", driver: "Juan Motos", city: "BELLO", department: "ANTIOQUIA", locationName: "DICAL", zone: "Descargue", date: "MIE 19 NOV 2025", vehicleType: "Moto", loadType: "A granel", operationType: "Descargue", product: "Insumos Varios",
-    nit: "9007427719", quantityOrdered: 400, quantityDelivered: 0, isReadyForAssignment: false 
+    id: "NOTAPRUEBAABI5002", carrier: "FERRIAMARILLA S.A.S", truckId: "---", time: "15:28", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-28", 
+    nit: "900.742.771-9", quantityOrdered: 150, peso: "5,000", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "MEDELLIN_ANT", product: "PRODUCTO EJEMPLO 1",
+    canal: "MODERNO", route: "RUTA SUR-01", priority: "ALTA", logisticProfile: "REFRIGERADO"
   },
   { 
-    id: "88997766554", carrier: "RapidoCarga", truckId: "TRK-RC02", time: "12:30", type: "inbound", status: "pending", 
-    locationId: "loc-1", dockGroupId: "dg-1b", driver: "Luis Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla", zone: "Descargue", date: "MIE 19 NOV 2025", vehicleType: "Sencillo", loadType: "Seca", operationType: "Descargue", product: "Materia Prima",
-    nit: "800112233-5", quantityOrdered: 10000, quantityDelivered: 0, isReadyForAssignment: false 
+    id: "ABI10200", carrier: "DISTRIBUIDORA NACIONAL", truckId: "---", time: "08:00", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-28", 
+    nit: "860.001.002-4", quantityOrdered: 2400, peso: "3,500", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "BOGOTA_DC", product: "ABARROTES VARIOS",
+    canal: "TRADICIONAL", route: "NORTE-05", priority: "MEDIA", logisticProfile: "SECA"
   },
+  { 
+    id: "DOC-88921", carrier: "SOLA S.A.", truckId: "---", time: "09:30", type: "outbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI MEDELLIN", date: "2026-01-29", 
+    nit: "890.900.120-1", quantityOrdered: 500, peso: "12,000", operationType: "Cargue", 
+    isReadyForAssignment: false, zone: "BELLO_ANT", product: "HARINA DE TRIGO",
+    canal: "MODERNO", route: "ORIENTE-02", priority: "ALTA", logisticProfile: "GRANEL"
+  },
+  { 
+    id: "TRK-99281", carrier: "ALIMENTOS POLAR", truckId: "---", time: "11:45", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI BARRANQUILLA", date: "2026-01-28", 
+    nit: "800.123.456-0", quantityOrdered: 1200, peso: "8,200", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "SOLEDAD_ATL", product: "CEREALES PACK",
+    canal: "DIRECTO", route: "COSTA-01", priority: "BAJA", logisticProfile: "SECA"
+  },
+  { 
+    id: "GUID-77261", carrier: "LOGISTICA INTEGRAL S.A.", truckId: "---", time: "14:15", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI PEREIRA", date: "2026-01-29", 
+    nit: "900.555.666-8", quantityOrdered: 85, peso: "1,200", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "DOSQUEBRADAS", product: "REPUESTOS INDUSTRIALES",
+    canal: "MODERNO", route: "EJE-03", priority: "MEDIA", logisticProfile: "ESTIBADO"
+  },
+  { 
+    id: "NOTA-44332", carrier: "PRODUCTOS DIANA", truckId: "---", time: "07:20", type: "outbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-30", 
+    nit: "860.444.555-1", quantityOrdered: 3000, peso: "15,000", operationType: "Cargue", 
+    isReadyForAssignment: false, zone: "YUMBO_VALLE", product: "ARROZ PREMIUM",
+    canal: "TRADICIONAL", route: "SUR-02", priority: "ALTA", logisticProfile: "SECA"
+  },
+  { 
+    id: "ABI-55667", carrier: "CERVECERIA UNION", truckId: "---", time: "10:00", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-28", 
+    nit: "890.101.202-3", quantityOrdered: 450, peso: "22,000", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "ITAGUI_ANT", product: "LIQUIDOS EMBOTELLADOS",
+    canal: "MODERNO", route: "CENTRO-04", priority: "MEDIA", logisticProfile: "PESADA"
+  },
+  { 
+    id: "DOC-11223", carrier: "NESTLE COLOMBIA", truckId: "---", time: "13:00", type: "outbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI MEDELLIN", date: "2026-01-29", 
+    nit: "860.000.123-9", quantityOrdered: 600, peso: "4,500", operationType: "Cargue", 
+    isReadyForAssignment: false, zone: "ENVIGADO_ANT", product: "LACTEOS VARIOS",
+    canal: "MODERNO", route: "VALLE-06", priority: "ALTA", logisticProfile: "REFRIGERADO"
+  },
+  { 
+    id: "GUID-99001", carrier: "COLGATE PALMOLIVE", truckId: "---", time: "16:45", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-28", 
+    nit: "800.999.888-7", quantityOrdered: 1500, peso: "6,800", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "CALI_VALLE", product: "CUIDADO PERSONAL",
+    canal: "DIRECTO", route: "PACIFICO-01", priority: "MEDIA", logisticProfile: "SECA"
+  },
+  { 
+    id: "NOTA-88776", carrier: "POSTOBON S.A.", truckId: "---", time: "06:00", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-30", 
+    nit: "890.333.222-1", quantityOrdered: 5000, peso: "30,000", operationType: "Descargue", 
+    isReadyForAssignment: false, zone: "CHIA_CUN", product: "BEBIDAS CARBONATADAS",
+    canal: "MODERNO", route: "SABANA-03", priority: "ALTA", logisticProfile: "PESADA"
+  }
 ];
 
 // --- HELPERS STYLES ---
@@ -228,7 +303,59 @@ function getTimelineAppointmentStyle(status: AppointmentStatus) {
   return "bg-slate-100 border-slate-400 text-slate-700 hover:bg-slate-200 cursor-pointer";
 }
 
+const DocumentCard = ({ apt, isSelected, onSelect, onOpenDetails }: any) => (
+  <div className={cn(
+    "relative bg-white border rounded-xl transition-all duration-200 shadow-sm hover:shadow-md",
+    isSelected ? "border-orange-500 ring-1 ring-orange-500/20" : "border-slate-100"
+  )}>
+    {/* Checkbox */}
+    <div className="absolute top-4 left-4 z-10">
+      <div 
+        onClick={(e) => onSelect(apt.id, e)}
+        className={cn(
+          "w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all",
+          isSelected ? "bg-orange-500 border-orange-500 shadow-sm" : "border-slate-200 bg-white hover:border-orange-300"
+        )}
+      >
+        {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
+      </div>
+    </div>
 
+    {/* Contenido Estilo Imagen 1 */}
+    <div className="pl-14 pr-4 py-4">
+      <div className="border-l-[3px] border-orange-500 pl-4 space-y-3">
+        <div className="flex justify-between items-start">
+          <h4 className="text-sm font-black text-[#1C1E59] leading-none uppercase">{apt.id}</h4>
+          <span className="text-[8px] font-bold text-slate-400 font-mono tracking-tighter">2026-01-28</span>
+        </div>
+
+        <div>
+          <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest block mb-0.5">Proveedor:</span>
+          <p className="text-[11px] font-bold text-gray-600 leading-tight uppercase">{apt.carrier}</p>
+        </div>
+
+        {/* Cajas de Peso y Ventas */}
+        <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+            <span className="text-[7px] font-black text-slate-400 uppercase block mb-1">Peso</span>
+            <span className="text-[11px] font-black text-[#1C1E59]">{apt.peso || '0'} kg</span>
+          </div>
+          <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+            <span className="text-[7px] font-black text-slate-400 uppercase block mb-1">Ventas</span>
+            <span className="text-[11px] font-black text-[#1C1E59]">{apt.quantityOrdered || '0'}</span>
+          </div>
+        </div>
+
+        <button 
+          onClick={() => onOpenDetails(apt)}
+          className="w-full mt-2 py-1 text-[8px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-widest flex items-center justify-center gap-1 bg-blue-50/50 rounded-md"
+        >
+          <Info size={10} /> Ver Detalle Completo
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
 function getStatusConfig(status: AppointmentStatus) {
   const baseClasses = "text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide w-full text-center border shadow-sm transition-all";
@@ -261,7 +388,74 @@ const InfoField = ({ label, value }: { label: string, value?: string }) => (
   </div>
 );
 
+const DocumentDetailView = ({ doc, onBack, onOpenRequest, onOpenTechnical }: any) => (
+  <div className="flex flex-col h-full bg-white animate-in slide-in-from-left-4 duration-300">
+    {/* Header del detalle */}
+    <div className="bg-[#1C1E59] px-4 py-3 flex items-center justify-between shadow-md">
+      <button onClick={onBack} className="text-white p-1 hover:bg-white/10 rounded-lg">
+        <ChevronLeft size={20} />
+      </button>
+      <span className="text-white font-bold text-sm uppercase italic">Detalle Documento</span>
+      <Button 
+        size="sm" 
+        onClick={onOpenRequest}
+        className="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase px-3 h-8 rounded-lg shadow-lg border-none"
+      >
+        Solicitar Cita
+      </Button>
+    </div>
 
+    {/* Contenido (Basado en tu imagen 2) */}
+    <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      <div className="border-l-4 border-orange-500 pl-4 space-y-4">
+        <div>
+          <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Nota de entrega:</h4>
+          <p className="text-sm font-black text-[#1C1E59] break-all">NOTAPRUEBAABI5002</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3">
+          <div>
+            <span className="text-[9px] font-black text-orange-500 uppercase block">Origen:</span>
+            <span className="text-xs font-bold text-gray-600">{doc.locationName || 'CEDI CALI'}</span>
+          </div>
+          <div>
+            <span className="text-[9px] font-black text-orange-500 uppercase block">Destino:</span>
+            <span className="text-xs font-bold text-gray-600">FERRIAMARILLA S.A.S-CR 87 48A 05 (MEDELLIN_ANT)</span>
+          </div>
+        </div>
+
+        <div>
+          <span className="text-[9px] font-black text-orange-500 uppercase block"># Documento:</span>
+          <span className="text-xs font-bold text-gray-600">{doc.id}</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <span className="text-[9px] font-black text-orange-500 uppercase block">Peso:</span>
+            <span className="text-xs font-bold text-gray-600">{doc.peso || '0.00'}</span>
+          </div>
+          <div>
+            <span className="text-[9px] font-black text-orange-500 uppercase block">Ventas (Cant):</span>
+            <span className="text-xs font-bold text-gray-600">{doc.quantityOrdered || '0'}</span>
+          </div>
+        </div>
+
+        <div>
+          <span className="text-[9px] font-black text-orange-500 uppercase block">Fecha de Creacion:</span>
+          <span className="text-xs font-bold text-gray-600">{doc.date} 15:28:00</span>
+        </div>
+      </div>
+      
+      <Button 
+        variant="outline" 
+        className="w-full border-dashed border-slate-300 text-slate-400 text-[10px] font-bold h-10 mt-4"
+        onClick={onOpenTechnical}
+      >
+        <Info size={14} className="mr-2" /> Ver Datos Técnicos Completos
+      </Button>
+    </div>
+  </div>
+);
 
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); if (dock.status !== "maintenance" && dock.occupancy < 100) onDragOver(); };
@@ -866,93 +1060,63 @@ function AppointmentEditModal({
 // Debes asegurarte de que este modal reciba también la función onOpenRequest
 // para poder abrir el flujo de solicitud desde aquí.
 
-function OrderDetailsTechnicalModal({ 
-  appointment, 
-  onClose, 
-  onRequestAppointment 
-}: { 
-  appointment: Appointment, 
-  onClose: () => void, 
-  onRequestAppointment: () => void 
-}) {
-  const DataItem = ({ label, value }: { label: string, value: any }) => (
-    <div className="flex flex-col py-1.5 border-b border-slate-50 last:border-0 group">
-      <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter group-hover:text-[#ff6b00] transition-colors">{label}</span>
-      <span className="text-[11px] font-bold text-slate-700 truncate">{value}</span>
+function OrderDetailsTechnicalModal({ appointment, onClose, onRequestAppointment }: any) {
+  const DataItem = ({ label, value, highlight = false }: any) => (
+    <div className="flex flex-col py-2 border-b border-slate-50 group hover:bg-slate-50/50 transition-colors">
+      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest group-hover:text-orange-500">{label}</span>
+      <span className={cn("text-[10px] font-bold", highlight ? "text-orange-600" : "text-[#1C1E59]")}>{value || '---'}</span>
     </div>
   );
 
   return (
     <Dialog open={!!appointment} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden border-none rounded-[2rem] shadow-2xl bg-white">
-        <DialogHeader className="sr-only">
-          <DialogTitle>Detalles Técnicos OC: {appointment.id}</DialogTitle>
-        </DialogHeader>
-
-        {/* Cabecera compacta */}
-        <div className="bg-[#1C1E59] px-6 py-4 text-white flex justify-between items-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5"><FileText size={100} /></div>
-          <div className="relative z-10 flex items-center gap-3">
+      <DialogContent className="max-w-4xl p-0 overflow-hidden border-none rounded-[2rem] shadow-2xl bg-white">
+        <div className="bg-[#1C1E59] px-6 py-4 text-white flex justify-between items-center">
+          <div className="flex items-center gap-3">
              <div className="p-2 bg-white/10 rounded-xl"><LayoutList size={18} className="text-orange-400" /></div>
              <div>
-                <p className="text-[9px] font-bold text-orange-400 uppercase tracking-[0.2em] leading-none">Maestro de Documento</p>
-                <h3 className="text-lg font-black mt-1">OC: {appointment.id}</h3>
+                <p className="text-[8px] font-bold text-orange-400 uppercase tracking-[0.2em]">Maestro de Documento</p>
+                <h3 className="text-lg font-black mt-1 uppercase">OC: {appointment.id}</h3>
              </div>
           </div>
-          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors z-20 p-2 hover:bg-white/10 rounded-full">
-            <X size={20} />
-          </button>
+          <button onClick={onClose} className="text-white/40 hover:text-white p-2 hover:bg-white/10 rounded-full"><X size={20} /></button>
         </div>
 
-        {/* Cuerpo con datos poblados */}
-        <div className="p-8 bg-white grid grid-cols-3 gap-x-10 gap-y-2">
+        <div className="p-8 grid grid-cols-3 gap-x-12 gap-y-1">
+          {/* Columna 1 */}
           <div className="space-y-1">
-            <DataItem label="Producto" value={appointment.product || "INSUMOS VARIOS"} />
-            <DataItem label="Nit Proveedor" value={appointment.nit || "900742771-9"} />
-            <DataItem label="Descripción Company" value={appointment.descripcionCompany || "Logística Integral SAS"} />
+            <DataItem label="Producto" value={appointment.product} />
+            <DataItem label="Nit Proveedor" value={appointment.nit} />
+            <DataItem label="Descripción Company" value={appointment.descripcionCompany} />
             <DataItem label="Estado Documento" value="ACTIVO" />
-            <DataItem label="Localidad" value={appointment.unidadNegocio || "CENTRO DISTRIBUCIÓN NORTE"} />
-            <DataItem label="Canal" value={appointment.canal || "MODERNO"} />
+            <DataItem label="Localidad" value={appointment.locationName} />
+            <DataItem label="Canal" value={appointment.canal} />
           </div>
-          <div className="space-y-1 border-x border-slate-100 px-6">
-            <DataItem label="Fecha Inicio" value={appointment.date || "27/01/2026"} />
-            <DataItem label="Fecha Fin" value={appointment.date || "29/01/2026"} />
-            <DataItem label="Tipo de Operación" value={appointment.operationType || "DESCARGUE"} />
-            <DataItem label="Tipo Mercancía" value={appointment.tipoMercancia || "GENERAL NO PERECEDERA"} />
-            <DataItem label="Tipo de Cargue" value={appointment.loadType || "A GRANEL"} />
-            <DataItem label="Código Artículo" value={appointment.codigoArticulo || "SKU-882910"} />
+          {/* Columna 2 */}
+          <div className="space-y-1 border-x border-slate-100 px-8">
+            <DataItem label="Fecha Inicio" value={appointment.date} />
+            <DataItem label="Fecha Fin" value={appointment.date} />
+            <DataItem label="Tipo de Operación" value={appointment.operationType} />
+            <DataItem label="Tipo Mercancía" value="GENERAL ..." />
+            <DataItem label="Tipo de Cargue" value={appointment.loadType} />
+            <DataItem label="Código Artículo" value={appointment.codigoArticulo} />
           </div>
+          {/* Columna 3 */}
           <div className="space-y-1">
-            <DataItem label="Peso" value={appointment.peso || "1,240.00 KG"} />
-            <DataItem label="Volumen" value={appointment.volumen || "4.50 M3"} />
-            <DataItem label="Litros" value={appointment.litros || "0.00"} />
-            <DataItem label="Cantidad Pedida" value={appointment.quantityOrdered || "400"} />
-            <DataItem label="Cantidad Recibida" value={appointment.quantityDelivered || "0"} />
-            <DataItem label="U. Medida" value={appointment.unidadMedida || "UNIDADES (UND)"} />
+            <DataItem label="Peso" value={`${appointment.peso} KG`} />
+            <DataItem label="Volumen" value="4.50 M3" />
+            <DataItem label="Litros" value="0.00" />
+            <DataItem label="Cantidad Pedida" value={appointment.quantityOrdered} />
+            <DataItem label="Cantidad Recibida" value="0" highlight={true} />
+            <DataItem label="U. Medida" value={appointment.unidadMedida} />
           </div>
         </div>
 
-        {/* FOOTER CON DOS BOTONES */}
-        <div className="p-6 bg-slate-50/50 flex justify-end gap-3 rounded-b-[2rem] border-t border-slate-100">
-          
-          {/* BOTÓN SOLICITAR CITA (NUEVO) */}
-          {/* Solo mostramos este botón si la cita aún no está lista/asignada */}
+        <div className="p-6 bg-slate-50 flex justify-end gap-3 border-t">
+          <Button onClick={onClose} className="bg-[#1C1E59] text-white text-[10px] font-black uppercase px-8 rounded-xl h-11">Cerrar</Button>
           {!appointment.isReadyForAssignment && (
-            <Button 
-              onClick={() => {
-                onClose(); // Cerramos este modal primero
-                onRequestAppointment(); // Abrimos el flujo de solicitud
-              }} 
-              className="bg-[#FF6C01] hover:bg-[#e66000] text-white text-[10px] font-bold uppercase px-8 rounded-2xl h-12 shadow-lg shadow-orange-500/20 transition-all active:scale-95"
-            >
-              Solicitar Cita
-            </Button>
+             <Button onClick={() => { onClose(); onRequestAppointment(); }} className="bg-orange-500 text-white text-[10px] font-black uppercase px-8 rounded-xl h-11 shadow-lg shadow-orange-500/20">Solicitar Cita</Button>
           )}
-
-          {/* BOTÓN CERRAR DETALLE */}
-          <Button onClick={onClose} className="bg-[#1C1E59] hover:bg-[#25286e] text-white text-[10px] font-bold uppercase px-8 rounded-2xl h-12 shadow-xl shadow-blue-900/20 transition-all active:scale-95">
-            Cerrar Detalle
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -1223,12 +1387,18 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
     return filtered;
   }, [allDocksState, locationId, localDockGroupId, propSelectedDockId]);
 
-  const filteredAppointments = useMemo(() => {
+const filteredAppointments = useMemo(() => {
     if (!locationId) return [];
     let filtered = allAppointmentsState.filter((apt) => apt.locationId === locationId);
+    
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((apt) => apt.carrier.toLowerCase().includes(query) || apt.id.toLowerCase().includes(query));
+      filtered = filtered.filter((apt) => 
+        apt.carrier.toLowerCase().includes(query) || 
+        apt.id.toLowerCase().includes(query) ||
+        apt.city?.toLowerCase().includes(query) ||
+        apt.loadType?.toLowerCase().includes(query)
+      );
     }
     return filtered;
   }, [allAppointmentsState, locationId, searchQuery]);
@@ -1340,81 +1510,85 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
       )}
 
       <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
-        {/* PANEL IZQUIERDO (OCs) */}
-        <div className="w-80 shrink-0 flex flex-col min-h-0 bg-slate-100/40 rounded-[1.5rem] border border-slate-200/60 shadow-inner overflow-hidden">
-          <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shadow-md z-20 rounded-t-[1.5rem]">
-            {selectedAptIds.length > 0 ? (
-              <div className="flex items-center justify-between w-full animate-in fade-in slide-in-from-top-1">
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Seleccionados</span>
-                  <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} Documentos</span>
-                </div>
-                <Button size="sm" onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))} className="bg-[#FF6C01] text-white text-[9px] font-black uppercase px-3 h-8 rounded-xl shadow-lg border-none">Solicitar Cita</Button>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 bg-orange-500/20 rounded-lg"><LayoutList className="w-4 h-4 text-orange-400" /></div>
-                  <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Popover>
-                    <PopoverTrigger asChild><button className="p-2 hover:bg-white/10 rounded-xl text-white transition-all"><ListFilter className="w-4 h-4" /></button></PopoverTrigger>
-                    <PopoverContent className="w-72 p-4 rounded-[1.5rem] shadow-2xl border-slate-100 bg-white" align="start" side="right">
-                      <div className="space-y-4">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">Filtros de búsqueda</h4>
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input type="text" placeholder="OC o Proveedor..." className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg">{filteredAppointments.length}</Badge>
-                </div>
-              </>
-            )}
-          </div>
+      {/* PANEL IZQUIERDO (DOCUMENTOS) */}
+<div className="w-80 shrink-0 flex flex-col min-h-0 bg-white rounded-[1.5rem] border border-slate-200 shadow-xl overflow-hidden">
+  
+  {/* CABECERA */}
+  <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shrink-0">
+    <div className="flex items-center gap-2.5">
+      <div className="p-1.5 bg-orange-500/20 rounded-lg"><LayoutList className="w-4 h-4 text-orange-400" /></div>
+      <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
+    </div>
+    <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg">
+      {filteredAppointments.length}
+    </Badge>
+  </div>
 
-          <div className="flex-1 overflow-y-auto p-3 custom-scrollbar relative">
-            {!locationId ? (
-              <SelectLocationState minimalist={true} />
-            ) : selectedAppointment ? (
-              <div className="space-y-3 animate-in fade-in slide-in-from-left-4 duration-500">
-                <button onClick={() => setSelectedAppointment(null)} className="flex items-center gap-2 text-slate-400 hover:text-[#1C1E59] text-[9px] font-black uppercase ml-2 group"><ChevronLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" /> VOLVER</button>
-                <div className="bg-white rounded-[1.5rem] overflow-hidden border border-slate-200 shadow-xl shadow-slate-200/30">
-                  <div className="bg-[#1C1E59] p-4 text-white relative"><span className="text-[8px] font-bold text-orange-300 uppercase tracking-widest opacity-80">Documento de Compra</span><h4 className="text-lg font-black tracking-tight leading-none mt-1">{selectedAppointment.id}</h4></div>
-                  <div className="p-4 space-y-3">
-                    <div className="space-y-2.5">
-                      <div className="flex justify-between items-center border-b border-slate-50 pb-1.5"><span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">Proveedor</span><p className="text-[10px] font-bold text-slate-700 text-right truncate max-w-[150px]">{selectedAppointment.carrier}</p></div>
-                    </div>
-                    <div className="flex gap-2 pt-1">
-                      {!selectedAppointment.isReadyForAssignment ? (
-                        <Button className="flex-1 bg-[#FF6C01] text-white font-black text-[10px] uppercase h-11 rounded-2xl shadow-lg border-none" onClick={() => setRequestModalAppointments([selectedAppointment])}>Solicitar Cita</Button>
-                      ) : (
-                        <div draggable onDragStart={(e) => { e.dataTransfer.setData("appointmentId", selectedAppointment.id); setDraggingId(selectedAppointment.id); }} onDragEnd={() => setDraggingId(null)} className="flex-1 p-3 border-2 border-dashed border-emerald-400 rounded-2xl text-center bg-emerald-50/50 cursor-grab active:cursor-grabbing hover:bg-emerald-100 transition-all group"><span className="text-[9px] text-emerald-700 font-black uppercase tracking-widest">Arrastrar a Muelle</span></div>
-                      )}
-                      <Button variant="outline" className="px-4 border-none bg-slate-50/80 text-[#1C1E59] rounded-2xl h-11 transition-all active:scale-95 shadow-sm" onClick={() => setIsTechnicalModalOpen(true)}><Info size={18} /></Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-2">
-                {filteredAppointments.map(apt => (
-                  <div key={apt.id} onClick={() => setSelectedAppointment(apt)} className={cn("group relative px-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] cursor-pointer transition-all duration-300 hover:shadow-lg", selectedAptIds.includes(apt.id) ? "border-orange-500/50 bg-orange-50/30" : "hover:border-orange-500/30", apt.isReadyForAssignment && "border-l-4 border-l-emerald-500")}>
-                    <div className="flex items-center gap-3">
-                      <div onClick={(e) => toggleAptSelection(apt.id, e)} className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all", selectedAptIds.includes(apt.id) ? "bg-orange-500 border-orange-500 shadow-sm" : "border-slate-200 bg-white group-hover:border-orange-300")}>{selectedAptIds.includes(apt.id) && <CheckCircle className="w-4 h-4 text-white" />}</div>
-                      <div className="flex-1 min-w-0"><h4 className="font-bold text-[12px] text-slate-800 truncate uppercase tracking-tight leading-none group-hover:text-[#1C1E59]">{apt.carrier}</h4><span className="text-[9px] font-black text-slate-500 font-mono">#{apt.id}</span></div>
-                      <ChevronRight size={14} className="text-slate-200 group-hover:text-orange-500 transition-all" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              
-            )}
-          </div>
+  {/* BUSCADOR */}
+  <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+    <div className="relative group">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+      <input 
+        type="text" 
+        placeholder="FILTRAR ÓRDENES / PROVEEDOR..." 
+        className="w-full pl-9 pr-4 py-2 text-[10px] font-black uppercase tracking-widest bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+    </div>
+  </div>
+
+  {/* BARRA DE SELECCIONADOS (Imagen 1 badge resumido) */}
+  {selectedAptIds.length > 0 && (
+    <div className="px-3 py-2 bg-[#050038] flex items-center justify-between animate-in slide-in-from-top-1">
+      <div className="flex items-center gap-2 overflow-hidden">
+        <span className="text-[8px] font-black text-orange-400 uppercase shrink-0">Sel ({selectedAptIds.length}):</span>
+        <div className="flex gap-1 overflow-x-auto no-scrollbar">
+          {selectedAptIds.map(id => (
+            <span key={id} className="text-[8px] font-bold text-white/70 whitespace-nowrap">#{id.slice(-4)}</span>
+          ))}
         </div>
+      </div>
+      <Button 
+        size="sm" 
+        onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))}
+        className="bg-orange-500 hover:bg-orange-600 text-white text-[8px] font-black uppercase h-6 px-3 rounded-lg ml-2 shrink-0 shadow-lg shadow-orange-500/20"
+      >
+        Citar
+      </Button>
+    </div>
+  )}
+
+  {/* LISTADO DE DOCUMENTOS POR DEFECTO */}
+  <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar bg-white">
+    {!locationId ? (
+      <div className="h-full flex flex-col items-center justify-center p-6 text-center opacity-40">
+        <MapPin className="text-slate-300 w-10 h-10 mb-2" />
+        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Selecciona una localidad</p>
+      </div>
+    ) : (
+      <>
+        {filteredAppointments.map(apt => (
+          <DocumentCard 
+            key={apt.id}
+            apt={apt}
+            isSelected={selectedAptIds.includes(apt.id)}
+            onSelect={toggleAptSelection}
+            onOpenDetails={(item: any) => {
+              setSelectedAppointment(item);
+              setIsTechnicalModalOpen(true);
+            }}
+          />
+        ))}
+        {filteredAppointments.length === 0 && (
+          <div className="py-10 text-center opacity-40">
+             <p className="text-[9px] font-black uppercase tracking-widest">Sin coincidencias</p>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+</div>
 
         {/* PANEL DERECHO (MUELLES) */}
         <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">

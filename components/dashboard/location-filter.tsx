@@ -1321,22 +1321,29 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
   const opcion = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
   const isEntryOrExit = registroId === "entrada" || registroId === "salida";
 
-  // ESTADOS DE FLUJO: 'initial' | 'scanner-cita' | 'data-view' | 'scanner-tracking'
-  const [step, setStep] = useState<'initial' | 'scanner-cita' | 'data-view' | 'scanner-tracking'>('initial');
-  const [codigo, setCodigo] = useState("");
+  // ESTADOS DEL FLUJO
+  // 'form'             -> Input manual inicial
+  // 'scanner'          -> Escáner principal (Cita/Registro)
+  // 'result'           -> Vista de datos cargados
+  // 'tracking-scanner' -> NUEVO: Escáner secundario para códigos de seguimiento
+  const [step, setStep] = useState<'form' | 'scanner' | 'result' | 'tracking-scanner'>('form');
   
-  // GESTIÓN DE CÓDIGOS DE SEGUIMIENTO
+  const [codigo, setCodigo] = useState("");
   const [trackingCodes, setTrackingCodes] = useState<string[]>([]);
   const [newTrackingInput, setNewTrackingInput] = useState("");
 
-  // Al confirmar el código principal (CITA), pasamos a la vista de datos
-  const handleConfirmCita = () => {
-    if (codigo === "3381589") { // Simulación de datos traídos
-      setTrackingCodes(["DFS54SF", "5464FGDF"]);
+  // --- ACCIONES ---
+
+  // 1. Ir a resultados desde el formulario manual
+  const handleSubmitManual = () => {
+    if (!codigo) return;
+    if (codigo === "3381589" || codigo.length > 3) {
+      setTrackingCodes(["DFS54SF", "5464FGDF"]); 
     }
-    setStep('data-view');
+    setStep('result');
   };
 
+  // 2. Agregar código manual con el botón (+) o Enter
   const handleManualAddTracking = () => {
     if (newTrackingInput.trim() !== "" && trackingCodes.length < 50) {
       setTrackingCodes([...trackingCodes, newTrackingInput.trim().toUpperCase()]);
@@ -1344,300 +1351,245 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     }
   };
 
-  // --- VISTA 1: PANTALLA INICIAL (Buscar Cita) ---
-  if (step === 'initial') {
+  // 3. Simular detección del escáner (Maneja ambos casos)
+  const handleScannerDetection = () => {
+    if (step === 'scanner') {
+        // Lógica escáner principal
+        setCodigo("QR-DETECTED-8821"); 
+        setTrackingCodes(["AUTO-QR-1", "AUTO-QR-2"]);
+        setStep('result');
+    } else {
+        // Lógica escáner secundario (Tracking)
+        const newCode = `PKG-${Math.floor(Math.random() * 9000) + 1000}`;
+        setTrackingCodes(prev => [...prev, newCode]);
+        setStep('result'); // Volver a resultados
+    }
+  };
+
+  // --- VISTA 1: FORMULARIO INICIAL ---
+  if (step === 'form') {
     return (
-  <div className="flex flex-col h-full w-full bg-slate-50/50 overflow-hidden">
-      {/* Header Superior - Más delgado (h-12) */}
-      <div className="bg-[#1C1E59] h-12 flex items-center justify-between px-6 shrink-0 w-full shadow-md z-20">
-         <div className="flex items-center gap-3">
-           <CheckCircle2 className="text-[#4CCAC8]" size={18} />
-           <h2 className="text-xs font-bold text-white uppercase tracking-tight italic">Información Verificada</h2>
-         </div>
-         <DialogPrimitive.Close className="text-white/40 hover:text-white transition-colors"><X size={18} /></DialogPrimitive.Close>
-      </div>
+      <div className="flex flex-col h-full w-full bg-[#F2F6FA] items-center justify-center relative p-6 animate-in fade-in zoom-in-95 duration-300">
+        <DialogPrimitive.Close className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+          <X size={24} strokeWidth={2.5} />
+        </DialogPrimitive.Close>
 
-      {/* Contenedor Principal - Reducido p-6 a p-4 */}
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-        <div className="max-w-2xl mx-auto space-y-3"> {/* Reducido space-y-6 a 3 */}
-          
-          {/* FEEDBACK ÉXITO - Más compacto */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 flex flex-col items-center shadow-sm">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center mb-2">
-                  <Check className="text-white" size={20} />
-              </div>
-              <span className="font-black text-xs uppercase italic text-blue-600">Cita Cargada Correctamente</span>
-          </div>
-
-          {/* CARD: INFORMACIÓN DE LA CITA - Padding interno reducido */}
-          <div className="bg-white rounded-[1.5rem] border border-gray-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-3 border-b border-gray-50 flex items-center gap-3 bg-slate-50/30">
-                  <CalendarIcon size={16} className="text-[#1C1E59]" />
-                  <span className="font-black text-[#1C1E59] text-[10px] uppercase italic">Detalles de la Cita</span>
-              </div>
-              <div className="p-5 space-y-3"> {/* Reducido p-8 a 5 y space-y-5 a 3 */}
-                  {[
-                      { icon: Hash, label: "ID Cita", val: codigo || "3381589" },
-                      { icon: CalendarIcon, label: "Fecha", val: "MAR 23 ABR 2024" },
-                      { icon: Truck, label: "Tipo de Vehículo", val: "CARRY (500 KILOS)" },
-                      { icon: Box, label: "Tipo de Carga", val: "Mercado" },
-                      { icon: Building2, label: "Proveedor", val: "13203" }
-                  ].map((row, i) => (
-                      <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-2 last:border-0 last:pb-0">
-                          <div className="flex items-center gap-3">
-                              <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#1C1E59]"><row.icon size={14} /></div>
-                              <span className="text-gray-400 text-[9px] font-black uppercase tracking-widest">{row.label}</span>
-                          </div>
-                          <span className="text-[#1C1E59] font-black text-[11px]">{row.val}</span>
-                      </div>
-                  ))}
-              </div>
-          </div>
-
-          {/* SECCIÓN tracking - Padding interno reducido */}
-          {isEntryOrExit && (
-            <div className="bg-white rounded-[1.5rem] border border-orange-100 shadow-lg shadow-orange-900/5 overflow-hidden animate-in slide-in-from-bottom-2">
-                <div className="px-6 py-3 border-b border-orange-50 flex items-center justify-between bg-orange-50/30">
-                    <div className="flex items-center gap-2">
-                      <Hash size={16} className="text-[#ff6b00]" />
-                      <span className="font-black text-[#ff6b00] text-[10px] uppercase italic">Códigos de Seguimiento ({trackingCodes.length}/50)</span>
-                    </div>
-                    <Button 
-                      onClick={() => setStep('scanner-tracking')}
-                      variant="ghost" 
-                      className="h-7 text-[8px] font-black uppercase text-[#ff6b00] hover:bg-orange-100 gap-2"
-                    >
-                      <QrCode size={12} /> Escanear Guía
-                    </Button>
-                </div>
-                
-                <div className="p-5 space-y-4"> {/* Reducido p-8 a 5 */}
-                  <div className="flex gap-2">
-                      <Input 
-                        placeholder="Agregar código manual..." 
-                        value={newTrackingInput}
-                        onChange={(e) => setNewTrackingInput(e.target.value)}
-                        className="h-10 rounded-xl bg-slate-50 border-gray-100 text-xs font-bold"
-                        onKeyPress={(e) => e.key === 'Enter' && handleManualAddTracking()}
-                      />
-                      <Button onClick={handleManualAddTracking} className="h-10 w-10 bg-[#1C1E59] rounded-xl shrink-0">
-                         <Plus size={20} />
-                      </Button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 p-3 bg-slate-50 rounded-xl border border-dashed border-gray-200 min-h-[60px]">
-                      {trackingCodes.length > 0 ? (
-                        trackingCodes.map((c, idx) => (
-                          <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 pl-2 pr-1 py-0.5 rounded-lg shadow-sm group">
-                              <span className="text-[9px] font-black text-[#1C1E59] font-mono">{c}</span>
-                              <button onClick={() => setTrackingCodes(p => p.filter((_,i) => i !== idx))} className="p-1 text-gray-300 hover:text-red-500 transition-colors">
-                                <X size={10} />
-                              </button>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="w-full flex items-center justify-center text-gray-400 opacity-50">
-                          <span className="text-[8px] font-bold uppercase tracking-widest">Sin códigos vinculados</span>
-                        </div>
-                      )}
-                  </div>
-                </div>
-            </div>
-          )}
-
-          {/* JSON Compacto */}
-          <div className="bg-white/50 rounded-xl px-4 py-2 border border-gray-100 flex items-center justify-between text-gray-400 cursor-pointer">
-              <div className="flex items-center gap-2">
-                  <span className="font-mono text-[9px]">&lt; &gt;</span>
-                  <span className="text-[9px] font-black uppercase tracking-widest">Ver JSON</span>
-              </div>
-              <ChevronDown size={12} />
-          </div>
+        <div className="mb-8 p-4 bg-white rounded-3xl shadow-lg shadow-gray-200/50">
+           <ArrowRight className="text-[#4CCAC8]" size={32} strokeWidth={3} />
         </div>
-      </div>
 
-      {/* FOOTER ACCIONES - Reducido h-16 a h-14 */}
-      <div className="p-4 bg-white border-t border-gray-100 shrink-0 shadow-[0_-4px_10px_rgba(0,0,0,0.03)]">
-        <div className="max-w-2xl mx-auto grid grid-cols-2 gap-3">
-            <Button onClick={() => { setStep('initial'); setCodigo(""); setTrackingCodes([]); }} className="h-12 bg-[#1C1E59] hover:bg-[#151744] text-white font-black rounded-xl gap-2 text-[10px] tracking-widest">
-                <RefreshCw size={16} /> ESCANEAR OTRO
-            </Button>
-            <Button className="h-12 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black rounded-xl gap-2 text-[10px] tracking-widest shadow-orange-100 shadow-lg">
-                <CheckCircle2 size={16} /> FINALIZAR
-            </Button>
-        </div>
-      </div>
-  </div>
-);
-  }
+        <h2 className="text-[#050038] font-black text-2xl uppercase tracking-tighter mb-10 text-center">
+          {opcion.label}
+        </h2>
 
-  // --- VISTA 2: ESCÁNERES (Cita o Tracking) ---
-  if (step === 'scanner-cita' || step === 'scanner-tracking') {
-    return (
-      <div className="flex flex-col h-full w-full bg-[#050038] items-center justify-center p-6 animate-in fade-in duration-300">
-        <h3 className="text-white font-black text-xl italic uppercase tracking-tighter mb-12">
-          {step === 'scanner-cita' ? 'Escaneando Cita Principal' : 'Escaneando Código de Seguimiento'}
-        </h3>
-        <div className="relative w-full max-w-[300px] aspect-square bg-black/40 rounded-[3rem] border-2 border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
-            <div className="absolute top-6 left-6 w-10 h-10 border-t-4 border-l-4 border-[#ff6b00] rounded-tl-xl" />
-            <div className="absolute top-6 right-6 w-10 h-10 border-t-4 border-r-4 border-[#ff6b00] rounded-tr-xl" />
-            <div className="absolute bottom-6 left-6 w-10 h-10 border-b-4 border-l-4 border-[#ff6b00] rounded-bl-xl" />
-            <div className="absolute bottom-6 right-6 w-10 h-10 border-b-4 border-r-4 border-[#ff6b00] rounded-br-xl" />
-            <div className="absolute left-0 w-full h-1 bg-[#ff6b00] shadow-[0_0_15px_#ff6b00] animate-scan-loop" />
-            <QrCode size={80} className="text-white/5" />
+        <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-xl shadow-slate-200/60 p-10 flex flex-col gap-6">
+           <div className="space-y-2">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
+                Número de Cita / Código
+              </label>
+              <Input 
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
+                placeholder="Ej: CITA-9982-24" 
+                className="h-14 rounded-2xl border-2 border-gray-100 bg-gray-50/50 text-center text-lg font-black text-[#050038] placeholder:text-gray-300 focus-visible:ring-0 focus-visible:border-[#ff6b00] transition-all uppercase"
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmitManual()}
+              />
+           </div>
+
+           <Button 
+             onClick={handleSubmitManual}
+             disabled={!codigo}
+             className={cn(
+               "h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all",
+               codigo 
+                ? "bg-[#050038] hover:bg-[#1C1E59] text-white shadow-xl shadow-blue-900/20" 
+                : "bg-gray-100 text-gray-300 cursor-not-allowed"
+             )}
+           >
+             Aceptar Registro
+           </Button>
         </div>
-        <Button 
-          variant="ghost" 
-          onClick={() => {
-            if (step === 'scanner-cita') setStep('initial');
-            else setStep('data-view');
-          }}
-          className="mt-12 text-white/50 hover:text-white font-black uppercase text-[10px] tracking-widest"
-        >
-          CANCELAR
-        </Button>
-        <Button 
-           onClick={() => {
-             if (step === 'scanner-cita') { setCodigo("3381589"); handleConfirmCita(); }
-             else { setTrackingCodes(p => [...p, "QR-" + Math.floor(Math.random()*1000)]); setStep('data-view'); }
-           }}
-           className="mt-4 bg-white/10 text-white text-[9px] font-bold px-4 h-8 rounded-lg"
-        >
-          [ Simular Lectura Exitosa ]
-        </Button>
+
+        <div className="mt-12 text-center space-y-4">
+           <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">¿Tienes un código QR?</p>
+           <Button 
+             variant="outline"
+             onClick={() => setStep('scanner')}
+             className="h-12 px-8 rounded-2xl border-orange-100 bg-white text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white hover:border-[#ff6b00] font-black text-[10px] uppercase tracking-widest gap-3 shadow-lg shadow-orange-100/50 transition-all"
+           >
+             <QrCode size={18} /> Escanear QR
+           </Button>
+        </div>
       </div>
     );
   }
 
-  // --- VISTA 3: INFORMACIÓN CARGADA + GESTIÓN DE TRACKING ---
+  // --- VISTA 2: ESCÁNER (Reutilizable para Principal y Tracking) ---
+  if (step === 'scanner' || step === 'tracking-scanner') {
+    const isTracking = step === 'tracking-scanner';
+    return (
+      <div className="flex flex-col h-full w-full bg-[#050038] items-center justify-center p-6 animate-in fade-in duration-300 relative">
+        <button 
+            onClick={() => setStep(isTracking ? 'result' : 'form')} 
+            className="absolute top-6 right-6 text-white/50 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+
+        <h3 className="text-white font-black text-xl italic uppercase tracking-tighter mb-12 text-center">
+          {isTracking ? "Añadir Paquete" : "Escaneando Código"}<br/>
+          <span className="text-[#ff6b00] text-sm not-italic font-bold tracking-widest">
+             {isTracking ? "Escanee el código de la guía" : "Enfoque el QR del conductor"}
+          </span>
+        </h3>
+
+        <div className="relative w-full max-w-[320px] aspect-square bg-black/40 rounded-[3rem] border-2 border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+            <div className="absolute top-8 left-8 w-12 h-12 border-t-[6px] border-l-[6px] border-[#ff6b00] rounded-tl-2xl" />
+            <div className="absolute top-8 right-8 w-12 h-12 border-t-[6px] border-r-[6px] border-[#ff6b00] rounded-tr-2xl" />
+            <div className="absolute bottom-8 left-8 w-12 h-12 border-b-[6px] border-l-[6px] border-[#ff6b00] rounded-bl-2xl" />
+            <div className="absolute bottom-8 right-8 w-12 h-12 border-b-[6px] border-r-[6px] border-[#ff6b00] rounded-br-2xl" />
+            <div className="absolute left-0 w-full h-0.5 bg-[#ff6b00] shadow-[0_0_20px_4px_#ff6b00] animate-scan-loop z-10" />
+            <QrCode size={100} className="text-white/5" />
+        </div>
+
+        <div className="mt-12 flex flex-col gap-4 w-full max-w-xs">
+           <Button 
+             variant="ghost" 
+             onClick={() => setStep(isTracking ? 'result' : 'form')} 
+             className="text-white/40 hover:text-white hover:bg-white/10 font-black uppercase text-[10px] tracking-widest h-12 rounded-xl"
+           >
+             Cancelar Escaneo
+           </Button>
+           
+           <Button 
+             onClick={handleScannerDetection}
+             className="bg-white/5 text-white/20 hover:bg-white/10 hover:text-white text-[9px] h-8 rounded-lg"
+           >
+             [ Simular Detección ]
+           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- VISTA 3: RESULTADOS (Data View) ---
   return (
-    <div className="flex flex-col h-full w-full bg-slate-50/50 overflow-hidden">
-        {/* Header Compacto */}
-        <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full">
+    <div className="flex flex-col h-full w-full bg-slate-50/50 overflow-hidden animate-in slide-in-from-right duration-300">
+        <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-md z-10">
            <div className="flex items-center gap-3">
              <CheckCircle2 className="text-[#4CCAC8]" size={20} />
-             <h2 className="text-sm font-bold text-white uppercase tracking-tight">Información Verificada</h2>
+             <h2 className="text-sm font-bold text-white uppercase tracking-tight">Registro Exitoso</h2>
            </div>
            <DialogPrimitive.Close className="text-white/40 hover:text-white"><X size={20} /></DialogPrimitive.Close>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-          <div className="max-w-2xl mx-auto space-y-6">
+        {/* PADDING REDUCIDO EN EL CONTENEDOR PRINCIPAL (p-4 en lugar de p-6) */}
+        <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+          <div className="max-w-2xl mx-auto space-y-4"> {/* SPACE-Y REDUCIDO DE 6 A 4 */}
             
-            {/* FEEDBACK ÉXITO */}
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 flex flex-col items-center shadow-sm">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-3">
-                    <Check className="text-white" size={24} />
+            <div className="bg-white rounded-[2rem] p-5 border border-gray-100 flex flex-col items-center shadow-sm text-center">
+                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-2 border border-emerald-100">
+                    <Check className="text-emerald-500" size={24} strokeWidth={3} />
                 </div>
-                <div className="flex items-center gap-2 mb-1 text-blue-600">
-                    <span className="font-black text-sm uppercase italic">Cita Cargada Correctamente</span>
-                </div>
+                <h3 className="font-black text-base text-[#1C1E59] uppercase italic tracking-tight">
+                  {opcion.label} Completado
+                </h3>
             </div>
 
-            {/* CARD: INFORMACIÓN DE LA CITA */}
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-                <div className="px-8 py-4 border-b border-gray-50 flex items-center gap-3 bg-slate-50/30">
-                    <CalendarIcon size={18} className="text-[#1C1E59]" />
-                    <span className="font-black text-[#1C1E59] text-xs uppercase italic">Detalles de la Cita</span>
+                <div className="px-6 py-3 border-b border-gray-50 flex items-center gap-3 bg-slate-50/30">
+                    <CalendarIcon size={16} className="text-[#1C1E59]" />
+                    <span className="font-black text-[#1C1E59] text-[10px] uppercase italic">Detalles Operativos</span>
                 </div>
-                <div className="p-8 space-y-5">
+                {/* PADDING INTERNO REDUCIDO (p-5 en lugar de p-8) */}
+                <div className="p-5 space-y-3">
                     {[
-                        { icon: Hash, label: "ID Cita", val: codigo || "3381589" },
-                        { icon: CalendarIcon, label: "Fecha", val: "MAR 23 ABR 2024" },
-                        { icon: Truck, label: "Tipo de Vehículo", val: "CARRY (500 KILOS)" },
-                        { icon: Box, label: "Tipo de Carga", val: "Mercado" },
-                        { icon: Building2, label: "Proveedor", val: "13203" }
+                        { icon: Hash, label: "ID Referencia", val: codigo || "MANUAL-INPUT" },
+                        { icon: CalendarIcon, label: "Fecha Registro", val: "29 ENE 2026 - 16:20" },
+                        { icon: Truck, label: "Vehículo", val: "TURBO (4.5 TON)" },
+                        { icon: Building2, label: "Muelle Asignado", val: "MUELLE NORTE A-01" }
                     ].map((row, i) => (
-                        <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-4 last:border-0 last:pb-0">
-                            <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-[#1C1E59]"><row.icon size={16} /></div>
-                                <span className="text-gray-400 text-[10px] font-black uppercase tracking-widest">{row.label}</span>
+                        <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-2 last:border-0 last:pb-0">
+                            <div className="flex items-center gap-3">
+                                <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-[#1C1E59]"><row.icon size={14} /></div>
+                                <span className="text-gray-400 text-[9px] font-black uppercase tracking-widest">{row.label}</span>
                             </div>
-                            <span className="text-[#1C1E59] font-black text-xs">{row.val}</span>
+                            <span className="text-[#1C1E59] font-black text-[11px]">{row.val}</span>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* --- SECCIÓN ADICIONAL: GESTIÓN DE CÓDIGOS DE SEGUIMIENTO (Solo Entrada/Salida) --- */}
+            {/* SECCIÓN CÓDIGOS DE SEGUIMIENTO COMPACTA */}
             {isEntryOrExit && (
-              <div className="bg-white rounded-[2.5rem] border border-orange-100 shadow-xl shadow-orange-900/5 overflow-hidden animate-in slide-in-from-bottom-4">
-                  <div className="px-8 py-4 border-b border-orange-50 flex items-center justify-between bg-orange-50/30">
+              <div className="bg-white rounded-[2.5rem] border border-orange-100 shadow-xl shadow-orange-900/5 overflow-hidden">
+                  <div className="px-6 py-3 border-b border-orange-50 flex items-center justify-between bg-orange-50/30">
                       <div className="flex items-center gap-3">
-                        <Hash size={18} className="text-[#ff6b00]" />
-                        <span className="font-black text-[#ff6b00] text-xs uppercase italic">Códigos de Seguimiento ({trackingCodes.length}/50)</span>
+                        <Hash size={16} className="text-[#ff6b00]" />
+                        <span className="font-black text-[#ff6b00] text-[10px] uppercase italic">Códigos de Seguimiento</span>
                       </div>
-                      <Button 
-                        onClick={() => setStep('scanner-tracking')}
-                        variant="ghost" 
-                        className="h-8 text-[9px] font-black uppercase text-[#ff6b00] hover:bg-orange-100 gap-2"
-                      >
-                        <QrCode size={14} /> Escanear Guía
-                      </Button>
                   </div>
                   
-                  <div className="p-8 space-y-6">
-                    {/* Input Manual Tracking */}
-                    <div className="flex gap-2">
-                        <Input 
-                          placeholder="Agregar código manual..." 
-                          value={newTrackingInput}
-                          onChange={(e) => setNewTrackingInput(e.target.value)}
-                          className="h-12 rounded-xl bg-slate-50 border-gray-100 text-xs font-bold"
-                          onKeyPress={(e) => e.key === 'Enter' && handleManualAddTracking()}
-                        />
-                        <Button onClick={handleManualAddTracking} className="h-12 w-12 bg-[#1C1E59] rounded-xl shrink-0">
-                           <Plus size={24} />
+                  <div className="p-5 space-y-4">
+                    {/* INPUT CON BOTÓN QR MODIFICADO */}
+                    <div className="flex gap-2 items-center">
+                        <div className="relative flex-1">
+                            <Input 
+                              placeholder="Vincular paquete adicional..." 
+                              value={newTrackingInput}
+                              onChange={(e) => setNewTrackingInput(e.target.value)}
+                              className="h-11 rounded-xl bg-slate-50 border-gray-100 text-[10px] font-bold pr-12"
+                              onKeyDown={(e) => e.key === 'Enter' && handleManualAddTracking()}
+                            />
+                            {/* BOTÓN QR ESTILO REFERENCE */}
+                            <button 
+                              onClick={() => setStep('tracking-scanner')} // ABRE EL ESCANER
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-orange-100 text-[#ff6b00] hover:bg-orange-200 rounded-lg transition-colors"
+                              title="Escanear paquete"
+                            >
+                              <QrCode size={16} strokeWidth={2.5} />
+                            </button>
+                        </div>
+
+                        <Button onClick={handleManualAddTracking} className="h-11 w-11 bg-[#1C1E59] hover:bg-[#151744] rounded-xl shrink-0 shadow-lg shadow-blue-900/20">
+                           <Plus size={20} />
                         </Button>
                     </div>
 
-                    {/* Lista de Tags */}
-                    <div className="flex flex-wrap gap-2 p-4 bg-slate-50 rounded-2xl border border-dashed border-gray-200 min-h-[80px]">
-                        {trackingCodes.length > 0 ? (
-                          trackingCodes.map((c, idx) => (
-                            <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 pl-3 pr-1 py-1 rounded-lg shadow-sm group">
-                                <span className="text-[10px] font-black text-[#1C1E59] font-mono">{c}</span>
-                                <button onClick={() => setTrackingCodes(p => p.filter((_,i) => i !== idx))} className="p-1 text-gray-300 hover:text-red-500 transition-colors">
-                                  <X size={12} />
-                                </button>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="w-full flex flex-col items-center justify-center text-gray-400 gap-1 opacity-50">
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-center">No hay códigos vinculados todavía</span>
+                    <div className="flex flex-wrap gap-2">
+                        {trackingCodes.map((c, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-white border border-gray-200 pl-3 pr-2 py-1 rounded-lg shadow-sm animate-in zoom-in duration-200">
+                              <span className="text-[9px] font-black text-[#1C1E59] font-mono">{c}</span>
+                              <button onClick={() => setTrackingCodes(p => p.filter((_,i) => i !== idx))} className="text-gray-300 hover:text-red-500 transition-colors">
+                                <X size={10} />
+                              </button>
                           </div>
+                        ))}
+                        {trackingCodes.length === 0 && (
+                           <span className="text-[9px] text-gray-400 font-medium italic pl-1">Sin códigos vinculados</span>
                         )}
                     </div>
                   </div>
               </div>
             )}
-
-            {/* JSON ACCORDION MOCK */}
-            <div className="bg-white/50 rounded-2xl px-6 py-3 border border-gray-100 flex items-center justify-between text-gray-400 cursor-pointer">
-                <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px]">&lt; &gt;</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest">Ver JSON completo</span>
-                </div>
-                <ChevronDown size={14} />
-            </div>
           </div>
         </div>
 
-        {/* FOOTER ACCIONES */}
-        <div className="p-6 bg-white border-t border-gray-100 shrink-0">
-          <div className="max-w-2xl mx-auto grid grid-cols-2 gap-4">
-              <Button onClick={() => { setStep('initial'); setCodigo(""); setTrackingCodes([]); }} className="h-16 bg-[#1C1E59] hover:bg-[#151744] text-white font-black rounded-2xl gap-3 text-xs tracking-widest shadow-xl">
-                  <RefreshCw size={18} /> ESCANEAR OTRO QR
+        <div className="p-4 bg-white border-t border-gray-100 shrink-0">
+          <div className="max-w-2xl mx-auto grid grid-cols-2 gap-3">
+              <Button onClick={() => { setStep('form'); setCodigo(""); setTrackingCodes([]); }} className="h-14 bg-gray-100 hover:bg-gray-200 text-[#1C1E59] font-black rounded-2xl gap-2 text-[10px] tracking-widest">
+                  <RefreshCw size={16} /> NUEVO REGISTRO
               </Button>
-              <Button className="h-16 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black rounded-2xl gap-3 text-xs tracking-widest shadow-xl shadow-orange-100">
-                  <CheckCircle2 size={18} /> FINALIZAR REGISTRO
-              </Button>
+              <DialogPrimitive.Close asChild>
+                <Button className="h-14 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black rounded-2xl gap-2 text-[10px] tracking-widest shadow-xl shadow-orange-100">
+                    <CheckCircle2 size={16} /> FINALIZAR PROCESO
+                </Button>
+              </DialogPrimitive.Close>
           </div>
         </div>
     </div>
   );
 }
-
 export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedDockGroupId, setSelectedDockGroupId] = useState<string | null>(null);
@@ -1768,27 +1720,24 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
 
           {/* BOTÓN MAPA EN EL NAVBAR */}
  <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
-      <DialogTrigger asChild>
-        <DashboardNavButton icon={Map} label="Mapa" variant="orange" />
-      </DialogTrigger>
-      <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
-        {/* Header Superior Navy */}
-        <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-          <div className="flex items-center gap-3 text-white">
-            <Map size={20} className="text-orange-500" />
-            <h2 className="text-sm font-bold uppercase tracking-tight italic">Monitoreo de Vehículos en Tiempo Real</h2>
-          </div>
-          <button onClick={() => setIsMapOpen(false)} className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Componente del Mapa */}
-        <div className="flex-1 relative overflow-hidden">
-          <VehicleMap locationName={selectedLocation?.name || "SIN LOCALIDAD"} />
-        </div>
-      </DialogContent>
-    </Dialog>
+  <DialogTrigger asChild>
+    <DashboardNavButton icon={MapPin} label="Mapa" variant="orange" />
+  </DialogTrigger>
+  <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
+    <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+      <div className="flex items-center gap-3 text-white">
+        <MapPin size={20} className="text-[#ff6b00]" />
+        <h2 className="text-sm font-bold uppercase tracking-tight italic">Monitoreo Satelital de Arribos</h2>
+      </div>
+      <button onClick={() => setIsMapOpen(false)} className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+        <X size={20} />
+      </button>
+    </div>
+    <div className="flex-1 relative overflow-hidden">
+      <VehicleMap locationName={selectedLocation?.name || "SIN LOCALIDAD"} />
+    </div>
+  </DialogContent>
+</Dialog>
 
          {/* AUDITORÍA */}
           <Dialog>
