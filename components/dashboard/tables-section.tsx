@@ -498,7 +498,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 
   const monitoringTabs = [
     { id: "appointments", label: "Consulta de Citas", icon: CalendarRange, count: 24 },
-    { id: "carriers", label: "Torre Control", icon: Truck, count: 8 },
+    { id: "carriers", label: "Control de Citas", icon: Truck, count: 8 },
     { id: "inventory", label: "Editar Información", icon: Package, count: 12 }
   ];
 
@@ -635,16 +635,22 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                         )}
 
                         {/* --- VISTA: TORRE DE CONTROL (NUEVA) --- */}
+                        {/* --- VISTA: TORRE DE CONTROL (ACTUALIZADA COMPLETA) --- */}
                         {monitoreoView === "carriers" && (
                           <Table>
                             <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
                               <TableRow className="hover:bg-transparent border-none h-11">
                                 {[
-                                  "Unidad Negocio", "Proveedor", "Fecha", "Hora", "Tipo Cita", 
-                                  "ID Cita", "Estado", "Orden Compra", "Recibo", "Placa", 
-                                  "Transportadora", "Entrada UN", "T. Transcurrido UN", "T. Traslado", 
-                                  "T. Descargue", "T. Est. Descargue", "Salida", "Usuario", 
-                                  "A Tiempo", "Descargue", "ID Proveedor"
+                                  "Numero de Cita", "Localidad", "Muelle", "Tipo de Cita", "Fecha Cita", "Hora Cita", 
+                                  "Usuario Solicitante", "Estado de Cita", "Documento", "Recibo Maestro", 
+                                  "ID Generador", "Generador / Cliente", "Placa Agendada", "Placa Ingresó", 
+                                  "ID Conductor Agend.", "Nombre Cond. Agend.", "ID Cond. Ingresó", "Nombre Cond. Ingresó", 
+                                  "Celular", "ID Emp. Transporte", "Emp. Transporte", "Tipo de Cargue", "Tipo de Producto", 
+                                  "Peso Total", "Litros Totales", "Volumen Total", "GPS Ingreso", 
+                                  "Fecha/Hora Ingreso", "T. Transcurrido Localidad", "T. Transcurrido Traspaso", 
+                                  "T. Transcurrido C/D", "T. Estimado C/D", "Cant. Solicitada", "Cant. Entregada", 
+                                  "Fecha/Hora Salida", "GPS Salida", "OnTime", "% Cargue/Descargue", 
+                                  "User Entrada", "User Inicio", "User Fin", "User Salida"
                                 ].map((h) => (
                                   <TableHead key={h} className="text-white font-bold text-[9px] uppercase tracking-[0.1em] px-4 h-11 whitespace-nowrap">{h}</TableHead>
                                 ))}
@@ -653,33 +659,90 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                             <TableBody>
                               {[...Array(10)].map((_, i) => (
                                 <TableRow key={i} className="group hover:bg-blue-50/40 border-b border-slate-50 transition-colors h-14">
-                                  <TableCell className="px-4 font-bold text-slate-700 text-[11px]">Planta Bello</TableCell>
-                                  <TableCell className="px-4 font-bold text-[#1C1E59] text-[11px] uppercase">Solla S.A.</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[11px]">26/01/2026</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[11px]">14:30</TableCell>
-                                  <TableCell className="px-4 font-medium text-blue-600 text-[10px] uppercase">Descargue</TableCell>
-                                  <TableCell className="px-4 font-black text-[#1C1E59] text-xs">DOC-9921{i}</TableCell>
+                                  {/* 1. Numero de Cita */}
+                                  <TableCell className="px-4 font-black text-[#1C1E59] text-xs whitespace-nowrap">CITA-{1000 + i}</TableCell>
+                                  {/* 2. Localidad */}
+                                  <TableCell className="px-4 text-slate-600 text-[10px] font-bold whitespace-nowrap">Planta Bello</TableCell>
+                                  {/* 3. Muelle */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">Muelle {i+1}</TableCell>
+                                  {/* 4. Tipo de Cita */}
+                                  <TableCell className="px-4 font-medium text-blue-600 text-[10px] uppercase whitespace-nowrap">Descargue</TableCell>
+                                  {/* 5. Fecha Cita */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">26/01/2026</TableCell>
+                                  {/* 6. Hora Cita */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">08:00 AM</TableCell>
+                                  {/* 7. Usuario Solicitante */}
+                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase whitespace-nowrap">Juan Perez</TableCell>
+                                  {/* 8. Estado de Cita */}
                                   <TableCell className="px-4"><StatusBadge status="en_proceso" /></TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px]">OC-7721</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">REC-001</TableCell>
-                                  <TableCell className="px-4">
-                                    <span className="bg-amber-50 border border-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[10px] uppercase">XYZ-12{i}</span>
-                                  </TableCell>
-                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase">Carga Segura</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">14:45</TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px] text-orange-600 font-bold">00:45:12</TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px]">00:15:00</TableCell>
-                                  <TableCell className="px-4 font-mono text-[10px] text-emerald-600 font-bold">01:20:00</TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">02:00:00</TableCell>
-                                  <TableCell className="px-4 text-slate-500 text-[10px]">16:05</TableCell>
-                                  <TableCell className="px-4 text-slate-600 text-[10px] font-medium uppercase">Admin_User</TableCell>
-                                  <TableCell className="px-4 text-center">
-                                    {i % 2 === 0 ? <Check className="w-4 h-4 text-emerald-500 mx-auto" /> : <XCircle className="w-4 h-4 text-rose-500 mx-auto" />}
-                                  </TableCell>
-                                  <TableCell className="px-4">
-                                    <Badge className="bg-blue-100 text-blue-700 text-[8px] font-black border-none">95%</Badge>
-                                  </TableCell>
-                                  <TableCell className="px-4 text-slate-400 text-[10px]">NIT 800.112.233</TableCell>
+                                  {/* 9. Documento */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">DOC-{500+i}</TableCell>
+                                  {/* 10. Recibo Maestro */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">REC-{200+i}</TableCell>
+                                  {/* 11. ID Generador */}
+                                  <TableCell className="px-4 text-slate-400 text-[10px] whitespace-nowrap">NIT 900.123</TableCell>
+                                  {/* 12. Generador / Cliente */}
+                                  <TableCell className="px-4 font-bold text-[#1C1E59] text-[10px] uppercase whitespace-nowrap">Cliente Principal SAS</TableCell>
+                                  {/* 13. Placa Agendada */}
+                                  <TableCell className="px-4"><span className="bg-slate-100 px-2 py-0.5 rounded font-mono font-bold text-[10px] text-slate-600">AAA-123</span></TableCell>
+                                  {/* 14. Placa Ingresó */}
+                                  <TableCell className="px-4"><span className="bg-amber-50 border border-amber-100 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[10px]">AAA-123</span></TableCell>
+                                  {/* 15. ID Conductor Agend. */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">71.223.334</TableCell>
+                                  {/* 16. Nombre Cond. Agend. */}
+                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase whitespace-nowrap">Pedro Pablo</TableCell>
+                                  {/* 17. ID Cond. Ingresó */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">71.223.334</TableCell>
+                                  {/* 18. Nombre Cond. Ingresó */}
+                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase whitespace-nowrap">Pedro Pablo</TableCell>
+                                  {/* 19. Celular */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">300 123 4567</TableCell>
+                                  {/* 20. ID Emp. Transporte */}
+                                  <TableCell className="px-4 text-slate-400 text-[10px] whitespace-nowrap">NIT 800.111</TableCell>
+                                  {/* 21. Emp. Transporte */}
+                                  <TableCell className="px-4 text-slate-600 text-[10px] uppercase font-bold whitespace-nowrap">Carga Segura</TableCell>
+                                  {/* 22. Tipo de Cargue */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">Palletizado</TableCell>
+                                  {/* 23. Tipo de Producto */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">Materia Prima</TableCell>
+                                  {/* 24. Peso Total */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">10,000 Kg</TableCell>
+                                  {/* 25. Litros Totales */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">N/A</TableCell>
+                                  {/* 26. Volumen Total */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">15 M3</TableCell>
+                                  {/* 27. GPS Ingreso */}
+                                  <TableCell className="px-4"><Badge variant="outline" className="text-[9px] whitespace-nowrap">GPS-{i}99</Badge></TableCell>
+                                  {/* 28. Fecha/Hora Ingreso */}
+                                  <TableCell className="px-4 text-slate-500 text-[10px] whitespace-nowrap">26/01 07:45</TableCell>
+                                  {/* 29. T. Transcurrido Localidad */}
+                                  <TableCell className="px-4 font-mono text-[10px] text-orange-600 font-bold whitespace-nowrap">01:15:00</TableCell>
+                                  {/* 30. T. Transcurrido Traspaso */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">00:10:00</TableCell>
+                                  {/* 31. T. Transcurrido C/D */}
+                                  <TableCell className="px-4 font-mono text-[10px] text-blue-600 font-bold whitespace-nowrap">00:45:00</TableCell>
+                                  {/* 32. T. Estimado C/D */}
+                                  <TableCell className="px-4 text-slate-400 text-[10px] whitespace-nowrap">01:00:00</TableCell>
+                                  {/* 33. Cant. Solicitada */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">1000</TableCell>
+                                  {/* 34. Cant. Entregada */}
+                                  <TableCell className="px-4 font-mono text-[10px] whitespace-nowrap">500</TableCell>
+                                  {/* 35. Fecha/Hora Salida */}
+                                  <TableCell className="px-4 text-slate-400 text-[10px] whitespace-nowrap">---</TableCell>
+                                  {/* 36. GPS Salida */}
+                                  <TableCell className="px-4 text-slate-400 text-[10px] whitespace-nowrap">---</TableCell>
+                                  {/* 37. OnTime */}
+                                  <TableCell className="px-4 text-center">{i % 2 === 0 ? <Check className="w-3.5 h-3.5 text-emerald-500 mx-auto" /> : <XCircle className="w-3.5 h-3.5 text-rose-500 mx-auto" />}</TableCell>
+                                  {/* 38. % Cargue/Descargue */}
+                                  <TableCell className="px-4"><Badge className="bg-blue-100 text-blue-700 text-[9px] font-black border-none whitespace-nowrap">50%</Badge></TableCell>
+                                  {/* 39. User Entrada */}
+                                  <TableCell className="px-4 text-slate-500 text-[9px] uppercase whitespace-nowrap">Portero 1</TableCell>
+                                  {/* 40. User Inicio */}
+                                  <TableCell className="px-4 text-slate-500 text-[9px] uppercase whitespace-nowrap">Montacarga 2</TableCell>
+                                  {/* 41. User Fin */}
+                                  <TableCell className="px-4 text-slate-400 text-[9px] uppercase whitespace-nowrap">---</TableCell>
+                                  {/* 42. User Salida */}
+                                  <TableCell className="px-4 text-slate-400 text-[9px] uppercase whitespace-nowrap">---</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
