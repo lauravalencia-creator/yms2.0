@@ -24,11 +24,15 @@ import {
   Search, BarChart3, Settings, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
   RotateCw, Filter, UserPlus, ChevronRight, AlertTriangle,MapPin,
-  Package, X, QrCode, ArrowRight, LayoutGrid, Type,  Plus,
+  Package, X, QrCode, ArrowRight, LayoutGrid, Type,  Plus, Map,
   Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+
+
+
+
 
 import { 
   Popover,
@@ -51,6 +55,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import dynamic from "next/dynamic";
 
 // --- CONSTANTES DE COLOR ---
 const COLORS = {
@@ -60,6 +65,21 @@ const COLORS = {
   ORANGE_TEXT: "text-[#ff6b00]",
   ORANGE_LIGHT_BG: "bg-[#FFEAD5]",
 };
+
+// Cargamos el mapa dinámicamente deshabilitando SSR
+const VehicleMap = dynamic(
+  () => import('./VehicleMap'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 gap-4">
+        <RotateCw className="animate-spin text-[#ff6b00]" size={40} />
+        <p className="font-black text-[#1e2b58] uppercase text-xs tracking-widest animate-pulse">Cargando Infraestructura Satelital...</p>
+      </div>
+    )
+  }
+);
+
 
 const SettingsIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg 
@@ -111,6 +131,8 @@ function MapPinIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+// --- CONFIGURACIÓN DEL PIN PERSONALIZADO (Estilo tu imagen) ---
 
 function BuildingIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -358,6 +380,56 @@ const InputWithIcon = ({ icon: Icon, ...props }: any) => (
   </div>
 );
 
+const VehiclePin = ({ placa, oc, cita, x, y, isInside = false }: { placa: string, oc: string, cita: string, x: string, y: string, isInside?: boolean }) => (
+  <div className="absolute z-10 transition-all hover:z-20 cursor-pointer group" style={{ left: x, top: y }}>
+    {/* PLACA (CAJA NEGRA ESTILO IMAGEN) */}
+    <div className="flex flex-col items-center mb-0.5 drop-shadow-md">
+      <div className="bg-[#050038] text-white px-2 py-0.5 rounded-sm border border-white/10">
+        <span className="text-[11px] font-black tracking-tighter uppercase">{placa}</span>
+      </div>
+      <div className="w-0 h-0 border-l-[4px] border-l-transparent border-r-[4px] border-r-transparent border-t-[4px] border-t-[#050038]"></div>
+    </div>
+
+    {/* PIN NARANJA */}
+    <div className="flex flex-col items-center relative">
+       <div className="relative hover:scale-110 transition-transform duration-300">
+          <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 0C7.16344 0 0 7.16344 0 16C0 28 16 40 16 40C16 40 32 28 32 16C32 7.16344 24.8366 0 16 0Z" fill="#ff6b00"/>
+            <circle cx="16" cy="16" r="10" fill="white"/>
+          </svg>
+          <Truck size={12} className="absolute top-[10px] left-[10px] text-[#050038]" strokeWidth={3} />
+       </div>
+       
+       {/* Indicador de "Dentro de Localidad" si aplica */}
+       {isInside && (
+         <div className="absolute -bottom-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white animate-ping" />
+       )}
+    </div>
+
+    {/* BUBBLE INFO (TOOLTIP) */}
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-12 w-44 bg-white rounded-2xl shadow-2xl p-3 border border-gray-100 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none scale-90 group-hover:scale-100 origin-bottom">
+       <div className="flex flex-col gap-1.5">
+          <div className="flex justify-between border-b border-gray-50 pb-1">
+             <span className="text-[8px] font-black text-gray-400 uppercase">Documento OC</span>
+             <span className="text-[10px] font-bold text-[#1e2b58]">{oc}</span>
+          </div>
+          <div className="flex justify-between">
+             <span className="text-[8px] font-black text-gray-400 uppercase">Cita #</span>
+             <span className="text-[10px] font-black text-[#ff6b00]">{cita}</span>
+          </div>
+          {isInside && (
+            <div className="mt-1 bg-emerald-50 py-1 px-2 rounded-lg flex items-center gap-2">
+               <CheckCircle2 size={10} className="text-emerald-500" />
+               <span className="text-[8px] font-black text-emerald-600 uppercase">En Localidad</span>
+            </div>
+          )}
+       </div>
+       {/* Triángulo del Bubble */}
+       <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white"></div>
+    </div>
+  </div>
+);
+
 // --- MODAL: GENERAR PERFIL ---
 function CreateProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [flags, setFlags] = useState({ autocomplete: false, delivery: false, terminal: false });
@@ -435,6 +507,9 @@ function CreateProfileModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     </Dialog>
   );
 }
+
+
+
 
 function PermissionsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   // Estado local para manejar los toggles (en una app real esto vendría de BD)
@@ -904,10 +979,9 @@ function ReprocessConfirmModal({ isOpen, onClose }: { isOpen: boolean, onClose: 
   );
 }
 
-// --- COMPONENTE: MODAL HISTORIAL (CON TOGGLE Y HEADER AZUL) ---
-// --- COMPONENTE: AUDITORÍA (CON TODA LA LÓGICA Y DATOS) ---
+// --- COMPONENTE: MODAL HISTORIAL  ---
 function AuditHistoryContent() {
-  // 1. Estados para controlar qué modal se abre
+
   const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
   const [isReprocessOpen, setIsReprocessOpen] = useState(false);
   const [operationType, setOperationType] = useState<"creacion" | "actualizacion">("creacion");
@@ -1439,6 +1513,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false);
 
   const selectedLocation = locationsData.find((loc) => loc.id === selectedLocationId);
+   const [isMapOpen, setIsMapOpen] = useState(false);
 
   // ESTADOS PARA REGISTROS
   const [selectedRegistro, setSelectedRegistro] = useState<string | null>(null);
@@ -1557,7 +1632,29 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
             </PopoverContent>
           </Popover>
 
-         
+          {/* BOTÓN MAPA EN EL NAVBAR */}
+ <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
+      <DialogTrigger asChild>
+        <DashboardNavButton icon={Map} label="Mapa" variant="orange" />
+      </DialogTrigger>
+      <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
+        {/* Header Superior Navy */}
+        <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
+          <div className="flex items-center gap-3 text-white">
+            <Map size={20} className="text-orange-500" />
+            <h2 className="text-sm font-bold uppercase tracking-tight italic">Monitoreo de Vehículos en Tiempo Real</h2>
+          </div>
+          <button onClick={() => setIsMapOpen(false)} className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Componente del Mapa */}
+        <div className="flex-1 relative overflow-hidden">
+          <VehicleMap locationName={selectedLocation?.name || "SIN LOCALIDAD"} />
+        </div>
+      </DialogContent>
+    </Dialog>
 
          {/* AUDITORÍA */}
           <Dialog>

@@ -1347,7 +1347,7 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
               <div className="flex items-center justify-between w-full animate-in fade-in slide-in-from-top-1">
                 <div className="flex flex-col">
                   <span className="text-[10px] font-black text-orange-400 uppercase tracking-widest">Seleccionados</span>
-                  <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} OC</span>
+                  <span className="text-white font-bold text-sm leading-none">{selectedAptIds.length} Documentos</span>
                 </div>
                 <Button size="sm" onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))} className="bg-[#FF6C01] text-white text-[9px] font-black uppercase px-3 h-8 rounded-xl shadow-lg border-none">Solicitar Cita</Button>
               </div>
