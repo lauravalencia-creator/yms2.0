@@ -210,74 +210,234 @@ const allDocks: Dock[] = [
 // --- Citas pendientes ---
 const pendingAppointments: Appointment[] = [
   { 
-    id: "NOTAPRUEBAABI5002", carrier: "FERRIAMARILLA S.A.S", truckId: "---", time: "15:28", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-28", 
-    nit: "900.742.771-9", quantityOrdered: 150, peso: "5,000", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "MEDELLIN_ANT", product: "PRODUCTO EJEMPLO 1",
-    canal: "MODERNO", route: "RUTA SUR-01", priority: "ALTA", logisticProfile: "REFRIGERADO"
+    id: "NOTAPRUEBAABI5002",
+    carrier: "FERRIAMARILLA S.A.S",
+    truckId: "TRK-ANT-001",
+    time: "15:28",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-28",
+    nit: "900.742.771-9",
+    quantityOrdered: 150,
+    quantityDelivered: 50,
+    peso: "5,000",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "MEDELLIN_ANT",
+    product: "PRODUCTO EJEMPLO 1",
+    canal: "MODERNO",
+    route: "RUTA SUR-01",
+    priority: "ALTA",
+    logisticProfile: "REFRIGERADO"
   },
   { 
-    id: "ABI10200", carrier: "DISTRIBUIDORA NACIONAL", truckId: "---", time: "08:00", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-28", 
-    nit: "860.001.002-4", quantityOrdered: 2400, peso: "3,500", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "BOGOTA_DC", product: "ABARROTES VARIOS",
-    canal: "TRADICIONAL", route: "NORTE-05", priority: "MEDIA", logisticProfile: "SECA"
+    id: "ABI10200",
+    carrier: "DISTRIBUIDORA NACIONAL",
+    truckId: "TRK-DC-014",
+    time: "08:00",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-28",
+    nit: "860.001.002-4",
+    quantityOrdered: 2400,
+    quantityDelivered: 1200,
+    peso: "3,500",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "BOGOTA_DC",
+    product: "ABARROTES VARIOS",
+    canal: "TRADICIONAL",
+    route: "NORTE-05",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
   },
   { 
-    id: "DOC-88921", carrier: "SOLA S.A.", truckId: "---", time: "09:30", type: "outbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI MEDELLIN", date: "2026-01-29", 
-    nit: "890.900.120-1", quantityOrdered: 500, peso: "12,000", operationType: "Cargue", 
-    isReadyForAssignment: false, zone: "BELLO_ANT", product: "HARINA DE TRIGO",
-    canal: "MODERNO", route: "ORIENTE-02", priority: "ALTA", logisticProfile: "GRANEL"
+    id: "DOC-88921",
+    carrier: "SOLA S.A.",
+    truckId: "TRK-ANT-223",
+    time: "09:30",
+    type: "outbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-29",
+    nit: "890.900.120-1",
+    quantityOrdered: 500,
+    quantityDelivered: 0,
+    peso: "12,000",
+    operationType: "Cargue",
+    isReadyForAssignment: false,
+    zone: "BELLO_ANT",
+    product: "HARINA DE TRIGO",
+    canal: "MODERNO",
+    route: "ORIENTE-02",
+    priority: "ALTA",
+    logisticProfile: "GRANEL"
   },
   { 
-    id: "TRK-99281", carrier: "ALIMENTOS POLAR", truckId: "---", time: "11:45", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI BARRANQUILLA", date: "2026-01-28", 
-    nit: "800.123.456-0", quantityOrdered: 1200, peso: "8,200", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "SOLEDAD_ATL", product: "CEREALES PACK",
-    canal: "DIRECTO", route: "COSTA-01", priority: "BAJA", logisticProfile: "SECA"
+    id: "TRK-99281",
+    carrier: "ALIMENTOS POLAR",
+    truckId: "TRK-ATL-078",
+    time: "11:45",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-28",
+    nit: "800.123.456-0",
+    quantityOrdered: 1200,
+    quantityDelivered: 800,
+    peso: "8,200",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "SOLEDAD_ATL",
+    product: "CEREALES PACK",
+    canal: "DIRECTO",
+    route: "COSTA-01",
+    priority: "BAJA",
+    logisticProfile: "SECA"
   },
   { 
-    id: "GUID-77261", carrier: "LOGISTICA INTEGRAL S.A.", truckId: "---", time: "14:15", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI PEREIRA", date: "2026-01-29", 
-    nit: "900.555.666-8", quantityOrdered: 85, peso: "1,200", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "DOSQUEBRADAS", product: "REPUESTOS INDUSTRIALES",
-    canal: "MODERNO", route: "EJE-03", priority: "MEDIA", logisticProfile: "ESTIBADO"
+    id: "GUID-77261",
+    carrier: "LOGISTICA INTEGRAL S.A.",
+    truckId: "TRK-EJE-031",
+    time: "14:15",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-29",
+    nit: "900.555.666-8",
+    quantityOrdered: 85,
+    quantityDelivered: 85,
+    peso: "1,200",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "DOSQUEBRADAS",
+    product: "REPUESTOS INDUSTRIALES",
+    canal: "MODERNO",
+    route: "EJE-03",
+    priority: "MEDIA",
+    logisticProfile: "ESTIBADO"
   },
   { 
-    id: "NOTA-44332", carrier: "PRODUCTOS DIANA", truckId: "---", time: "07:20", type: "outbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-30", 
-    nit: "860.444.555-1", quantityOrdered: 3000, peso: "15,000", operationType: "Cargue", 
-    isReadyForAssignment: false, zone: "YUMBO_VALLE", product: "ARROZ PREMIUM",
-    canal: "TRADICIONAL", route: "SUR-02", priority: "ALTA", logisticProfile: "SECA"
+    id: "NOTA-44332",
+    carrier: "PRODUCTOS DIANA",
+    truckId: "TRK-VLL-119",
+    time: "07:20",
+    type: "outbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-30",
+    nit: "860.444.555-1",
+    quantityOrdered: 3000,
+    quantityDelivered: 1000,
+    peso: "15,000",
+    operationType: "Cargue",
+    isReadyForAssignment: false,
+    zone: "YUMBO_VALLE",
+    product: "ARROZ PREMIUM",
+    canal: "TRADICIONAL",
+    route: "SUR-02",
+    priority: "ALTA",
+    logisticProfile: "SECA"
   },
   { 
-    id: "ABI-55667", carrier: "CERVECERIA UNION", truckId: "---", time: "10:00", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-28", 
-    nit: "890.101.202-3", quantityOrdered: 450, peso: "22,000", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "ITAGUI_ANT", product: "LIQUIDOS EMBOTELLADOS",
-    canal: "MODERNO", route: "CENTRO-04", priority: "MEDIA", logisticProfile: "PESADA"
+    id: "ABI-55667",
+    carrier: "CERVECERIA UNION",
+    truckId: "TRK-ANT-542",
+    time: "10:00",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-28",
+    nit: "890.101.202-3",
+    quantityOrdered: 450,
+    quantityDelivered: 200,
+    peso: "22,000",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "ITAGUI_ANT",
+    product: "LIQUIDOS EMBOTELLADOS",
+    canal: "MODERNO",
+    route: "CENTRO-04",
+    priority: "MEDIA",
+    logisticProfile: "PESADA"
   },
   { 
-    id: "DOC-11223", carrier: "NESTLE COLOMBIA", truckId: "---", time: "13:00", type: "outbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI MEDELLIN", date: "2026-01-29", 
-    nit: "860.000.123-9", quantityOrdered: 600, peso: "4,500", operationType: "Cargue", 
-    isReadyForAssignment: false, zone: "ENVIGADO_ANT", product: "LACTEOS VARIOS",
-    canal: "MODERNO", route: "VALLE-06", priority: "ALTA", logisticProfile: "REFRIGERADO"
+    id: "DOC-11223",
+    carrier: "NESTLE COLOMBIA",
+    truckId: "TRK-ANT-611",
+    time: "13:00",
+    type: "outbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-29",
+    nit: "860.000.123-9",
+    quantityOrdered: 600,
+    quantityDelivered: 300,
+    peso: "4,500",
+    operationType: "Cargue",
+    isReadyForAssignment: false,
+    zone: "ENVIGADO_ANT",
+    product: "LACTEOS VARIOS",
+    canal: "MODERNO",
+    route: "VALLE-06",
+    priority: "ALTA",
+    logisticProfile: "REFRIGERADO"
   },
   { 
-    id: "GUID-99001", carrier: "COLGATE PALMOLIVE", truckId: "---", time: "16:45", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI CALI", date: "2026-01-28", 
-    nit: "800.999.888-7", quantityOrdered: 1500, peso: "6,800", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "CALI_VALLE", product: "CUIDADO PERSONAL",
-    canal: "DIRECTO", route: "PACIFICO-01", priority: "MEDIA", logisticProfile: "SECA"
+    id: "GUID-99001",
+    carrier: "COLGATE PALMOLIVE",
+    truckId: "TRK-VLL-204",
+    time: "16:45",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-28",
+    nit: "800.999.888-7",
+    quantityOrdered: 1500,
+    quantityDelivered: 750,
+    peso: "6,800",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "CALI_VALLE",
+    product: "CUIDADO PERSONAL",
+    canal: "DIRECTO",
+    route: "PACIFICO-01",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
   },
   { 
-    id: "NOTA-88776", carrier: "POSTOBON S.A.", truckId: "---", time: "06:00", type: "inbound", status: "pending", 
-    locationId: "loc-1", locationName: "CEDI BOGOTA", date: "2026-01-30", 
-    nit: "890.333.222-1", quantityOrdered: 5000, peso: "30,000", operationType: "Descargue", 
-    isReadyForAssignment: false, zone: "CHIA_CUN", product: "BEBIDAS CARBONATADAS",
-    canal: "MODERNO", route: "SABANA-03", priority: "ALTA", logisticProfile: "PESADA"
+    id: "NOTA-88776",
+    carrier: "POSTOBON S.A.",
+    truckId: "TRK-CUN-901",
+    time: "06:00",
+    type: "inbound",
+    status: "pending",
+    locationId: "loc-1",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    date: "2026-01-30",
+    nit: "890.333.222-1",
+    quantityOrdered: 5000,
+    quantityDelivered: 2500,
+    peso: "30,000",
+    operationType: "Descargue",
+    isReadyForAssignment: false,
+    zone: "CHIA_CUN",
+    product: "BEBIDAS CARBONATADAS",
+    canal: "MODERNO",
+    route: "SABANA-03",
+    priority: "ALTA",
+    logisticProfile: "PESADA"
   }
 ];
 
@@ -597,6 +757,7 @@ function RequestAppointmentModal({
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(() => {
     const initial: { [key: string]: number } = {};
     appointments.forEach(apt => {
+      // Valor por defecto: Lo que falta por entregar (Pedida - Recibida)
       initial[apt.id] = (apt.quantityOrdered || 0) - (apt.quantityDelivered || 0);
     });
     return initial;
@@ -612,75 +773,84 @@ function RequestAppointmentModal({
   }, [appointments]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="flex items-center justify-between px-6 py-4 border-b bg-slate-50">
-          <h3 className="text-lg font-bold text-slate-800 uppercase tracking-tight">Detalle del Cargue</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-2">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col border border-slate-300">
+        
+        {/* HEADER PRINCIPAL */}
+        <div className="flex items-center justify-between px-4 py-2 border-b bg-white">
+          <h3 className="text-sm font-black text-[#1C1E59] uppercase tracking-tight">DETALLE DEL CARGUE</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-white">
-          <div className="border border-slate-200 rounded-sm overflow-hidden text-[11px]">
-            <table className="w-full text-left border-collapse">
-              <tbody>
-                {Object.entries(groupedByCarrier).map(([carrier, items]) => (
-                  <React.Fragment key={carrier}>
-                    <tr className="bg-slate-100 text-center font-bold border-b border-slate-300">
-                      <td colSpan={2} className="py-2 text-slate-700 uppercase">Detalle del Cargue</td>
+        <div className="flex-1 overflow-y-auto p-4 bg-white">
+          <div className="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+            {Object.entries(groupedByCarrier).map(([carrier, items]) => (
+              <div key={carrier} className="mb-0">
+                {/* Banner Gris de Sección */}
+                <div className="bg-[#E9ECEF] text-center py-1 border-b border-slate-300">
+                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Detalle del Cargue</span>
+                </div>
+
+                {/* Info Proveedor y Lugar */}
+                <div className="grid grid-cols-3 bg-white py-2 px-4 gap-2 border-b border-slate-200 text-[10px]">
+                  <div className="truncate"><span className="font-black text-[#1C1E59]">Proveedor:</span> <span className="text-slate-600 uppercase">{carrier}</span></div>
+                  <div className="text-center truncate"><span className="font-black text-[#1C1E59]">Nit:</span> <span className="text-slate-600">{items[0].nit}</span></div>
+                  <div className="text-right truncate"><span className="font-black text-[#1C1E59]">Lugar de entrega:</span> <span className="text-slate-600 uppercase">{items[0].locationName}</span></div>
+                </div>
+
+                {/* Tabla de Documentos */}
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-white border-b border-slate-200">
+                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase w-[30%]">Orden de compra</th>
+                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[20%]">Cantidad pedida</th>
+                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[20%]">Cantidad entregada</th>
+                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[30%]">Cantidad a entregar</th>
                     </tr>
-                    <tr className="border-b border-slate-200">
-                      <td colSpan={2}>
-                        <div className="grid grid-cols-3 bg-white py-2 px-4 gap-4">
-                          <div><span className="font-bold">Proveedor: </span>{carrier}</div>
-                          <div><span className="font-bold">Nit: </span>{items[0].nit}</div>
-                          <div><span className="font-bold">Lugar de entrega: </span>{items[0].locationName}</div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr className="bg-slate-50 font-bold text-slate-600 border-b border-slate-200">
-                      <td className="px-4 py-2 border-r w-1/3">Orden de compra</td>
-                      <td className="p-0">
-                        <div className="grid grid-cols-3 text-center">
-                          <div className="py-2 border-r">Cantidad pedida</div>
-                          <div className="py-2 border-r">Cantidad entregada</div>
-                          <div className="py-2">Cantidad a entregar</div>
-                        </div>
-                      </td>
-                    </tr>
+                  </thead>
+                  <tbody>
                     {items.map(apt => (
-                      <tr key={apt.id} className="border-b border-slate-200">
-                        <td className="px-4 py-3 border-r font-medium text-slate-800">{apt.id}</td>
-                        <td className="p-0">
-                          <div className="grid grid-cols-3 items-center text-center">
-                            <div className="py-3 border-r">{apt.quantityOrdered}</div>
-                            <div className="py-3 border-r">{apt.quantityDelivered}</div>
-                            <div className="px-2">
-                              <Input 
-                                type="number"
-                                className="h-7 text-right text-xs border-slate-300"
-                                value={quantities[apt.id]}
-                                onChange={(e) => setQuantities({...quantities, [apt.id]: Number(e.target.value)})}
-                              />
-                            </div>
+                      <tr key={apt.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50">
+                        <td className="px-4 py-2 text-[11px] font-bold text-[#1C1E59] uppercase">{apt.id}</td>
+                        <td className="px-4 py-2 text-[11px] font-medium text-slate-600 text-center">{apt.quantityOrdered}</td>
+                        <td className="px-4 py-2 text-[11px] font-medium text-slate-600 text-center">
+                          {apt.quantityDelivered} {/* Aquí ya se muestra el dato que no es cero */}
+                        </td>
+                        <td className="px-4 py-1.5">
+                          <div className="flex justify-center">
+                            <input 
+                              type="number"
+                              className="w-full max-w-[150px] h-7 text-right text-[11px] font-bold border border-slate-300 rounded-lg px-2 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
+                              value={quantities[apt.id]}
+                              onChange={(e) => setQuantities({...quantities, [apt.id]: Number(e.target.value)})}
+                            />
                           </div>
                         </td>
                       </tr>
                     ))}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="px-8 py-5 flex justify-center gap-4 bg-slate-50 border-t">
+        {/* FOOTER CON BOTONES ESTILO IMAGEN */}
+        <div className="px-8 py-4 flex justify-center gap-6 bg-white border-t border-slate-100">
           <Button 
-            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-bold px-10 h-10"
+            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-12 h-9 rounded-lg shadow-md transition-transform active:scale-95 uppercase text-xs tracking-wider"
             onClick={() => onContinue({ items: appointments, quantities })}
           >
             Confirmar
           </Button>
-          <Button variant="destructive" className="px-10 h-10" onClick={onClose}>Cancelar</Button>
+          <Button 
+            className="bg-[#EF4444] hover:bg-[#dc2626] text-white font-black px-12 h-9 rounded-lg shadow-md transition-transform active:scale-95 uppercase text-xs tracking-wider border-none"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
         </div>
       </div>
     </div>
@@ -688,259 +858,229 @@ function RequestAppointmentModal({
 }
 
 
-function CreateAppointmentModal({ appointment,  suggestedDock, onClose, onConfirm }: { appointment: Appointment, suggestedDock: string, onClose: () => void, onConfirm: (updatedData: Appointment) => void }) {
+function CreateAppointmentModal({ 
+  selectedItems, 
+  suggestedDock, 
+  onClose, 
+  onConfirm 
+}: { 
+  selectedItems: any[], 
+  suggestedDock: string, 
+  onClose: () => void, 
+  onConfirm: (updatedData: any) => void 
+}) {
+  const baseItem = selectedItems[0];
   
-  // Estados para controlar si estamos creando un registro nuevo (+)
+  // ESTADOS DE CREACIÓN (Restaurados de la versión anterior)
   const [isNewCarrier, setIsNewCarrier] = useState(false);
   const [isNewDriver, setIsNewDriver] = useState(false);
 
   const [formData, setFormData] = useState({
-    transportCompany: appointment.transportCompany || appointment.carrier || "",
-    // Campos nuevos para Transportista
-    carrierEmail: "",
-    carrierPhone: "",
-    carrierId: "",
-    
-    loadType: appointment.loadType || "A granel",
-    vehicleType: appointment.vehicleType || "Tipología de remolque 1",
-    loadDate: appointment.loadDate || "2026-01-28",
-    loadTime: appointment.loadTime || "12:00",
-    unloadDate: appointment.unloadDate || "2026-01-28",
-    unloadTime: appointment.unloadTime || "10:00",
-    
-    // Campos para Conductor
-    driver: appointment.driver || "",
-    driverId: appointment.driverId || "",
-    driverPhone: appointment.driverPhone || "",
-    driverEmail: appointment.driverEmail || "",
-    truckId: appointment.truckId || "", // Placa editable
-    comments: ""
+    appointmentId: "4006038", // Número de cita por defecto
+    transportCompany: baseItem.carrier || "",
+    loadType: "Bultos",
+    vehicleType: baseItem.vehicleType || "Turbo",
+    unloadTime: "gfssgs", // Tiempo descargue
+    estimatedTime: "1.5", // NUEVO: Tiempo estimado (decimal)
+    loadDate: baseItem.date || "2026-01-08",
+    loadTime: baseItem.time || "15:30",
+    driver: baseItem.driver || "",
+    driverId: baseItem.driverId || "",
+    driverPhone: baseItem.driverPhone || "",
+    truckId: baseItem.truckId === "---" ? "TRK-ANT-001" : baseItem.truckId,
+    comments: "fsdsdgs"
   });
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const inputClass = "h-9 text-xs border-slate-200 focus:border-orange-500 focus:ring-orange-500/20";
-  const labelClass = "font-semibold text-slate-600 text-[11px]";
+  // Estilos de la tabla tipo grid de la imagen
+  const labelClass = "text-[9px] font-black text-slate-500 uppercase pr-3 text-right bg-[#F8FAFC] border-r border-slate-200 w-40 shrink-0 flex items-center justify-end leading-tight";
+  const cellClass = "flex border-b border-slate-200 min-h-[36px]";
+  const inputClass = "flex-1 px-3 text-[11px] font-bold text-indigo-900 outline-none focus:bg-orange-50/30 uppercase";
+
+  const handleFinalCreate = () => {
+    onConfirm({
+      ...formData,
+      items: selectedItems,
+      suggestedDock,
+      status: "scheduled",
+      carrier: formData.transportCompany,
+      time: formData.loadTime
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[95vh]">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[95vh] border border-slate-300">
         
         {/* HEADER */}
-        <div className="flex items-center justify-between px-6 py-4 border-b">
-           <div className="flex items-center gap-3">
-              <div className="bg-indigo-50 p-2 rounded-lg border border-indigo-100">
-                <ClipboardList className="w-6 h-6 text-[#1C1E59]" />
-              </div>
-              <h3 className="text-lg font-bold text-[#1C1E59] uppercase tracking-tight">Solicitud de Citas</h3>
-           </div>
-           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
-              <X className="w-6 h-6" />
-           </button>
+        <div className="bg-white px-6 py-3 border-b flex justify-between items-center shrink-0">
+          <h3 className="text-base font-black text-slate-600 tracking-tighter w-full text-center uppercase italic">
+            Detalle de la Cita para Cargue
+          </h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
-           
-           {/* SECCIÓN: DETALLES DE LA CITA */}
-           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Detalles de la cita</h4>
+        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+          
+          {/* GRID DE FORMULARIO PRINCIPAL */}
+          <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+            <div className="grid grid-cols-2">
+              
+              {/* FILA 1 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Destino:</span>
+                <span className="flex-1 px-3 text-[10px] font-bold flex items-center text-slate-500">{baseItem.locationName}</span>
               </div>
-              <div className="grid grid-cols-2 gap-x-0">
-                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
-                    <span className={labelClass}>Destino</span>
-                    <span className="font-medium text-slate-900 text-xs">{appointment.locationName || "DICAL"}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
-                    <span className={labelClass}>ID de la cita</span>
-                    <span className="font-medium text-slate-400 text-xs">---</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
-                    <span className={labelClass}>Transportista de la cita</span>
-                    <span className="font-bold text-indigo-900 text-xs">SI</span>
-                 </div>
+              <div className={cellClass}>
+                <span className={labelClass}>Cita:</span>
+                <input className={cn(inputClass, "text-slate-400 italic font-normal")} value={formData.appointmentId} onChange={(e)=>handleChange('appointmentId', e.target.value)} />
+              </div>
 
-                 {/* TRANSPORTISTA (+) */}
-                 <div className="px-4 py-2 border-b border-slate-100 flex flex-col gap-2 bg-indigo-50/30">
-                    <div className="flex justify-between items-center">
-                        <span className={labelClass}>Transportista</span>
-                        <button 
-                            onClick={() => setIsNewCarrier(!isNewCarrier)}
-                            className={cn("p-1 rounded-md transition-colors", isNewCarrier ? "bg-orange-500 text-white" : "bg-white border border-slate-200 text-orange-500 hover:bg-orange-50")}
-                        >
-                            <Plus className="w-4 h-4" />
-                        </button>
+              {/* FILA 2 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Cita para transportista:</span>
+                <div className="flex-1 px-3 flex items-center">
+                  <input type="checkbox" checked className="w-4 h-4 accent-blue-600 cursor-pointer" />
+                </div>
+              </div>
+              <div className={cellClass}>
+                <span className={labelClass}>Transportista:<span className="text-red-500 ml-0.5">*</span></span>
+                <div className="flex-1 flex items-center pr-2">
+                   <input className={inputClass} value={formData.transportCompany} onChange={(e)=>handleChange('transportCompany', e.target.value)} />
+                   <button onClick={() => setIsNewCarrier(!isNewCarrier)} className="text-orange-500 p-1 hover:bg-orange-50 rounded">
+                     <Plus size={16} strokeWidth={3} />
+                   </button>
+                </div>
+              </div>
+
+              {/* FILA 3 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Tipo de cargue:<span className="text-red-500 ml-0.5">*</span></span>
+                <select className={cn(inputClass, "bg-transparent")} value={formData.loadType} onChange={(e)=>handleChange('loadType', e.target.value)}>
+                  <option>Bultos</option><option>Granel</option><option>Pallets</option>
+                </select>
+              </div>
+              <div className={cellClass}><span className={labelClass}></span></div>
+
+              {/* FILA 4 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Tipo de vehículo:<span className="text-red-500 ml-0.5">*</span></span>
+                <select className={cn(inputClass, "bg-transparent")} value={formData.vehicleType} onChange={(e)=>handleChange('vehicleType', e.target.value)}>
+                  <option>Turbo</option><option>Sencillo</option><option>Tractomula</option>
+                </select>
+              </div>
+              <div className={cellClass}>
+                <span className={labelClass}>Tiempo descargue:</span>
+                <input className={inputClass} value={formData.unloadTime} onChange={(e)=>handleChange('unloadTime', e.target.value)} />
+              </div>
+
+              {/* FILA 5 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Fecha de cita:<span className="text-red-500 ml-0.5">*</span></span>
+                <div className="flex-1 relative flex items-center">
+                  <input type="date" className={inputClass} value={formData.loadDate} onChange={(e)=>handleChange('loadDate', e.target.value)} />
+                </div>
+              </div>
+              <div className={cellClass}>
+                <span className={labelClass}>Hora de cita:<span className="text-red-500 ml-0.5">*</span></span>
+                <div className="flex-1 relative flex items-center">
+                  <input type="time" className={inputClass} value={formData.loadTime} onChange={(e)=>handleChange('loadTime', e.target.value)} />
+                </div>
+              </div>
+
+              {/* FILA 6: CONDUCTOR (MODO CREACIÓN) */}
+              <div className="col-span-2 flex border-b border-slate-200 min-h-[108px]">
+                 <div className={cn(labelClass, "min-h-[108px]")}>Conductor:</div>
+                 <div className="flex-1 flex flex-col">
+                    <div className="flex-1 flex border-b border-slate-100 items-center">
+                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Nombre completo:</span>
+                       <input className={inputClass} value={formData.driver} onChange={(e)=>handleChange('driver', e.target.value)} />
+                       <button onClick={() => setIsNewDriver(!isNewDriver)} className="text-orange-500 mx-2 p-1 hover:bg-orange-50 rounded">
+                         <Plus size={16} strokeWidth={3} />
+                       </button>
                     </div>
-                    {isNewCarrier ? (
-                        <div className="grid grid-cols-2 gap-2 pb-2">
-                            <Input placeholder="Razón Social" className={inputClass} value={formData.transportCompany} onChange={(e)=>handleChange('transportCompany', e.target.value)} />
-                            <Input placeholder="Identificación/ID" className={inputClass} value={formData.carrierId} onChange={(e)=>handleChange('carrierId', e.target.value)} />
-                            <Input placeholder="Correo" className={inputClass} value={formData.carrierEmail} onChange={(e)=>handleChange('carrierEmail', e.target.value)} />
-                            <Input placeholder="Teléfono" className={inputClass} value={formData.carrierPhone} onChange={(e)=>handleChange('carrierPhone', e.target.value)} />
-                        </div>
-                    ) : (
-                        <Input className={inputClass} value={formData.transportCompany} onChange={(e) => handleChange('transportCompany', e.target.value)} />
-                    )}
-                 </div>
-
-                 {/* TIPO DE CARGA (SELECT) */}
-                 <div className="px-4 py-2 border-b border-r border-slate-100 flex items-center justify-between">
-                    <span className={labelClass}>Tipo de carga</span>
-                    <div className="relative w-2/3">
-                        <select 
-                            className="w-full h-9 text-xs border border-slate-200 rounded-md px-3 appearance-none focus:border-orange-500 outline-none bg-white font-medium"
-                            value={formData.loadType}
-                            onChange={(e) => handleChange('loadType', e.target.value)}
-                        >
-                            <option value="pallet">Pallet</option>
-                            <option value="A granel">A granel</option>
-                            <option value="arrume">Arrume</option>
-                        </select>
-                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <div className="flex-1 flex border-b border-slate-100 items-center">
+                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Cédula:</span>
+                       <input className={inputClass} value={formData.driverId} onChange={(e)=>handleChange('driverId', e.target.value)} />
+                       <button className="text-orange-500 mx-2 p-1 opacity-100"><Plus size={16} strokeWidth={3} /></button>
                     </div>
-                 </div>
-
-                 {/* VEHÍCULO (SELECT) */}
-                 <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-                    <span className={labelClass}>Vehículo</span>
-                    <div className="relative w-2/3">
-                        <select 
-                            className="w-full h-9 text-xs border border-slate-200 rounded-md px-3 appearance-none focus:border-orange-500 outline-none bg-white font-medium"
-                            value={formData.vehicleType}
-                            onChange={(e) => handleChange('vehicleType', e.target.value)}
-                        >
-                            <option value="Tipología de remolque 1">Tipología de remolque 1</option>
-                            <option value="Tipología de remolque 2">Tipología de remolque 2</option>
-                            <option value="Camión Sencillo">Camión Sencillo</option>
-                            <option value="Turbo">Turbo</option>
-                        </select>
-                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    <div className="flex-1 flex items-center">
+                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Celular:</span>
+                       <input className={inputClass} value={formData.driverPhone} onChange={(e)=>handleChange('driverPhone', e.target.value)} />
+                       <div className="w-10"></div>
                     </div>
-                 </div>
-
-                 {/* FECHAS Y HORAS */}
-                 <div className="px-4 py-2 border-b border-r border-slate-100 flex items-center justify-between">
-                    <span className={labelClass}>Fecha inicio de la cita</span>
-                    <Input type="date" className="w-2/3 h-9 text-xs" value={formData.loadDate} onChange={(e) => handleChange('loadDate', e.target.value)} />
-                 </div>
-                 <div className="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
-                    <span className={labelClass}>Hora inicio de la cita</span>
-                    <Input type="time" className="w-2/3 h-9 text-xs" value={formData.loadTime} onChange={(e) => handleChange('loadTime', e.target.value)} />
-                 </div>
-                 <div className="px-4 py-2 border-r border-slate-100 flex items-center justify-between">
-                    <span className={labelClass}>Fecha termino de la cita</span>
-                    <Input type="date" className="w-2/3 h-9 text-xs" value={formData.unloadDate} onChange={(e) => handleChange('unloadDate', e.target.value)} />
-                 </div>
-                 <div className="px-4 py-2 flex items-center justify-between">
-                    <span className={labelClass}>Hora termino de la cita</span>
-                    <Input type="time" className="w-2/3 h-9 text-xs" value={formData.unloadTime} onChange={(e) => handleChange('unloadTime', e.target.value)} />
                  </div>
               </div>
-           </div>
 
-           {/* SECCIÓN: CONDUCTOR */}
-           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Conductor</h4>
+              {/* FILA 7 */}
+              <div className={cellClass}>
+                <span className={labelClass}>Placas:</span>
+                <input className={cn(inputClass, "tracking-widest font-black")} value={formData.truckId} onChange={(e)=>handleChange('truckId', e.target.value)} />
               </div>
-              <div className="grid grid-cols-2">
-                 {/* NOMBRE CONDUCTOR (+) */}
-                 <div className="px-4 py-3 border-b border-r border-slate-100 flex flex-col gap-2 bg-indigo-50/30">
-                    <div className="flex justify-between items-center">
-                        <span className={labelClass}>Nombre del conductor</span>
-                        <button 
-                            onClick={() => setIsNewDriver(!isNewDriver)}
-                            className={cn("p-1 rounded-md transition-colors", isNewDriver ? "bg-orange-500 text-white" : "bg-white border border-slate-200 text-orange-500 hover:bg-orange-50")}
-                        >
-                            <Plus className="w-4 h-4" />
-                        </button>
-                    </div>
-                    {isNewDriver ? (
-                        <div className="grid grid-cols-1 gap-2">
-                            <Input placeholder="Nombre Completo" className={inputClass} value={formData.driver} onChange={(e)=>handleChange('driver', e.target.value)} />
-                            <div className="grid grid-cols-2 gap-2">
-                                <Input placeholder="Teléfono" className={inputClass} value={formData.driverPhone} onChange={(e)=>handleChange('driverPhone', e.target.value)} />
-                                <Input placeholder="Correo" className={inputClass} value={formData.driverEmail} onChange={(e)=>handleChange('driverEmail', e.target.value)} />
-                            </div>
-                        </div>
-                    ) : (
-                        <Input className={inputClass} value={formData.driver} onChange={(e) => handleChange('driver', e.target.value)} />
-                    )}
-                 </div>
-
-                 {/* DOCUMENTO CONDUCTOR (+) */}
-                 <div className="px-4 py-3 border-b border-slate-100 flex flex-col justify-center">
-                    <div className="flex justify-between items-center mb-1">
-                        <span className={labelClass}>Documento del conductor</span>
-                        <Plus className="w-4 h-4 text-orange-500 cursor-pointer" />
-                    </div>
-                    <Input className={inputClass} value={formData.driverId} onChange={(e) => handleChange('driverId', e.target.value)} />
-                 </div>
-
-                 <div className="px-4 py-3 border-b border-r border-slate-100 flex justify-between items-center">
-                    <span className={labelClass}>Teléfono del conductor</span>
-                    <span className="text-xs font-medium text-slate-600">{formData.driverPhone || '---'}</span>
-                 </div>
-                 <div className="px-4 py-3 border-b border-slate-100 flex justify-between items-center">
-                    <span className={labelClass}>Correo electrónico</span>
-                    <span className="text-xs font-medium text-slate-600">{formData.driverEmail || '---'}</span>
-                 </div>
-
-                 {/* PLACA (INPUT EDITABLE) */}
-                 <div className="px-4 py-3 border-r border-slate-100 col-span-2 flex items-center gap-10">
-                    <span className={labelClass}>Placa del vehículo</span>
-                    <Input 
-                        className="w-40 h-9 text-xs font-bold uppercase tracking-widest border-orange-200 bg-orange-50/20" 
-                        value={formData.truckId} 
-                        onChange={(e) => handleChange('truckId', e.target.value)} 
-                    />
-                 </div>
+              <div className={cellClass}>
+                <span className={labelClass}>Tiempo estimado:</span>
+                <input 
+                  type="number" 
+                  step="0.1" 
+                  className={cn(inputClass, "text-orange-600")} 
+                  value={formData.estimatedTime} 
+                  onChange={(e)=>handleChange('estimatedTime', e.target.value)} 
+                  placeholder="0.0"
+                />
               </div>
-           </div>
 
-           {/* SECCIÓN: COMENTARIOS */}
-           <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              <div className="bg-slate-50/80 px-4 py-2 border-b border-slate-200 text-center">
-                 <h4 className="text-xs font-bold text-indigo-900 uppercase">Comentarios</h4>
+              {/* FILA 8 */}
+              <div className="col-span-2 flex min-h-[50px]">
+                <span className={cn(labelClass, "min-h-[50px]")}>Comentario:</span>
+                <textarea className="flex-1 p-2 text-[11px] font-medium outline-none resize-none uppercase" value={formData.comments} onChange={(e)=>handleChange('comments', e.target.value)} />
               </div>
-              <div className="p-4 space-y-4">
-                 <div className="flex gap-4">
-                    <span className={cn(labelClass, "w-32 pt-2")}>Escribe comentarios</span>
-                    <textarea 
-                       className="flex-1 border border-slate-200 rounded-lg p-3 text-slate-600 text-xs focus:outline-none focus:border-orange-400 placeholder:text-slate-300 min-h-[80px]"
-                       placeholder="Añadir observaciones aquí..."
-                       value={formData.comments}
-                       onChange={(e) => handleChange('comments', e.target.value)}
-                    />
-                 </div>
-                 <div className="flex justify-between items-center px-4 py-2 bg-slate-50 rounded-lg border border-slate-100">
-                    <div className="flex gap-2 items-center text-xs">
-                        <span className="font-bold text-slate-500 uppercase">Muelle Sugerido:</span> 
-                        {/* Antes tenías un 2 fijo, ahora usa la prop */}
-                        <span className="bg-indigo-900 text-white px-2 py-0.5 rounded text-[10px]">
-                          {suggestedDock} 
-                        </span>
-                    </div>
-                    <div className="flex gap-2 items-center text-xs">
-                        <span className="font-bold text-slate-500 uppercase">Cantidad:</span> 
-                        <span className="font-bold text-orange-600">{appointment.quantityOrdered || 0}</span>
-                    </div>
-                  </div>
+            </div>
+          </div>
+
+          <p className="text-[10px] text-red-500 font-bold">* Campos obligatorios.</p>
+
+          {/* LISTA DE DOCUMENTOS (DISEÑO IGUAL A LA IMAGEN) */}
+          <div className="space-y-3">
+            {selectedItems.map((doc) => (
+              <div key={doc.id} className="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+                <div className="flex bg-[#F8FAFC] border-b border-slate-200 text-[10px] font-bold">
+                  <div className="p-2 border-r border-slate-200 uppercase w-32 text-slate-500">Documento:</div>
+                  <div className="p-2 flex-1 text-blue-700 uppercase">{doc.id}</div>
+                  <div className="p-2 border-l border-slate-200 uppercase w-40 text-slate-500">Muelle sugerido:</div>
+                  <div className="p-2 bg-[#1C1E59] text-white text-center w-12 font-black">{suggestedDock}</div>
+                </div>
+                <div className="grid grid-cols-3 bg-white text-[9px] font-black text-slate-400 uppercase border-b border-slate-100">
+                  <div className="p-1.5 px-3">Artículo</div>
+                  <div className="p-1.5 px-3">Cantidad a entregar</div>
+                  <div className="p-1.5 px-3">Producto</div>
+                </div>
+                <div className="grid grid-cols-3 bg-white text-[11px] font-bold text-slate-700">
+                  <div className="p-2 px-3">{doc.codigoArticulo || "001"}</div>
+                  <div className="p-2 px-3 text-orange-600 font-black">{doc.quantityToDeliver || doc.quantityOrdered}</div>
+                  <div className="p-2 px-3 text-slate-400">{doc.product}</div>
+                </div>
               </div>
-           </div>
+            ))}
+          </div>
         </div>
 
         {/* FOOTER ACCIONES */}
-        <div className="px-8 py-5 flex items-center gap-4 bg-white border-t">
-           <Button className="bg-orange-500 hover:bg-orange-600 text-white font-black text-xs px-10 h-11 rounded-xl shadow-lg shadow-orange-500/20" 
-             onClick={() => onConfirm({ ...appointment, ...formData })}>
-             CREAR CITA
-           </Button>
-           <button className="text-orange-500 font-bold text-xs hover:underline uppercase" onClick={onClose}>
-             Atrás
-           </button>
+        <div className="px-8 py-5 flex justify-center gap-6 bg-white border-t shrink-0">
+          <Button 
+            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-16 h-10 rounded-xl uppercase text-xs shadow-lg shadow-orange-200 transition-transform active:scale-95"
+            onClick={handleFinalCreate}
+          >
+            Confirmar
+          </Button>
+          <Button 
+            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-16 h-10 rounded-xl uppercase text-xs shadow-lg shadow-orange-200 transition-transform active:scale-95"
+            onClick={onClose}
+          >
+            Cancelar
+          </Button>
         </div>
       </div>
     </div>
@@ -1595,35 +1735,54 @@ const filteredAppointments = useMemo(() => {
      <div className={isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-1 gap-2 overflow-hidden"}>
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
 
-      {requestModalAppointments && (
-        <RequestAppointmentModal 
-          appointments={requestModalAppointments} 
-          onClose={() => setRequestModalAppointments(null)} 
-          onContinue={(data) => { setCreateModalAppointment(data.items[0]); setRequestModalAppointments(null); }} 
-        />
-      )}
+    {requestModalAppointments && (
+  <RequestAppointmentModal 
+    appointments={requestModalAppointments} 
+    onClose={() => setRequestModalAppointments(null)} 
+    onContinue={(data) => { 
+        // Preparamos los items con sus nuevas cantidades
+        const itemsWithQuantities = data.items.map((item: any) => ({
+          ...item,
+          quantityToDeliver: data.quantities[item.id]
+        }));
+        
+        setCreateModalAppointment(itemsWithQuantities); // Pasamos el array al siguiente modal
+        setRequestModalAppointments(null); 
+    }} 
+  />
+)}
 
-  {createModalAppointment && (
-        <CreateAppointmentModal 
-          appointment={createModalAppointment} 
-          suggestedDock={suggestedDockDisplay} 
-          onClose={() => {
-            setCreateModalAppointment(null);
-            setTargetDockIdAfterModal(null);
-          }} 
-          onConfirm={(finalData) => { 
-              const targetDockId = targetDockIdAfterModal || "dock-1a-1"; 
-              setAllDocksState(prev => prev.map(dock => 
-                dock.id === targetDockId 
-                  ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: { ...finalData, status: "scheduled", time: finalData.loadTime || "10:00" } } 
-                  : dock
-              ));
-              setAllAppointmentsState(prev => prev.filter(a => a.id !== finalData.id));
-              setCreateModalAppointment(null); 
-              setTargetDockIdAfterModal(null);
-          }} 
-        />
-      )}
+
+ {createModalAppointment && (
+  <CreateAppointmentModal 
+    // PASO CLAVE: Ahora pasamos el array completo de items seleccionados
+    // Si vino de un drop, 'createModalAppointment' es un array de 1 item.
+    // Si vino de selección múltiple, ya es un array.
+    selectedItems={Array.isArray(createModalAppointment) ? createModalAppointment : [createModalAppointment]} 
+    suggestedDock={suggestedDockDisplay} 
+    onClose={() => {
+      setCreateModalAppointment(null);
+      setTargetDockIdAfterModal(null);
+    }} 
+    onConfirm={(finalAppointment) => { 
+        const targetDockId = targetDockIdAfterModal || "dock-1a-1"; 
+        
+        setAllDocksState(prev => prev.map(dock => 
+          dock.id === targetDockId 
+            ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: finalAppointment } 
+            : dock
+        ));
+
+        // Filtramos para quitar todos los documentos seleccionados de la lista lateral
+        const idsToRemove = finalAppointment.items.map((item: any) => item.id);
+        setAllAppointmentsState(prev => prev.filter(a => !idsToRemove.includes(a.id)));
+        
+        setCreateModalAppointment(null); 
+        setTargetDockIdAfterModal(null);
+        setSelectedAptIds([]);
+    }} 
+  />
+)}
 
        <div className={cn("h-full flex gap-2 p-1 bg-[#f8fafc] overflow-hidden transition-all duration-500", isExpanded && "fixed inset-0 z-50 bg-white")}>
       {/* PANEL IZQUIERDO (DOCUMENTOS) */}
