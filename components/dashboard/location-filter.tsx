@@ -1321,20 +1321,39 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
   const opcion = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
   const isEntryOrExit = registroId === "entrada" || registroId === "salida";
 
-  // ESTADOS DEL FLUJO
-  // 'form'             -> Input manual inicial
-  // 'scanner'          -> Escáner principal (Cita/Registro)
-  // 'result'           -> Vista de datos cargados
-  // 'tracking-scanner' -> NUEVO: Escáner secundario para códigos de seguimiento
   const [step, setStep] = useState<'form' | 'scanner' | 'result' | 'tracking-scanner'>('form');
-  
   const [codigo, setCodigo] = useState("");
   const [trackingCodes, setTrackingCodes] = useState<string[]>([]);
   const [newTrackingInput, setNewTrackingInput] = useState("");
 
-  // --- ACCIONES ---
+  // --- NUEVA LÓGICA: AUTO-DETECCIÓN ---
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
 
-  // 1. Ir a resultados desde el formulario manual
+    if (step === 'scanner' || step === 'tracking-scanner') {
+      // Simulamos que el hardware del escáner tarda 2.5 segundos en enfocar y leer
+      timer = setTimeout(() => {
+        handleScannerDetection();
+      }, 2500);
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [step]); // Se dispara cada vez que el "step" cambie a un modo de escaneo
+
+  const handleScannerDetection = () => {
+    if (step === 'scanner') {
+      setCodigo("QR-8821-AUTO"); 
+      setTrackingCodes(["PKG-7721", "PKG-9902"]);
+      setStep('result');
+    } else if (step === 'tracking-scanner') {
+      const newCode = `PKG-${Math.floor(Math.random() * 9000) + 1000}`;
+      setTrackingCodes(prev => [...prev, newCode]);
+      setStep('result');
+    }
+  };
+
   const handleSubmitManual = () => {
     if (!codigo) return;
     if (codigo === "3381589" || codigo.length > 3) {
@@ -1343,7 +1362,6 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     setStep('result');
   };
 
-  // 2. Agregar código manual con el botón (+) o Enter
   const handleManualAddTracking = () => {
     if (newTrackingInput.trim() !== "" && trackingCodes.length < 50) {
       setTrackingCodes([...trackingCodes, newTrackingInput.trim().toUpperCase()]);
@@ -1351,42 +1369,22 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     }
   };
 
-  // 3. Simular detección del escáner (Maneja ambos casos)
-  const handleScannerDetection = () => {
-    if (step === 'scanner') {
-        // Lógica escáner principal
-        setCodigo("QR-DETECTED-8821"); 
-        setTrackingCodes(["AUTO-QR-1", "AUTO-QR-2"]);
-        setStep('result');
-    } else {
-        // Lógica escáner secundario (Tracking)
-        const newCode = `PKG-${Math.floor(Math.random() * 9000) + 1000}`;
-        setTrackingCodes(prev => [...prev, newCode]);
-        setStep('result'); // Volver a resultados
-    }
-  };
-
-  // --- VISTA 1: FORMULARIO INICIAL ---
+  // --- VISTAS ---
   if (step === 'form') {
     return (
       <div className="flex flex-col h-full w-full bg-[#F2F6FA] items-center justify-center relative p-6 animate-in fade-in zoom-in-95 duration-300">
         <DialogPrimitive.Close className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
           <X size={24} strokeWidth={2.5} />
         </DialogPrimitive.Close>
-
         <div className="mb-8 p-4 bg-white rounded-3xl shadow-lg shadow-gray-200/50">
            <ArrowRight className="text-[#4CCAC8]" size={32} strokeWidth={3} />
         </div>
-
         <h2 className="text-[#050038] font-black text-2xl uppercase tracking-tighter mb-10 text-center">
           {opcion.label}
         </h2>
-
         <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-xl shadow-slate-200/60 p-10 flex flex-col gap-6">
            <div className="space-y-2">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">
-                Número de Cita / Código
-              </label>
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] ml-1">Número de Cita / Código</label>
               <Input 
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value)}
@@ -1395,28 +1393,13 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmitManual()}
               />
            </div>
-
-           <Button 
-             onClick={handleSubmitManual}
-             disabled={!codigo}
-             className={cn(
-               "h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all",
-               codigo 
-                ? "bg-[#050038] hover:bg-[#1C1E59] text-white shadow-xl shadow-blue-900/20" 
-                : "bg-gray-100 text-gray-300 cursor-not-allowed"
-             )}
-           >
+           <Button onClick={handleSubmitManual} disabled={!codigo} className={cn("h-14 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all", codigo ? "bg-[#050038] hover:bg-[#1C1E59] text-white shadow-xl" : "bg-gray-100 text-gray-300 cursor-not-allowed")}>
              Aceptar Registro
            </Button>
         </div>
-
         <div className="mt-12 text-center space-y-4">
            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">¿Tienes un código QR?</p>
-           <Button 
-             variant="outline"
-             onClick={() => setStep('scanner')}
-             className="h-12 px-8 rounded-2xl border-orange-100 bg-white text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white hover:border-[#ff6b00] font-black text-[10px] uppercase tracking-widest gap-3 shadow-lg shadow-orange-100/50 transition-all"
-           >
+           <Button variant="outline" onClick={() => setStep('scanner')} className="h-12 px-8 rounded-2xl border-orange-100 bg-white text-[#ff6b00] hover:bg-[#ff6b00] hover:text-white font-black text-[10px] uppercase tracking-widest gap-3 shadow-lg transition-all">
              <QrCode size={18} /> Escanear QR
            </Button>
         </div>
@@ -1424,90 +1407,84 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     );
   }
 
-  // --- VISTA 2: ESCÁNER (Reutilizable para Principal y Tracking) ---
   if (step === 'scanner' || step === 'tracking-scanner') {
     const isTracking = step === 'tracking-scanner';
     return (
       <div className="flex flex-col h-full w-full bg-[#050038] items-center justify-center p-6 animate-in fade-in duration-300 relative">
-        <button 
-            onClick={() => setStep(isTracking ? 'result' : 'form')} 
-            className="absolute top-6 right-6 text-white/50 hover:text-white"
-        >
-          <X size={24} />
-        </button>
+        <button onClick={() => setStep(isTracking ? 'result' : 'form')} className="absolute top-6 right-6 text-white/50 hover:text-white"><X size={24} /></button>
+        
+        <div className="text-center mb-12 space-y-2">
+            <h3 className="text-white font-black text-2xl italic uppercase tracking-tighter">
+              {isTracking ? "Vinculando Paquete" : "Lector Inteligente"}
+            </h3>
+            <p className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
+               Buscando código encriptado...
+            </p>
+        </div>
 
-        <h3 className="text-white font-black text-xl italic uppercase tracking-tighter mb-12 text-center">
-          {isTracking ? "Añadir Paquete" : "Escaneando Código"}<br/>
-          <span className="text-[#ff6b00] text-sm not-italic font-bold tracking-widest">
-             {isTracking ? "Escanee el código de la guía" : "Enfoque el QR del conductor"}
-          </span>
-        </h3>
-
-        <div className="relative w-full max-w-[320px] aspect-square bg-black/40 rounded-[3rem] border-2 border-white/10 flex items-center justify-center overflow-hidden shadow-2xl">
+        {/* ÁREA DE ESCANEO */}
+        <div className="relative w-full max-w-[320px] aspect-square bg-black/20 rounded-[3rem] border-2 border-white/5 flex items-center justify-center overflow-hidden shadow-2xl">
+            {/* Esquinas de enfoque */}
             <div className="absolute top-8 left-8 w-12 h-12 border-t-[6px] border-l-[6px] border-[#ff6b00] rounded-tl-2xl" />
             <div className="absolute top-8 right-8 w-12 h-12 border-t-[6px] border-r-[6px] border-[#ff6b00] rounded-tr-2xl" />
             <div className="absolute bottom-8 left-8 w-12 h-12 border-b-[6px] border-l-[6px] border-[#ff6b00] rounded-bl-2xl" />
             <div className="absolute bottom-8 right-8 w-12 h-12 border-b-[6px] border-r-[6px] border-[#ff6b00] rounded-br-2xl" />
-            <div className="absolute left-0 w-full h-0.5 bg-[#ff6b00] shadow-[0_0_20px_4px_#ff6b00] animate-scan-loop z-10" />
-            <QrCode size={100} className="text-white/5" />
+            
+            {/* Línea de escaneo animada */}
+            <div className="absolute left-0 w-full h-1 bg-[#ff6b00] shadow-[0_0_30px_6px_#ff6b00] animate-scan-loop z-10" />
+            
+            <QrCode size={120} className="text-white/5" />
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 w-full max-w-xs">
-           <Button 
-             variant="ghost" 
-             onClick={() => setStep(isTracking ? 'result' : 'form')} 
-             className="text-white/40 hover:text-white hover:bg-white/10 font-black uppercase text-[10px] tracking-widest h-12 rounded-xl"
-           >
-             Cancelar Escaneo
-           </Button>
-           
-           <Button 
-             onClick={handleScannerDetection}
-             className="bg-white/5 text-white/20 hover:bg-white/10 hover:text-white text-[9px] h-8 rounded-lg"
-           >
-             [ Simular Detección ]
-           </Button>
+        <div className="mt-16 text-center">
+            <p className="text-white/30 text-[9px] font-bold uppercase tracking-widest italic">
+              Mantenga el código dentro del recuadro
+            </p>
+            <Button 
+                variant="ghost" 
+                onClick={() => setStep(isTracking ? 'result' : 'form')} 
+                className="mt-8 text-red-400 hover:text-red-300 hover:bg-white/5 font-black uppercase text-[10px] tracking-widest"
+            >
+                Cancelar Operación
+            </Button>
         </div>
       </div>
     );
   }
 
-  // --- VISTA 3: RESULTADOS (Data View) ---
+  // --- VISTA 3: RESULTADOS (Igual que antes pero limpia) ---
   return (
     <div className="flex flex-col h-full w-full bg-slate-50/50 overflow-hidden animate-in slide-in-from-right duration-300">
         <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-md z-10">
            <div className="flex items-center gap-3">
              <CheckCircle2 className="text-[#4CCAC8]" size={20} />
-             <h2 className="text-sm font-bold text-white uppercase tracking-tight">Registro Exitoso</h2>
+             <h2 className="text-sm font-bold text-white uppercase tracking-tight">Carga de Datos Finalizada</h2>
            </div>
            <DialogPrimitive.Close className="text-white/40 hover:text-white"><X size={20} /></DialogPrimitive.Close>
         </div>
 
-        {/* PADDING REDUCIDO EN EL CONTENEDOR PRINCIPAL (p-4 en lugar de p-6) */}
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-          <div className="max-w-2xl mx-auto space-y-4"> {/* SPACE-Y REDUCIDO DE 6 A 4 */}
-            
+          <div className="max-w-2xl mx-auto space-y-4">
             <div className="bg-white rounded-[2rem] p-5 border border-gray-100 flex flex-col items-center shadow-sm text-center">
                 <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-2 border border-emerald-100">
                     <Check className="text-emerald-500" size={24} strokeWidth={3} />
                 </div>
                 <h3 className="font-black text-base text-[#1C1E59] uppercase italic tracking-tight">
-                  {opcion.label} Completado
+                  {opcion.label} Registrado
                 </h3>
             </div>
 
             <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
                 <div className="px-6 py-3 border-b border-gray-50 flex items-center gap-3 bg-slate-50/30">
                     <CalendarIcon size={16} className="text-[#1C1E59]" />
-                    <span className="font-black text-[#1C1E59] text-[10px] uppercase italic">Detalles Operativos</span>
+                    <span className="font-black text-[#1C1E59] text-[10px] uppercase italic">Información Validada</span>
                 </div>
-                {/* PADDING INTERNO REDUCIDO (p-5 en lugar de p-8) */}
                 <div className="p-5 space-y-3">
                     {[
-                        { icon: Hash, label: "ID Referencia", val: codigo || "MANUAL-INPUT" },
-                        { icon: CalendarIcon, label: "Fecha Registro", val: "29 ENE 2026 - 16:20" },
-                        { icon: Truck, label: "Vehículo", val: "TURBO (4.5 TON)" },
-                        { icon: Building2, label: "Muelle Asignado", val: "MUELLE NORTE A-01" }
+                        { icon: Hash, label: "Código Leído", val: codigo || "AUTO-SCAN" },
+                        { icon: CalendarIcon, label: "Timestamp", val: "29 ENE 2026 - 16:45" },
+                        { icon: Truck, label: "Unidad", val: "SCANIA R450" },
+                        { icon: Building2, label: "Zona de Patio", val: "PUNTO DE ACCESO A" }
                     ].map((row, i) => (
                         <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-2 last:border-0 last:pb-0">
                             <div className="flex items-center gap-3">
@@ -1520,38 +1497,33 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
                 </div>
             </div>
 
-            {/* SECCIÓN CÓDIGOS DE SEGUIMIENTO COMPACTA */}
             {isEntryOrExit && (
               <div className="bg-white rounded-[2.5rem] border border-orange-100 shadow-xl shadow-orange-900/5 overflow-hidden">
                   <div className="px-6 py-3 border-b border-orange-50 flex items-center justify-between bg-orange-50/30">
                       <div className="flex items-center gap-3">
                         <Hash size={16} className="text-[#ff6b00]" />
-                        <span className="font-black text-[#ff6b00] text-[10px] uppercase italic">Códigos de Seguimiento</span>
+                        <span className="font-black text-[#ff6b00] text-[10px] uppercase italic">Guías Escaneadas</span>
                       </div>
                   </div>
                   
                   <div className="p-5 space-y-4">
-                    {/* INPUT CON BOTÓN QR MODIFICADO */}
                     <div className="flex gap-2 items-center">
                         <div className="relative flex-1">
                             <Input 
-                              placeholder="Vincular paquete adicional..." 
+                              placeholder="Escanear o escribir guía..." 
                               value={newTrackingInput}
                               onChange={(e) => setNewTrackingInput(e.target.value)}
                               className="h-11 rounded-xl bg-slate-50 border-gray-100 text-[10px] font-bold pr-12"
                               onKeyDown={(e) => e.key === 'Enter' && handleManualAddTracking()}
                             />
-                            {/* BOTÓN QR ESTILO REFERENCE */}
                             <button 
-                              onClick={() => setStep('tracking-scanner')} // ABRE EL ESCANER
+                              onClick={() => setStep('tracking-scanner')}
                               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center bg-orange-100 text-[#ff6b00] hover:bg-orange-200 rounded-lg transition-colors"
-                              title="Escanear paquete"
                             >
                               <QrCode size={16} strokeWidth={2.5} />
                             </button>
                         </div>
-
-                        <Button onClick={handleManualAddTracking} className="h-11 w-11 bg-[#1C1E59] hover:bg-[#151744] rounded-xl shrink-0 shadow-lg shadow-blue-900/20">
+                        <Button onClick={handleManualAddTracking} className="h-11 w-11 bg-[#1C1E59] hover:bg-[#151744] rounded-xl shrink-0">
                            <Plus size={20} />
                         </Button>
                     </div>
@@ -1565,9 +1537,6 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
                               </button>
                           </div>
                         ))}
-                        {trackingCodes.length === 0 && (
-                           <span className="text-[9px] text-gray-400 font-medium italic pl-1">Sin códigos vinculados</span>
-                        )}
                     </div>
                   </div>
               </div>
@@ -1578,11 +1547,11 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
         <div className="p-4 bg-white border-t border-gray-100 shrink-0">
           <div className="max-w-2xl mx-auto grid grid-cols-2 gap-3">
               <Button onClick={() => { setStep('form'); setCodigo(""); setTrackingCodes([]); }} className="h-14 bg-gray-100 hover:bg-gray-200 text-[#1C1E59] font-black rounded-2xl gap-2 text-[10px] tracking-widest">
-                  <RefreshCw size={16} /> NUEVO REGISTRO
+                  <RefreshCw size={16} /> REINICIAR
               </Button>
               <DialogPrimitive.Close asChild>
                 <Button className="h-14 bg-[#ff6b00] hover:bg-[#e66000] text-white font-black rounded-2xl gap-2 text-[10px] tracking-widest shadow-xl shadow-orange-100">
-                    <CheckCircle2 size={16} /> FINALIZAR PROCESO
+                    <CheckCircle2 size={16} /> CONFIRMAR Y FINALIZAR
                 </Button>
               </DialogPrimitive.Close>
           </div>
@@ -1590,6 +1559,9 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     </div>
   );
 }
+
+
+
 export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [selectedDockGroupId, setSelectedDockGroupId] = useState<string | null>(null);
