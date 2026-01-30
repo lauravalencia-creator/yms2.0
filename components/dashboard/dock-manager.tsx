@@ -94,6 +94,7 @@ export interface Appointment {
   route: string;
   priority: string;
   logisticProfile: string;
+  
 }
 
 export interface Dock {
@@ -457,6 +458,93 @@ const DocumentDetailView = ({ doc, onBack, onOpenRequest, onOpenTechnical }: any
   </div>
 );
 
+// --- COMPONENTE: CARD ESTILO MAESTRO DE DOCUMENTO (AJUSTADO: MÁS LARGO, MENOS ANCHO) ---
+const DocumentMaestroCard = ({ apt, isSelected, onSelect, onDragStart, onDragEnd }: any) => {
+  const DataEntry = ({ label, value, color = "text-slate-700" }: any) => (
+    <div className="flex flex-col min-w-0">
+      <span className="text-[7px] font-black text-orange-500 uppercase tracking-tighter leading-none mb-1.5">{label}</span>
+      <span className={cn("text-[10px] font-bold truncate leading-none", color)}>{value || '---'}</span>
+    </div>
+  );
+
+  return (
+    <div 
+      draggable 
+      onDragStart={(e) => onDragStart(e, apt.id)} 
+      onDragEnd={onDragEnd} 
+      className={cn(
+        "group relative bg-white border-2 rounded-xl transition-all duration-300 mb-4 cursor-pointer overflow-hidden",
+        isSelected ? "border-orange-500 shadow-xl bg-orange-50/5 scale-[1.01]" : "border-slate-100 hover:border-orange-200",
+        "active:cursor-grabbing" 
+      )}
+      onClick={() => onSelect(apt.id)}
+    >
+      <div className="bg-slate-50/80 px-4 py-2 border-b flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all", isSelected ? "bg-orange-500 border-orange-500" : "border-slate-300 bg-white")}>
+            {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
+          </div>
+          <span className="text-[11px] font-black text-[#1C1E59] uppercase">DOC: {apt.id}</span>
+        </div>
+        
+      </div>
+
+      {/* AUMENTÉ EL PADDING (p-5) Y EL GAP VERTICAL (gap-y-6) PARA HACERLA MÁS LARGA */}
+      <div className="p-5 border-l-[6px] border-orange-500 grid grid-cols-2 gap-x-4 gap-y-6 bg-white"> 
+        
+        {/* FILA 1 */}
+        <div className="col-span-2 grid grid-cols-2 gap-4 border-b border-slate-50 pb-4">
+           <DataEntry label="Producto" value={apt.product} />
+             <DataEntry label="Estado del documento" value="ACTIVO"  />
+        </div>
+
+        {/* COLUMNA IZQUIERDA */}
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+           <DataEntry label="Proveedor" value={apt.carrier} />
+            <DataEntry label="NIT Proveedor" value={apt.nit || '900.742.771-9'} />
+          </div>
+          <DataEntry label="Empresa" value={apt.descripcionCompany} color="text-slate-500" />
+          <DataEntry label="Tipo Mercancía" value={apt.tipoMercancia || 'GENERAL NO PERECEDERA'} />
+          <DataEntry label="Tipo de Cargue" value=" Agranel"  />
+       
+          <div className="grid grid-cols-2 gap-2">
+            <DataEntry label="Peso" value={`${apt.peso || '0'} KG`} />
+            <DataEntry label="Volumen" value="4.50 M³" />
+            <DataEntry label="Litros" value="500 lts" />
+            <DataEntry label="Unidad de Medida" value="Unidades (UND)" />
+          </div>
+          
+          
+        </div>
+
+        {/* COLUMNA DERECHA */}
+        <div className="space-y-4 border-l border-slate-50 pl-4">
+          <div className="grid grid-cols-2 gap-2">
+            <DataEntry label="Fecha de Inicio" value="500 lts" />
+            <DataEntry label="Fecha de Finalización" value="500 lts" />
+          </div>
+          <DataEntry label="Canal" value={apt.canal} color="text-[#1C1E59] " />
+          <DataEntry label="Operación" value={apt.operationType} />
+          <DataEntry label="SKU Artículo" value={apt.codigoArticulo || 'SKU-882910'} color="font-mono text-slate-600" />
+          
+          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 space-y-2 mt-1">
+            <div className="flex justify-between items-center">
+              <span className="text-[7px] font-black text-orange-500 uppercase">Pedida</span>
+              <span className="text-[11px] font-black text-[#1C1E59]">{apt.quantityOrdered}</span>
+            </div>
+            <div className="flex justify-between items-center pt-1 border-t border-slate-200">
+              <span className="text-[7px] font-black text-orange-600 uppercase">Recibida</span>
+              <span className="text-[11px] font-black text-orange-600">0</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
 function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick, isDragging }: any) {
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); if (dock.status !== "maintenance" && dock.occupancy < 100) onDragOver(); };
   const handleDrop = (e: React.DragEvent) => { e.preventDefault(); const appointmentId = e.dataTransfer.getData("appointmentId"); if (appointmentId && dock.status !== "maintenance" && dock.occupancy < 100) onDrop(appointmentId, dock.id); onDragLeave(); };
@@ -600,7 +688,7 @@ function RequestAppointmentModal({
 }
 
 
-function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointment: Appointment, onClose: () => void, onConfirm: (updatedData: Appointment) => void }) {
+function CreateAppointmentModal({ appointment,  suggestedDock, onClose, onConfirm }: { appointment: Appointment, suggestedDock: string, onClose: () => void, onConfirm: (updatedData: Appointment) => void }) {
   
   // Estados para controlar si estamos creando un registro nuevo (+)
   const [isNewCarrier, setIsNewCarrier] = useState(false);
@@ -830,13 +918,16 @@ function CreateAppointmentModal({ appointment, onClose, onConfirm }: { appointme
                  <div className="flex justify-between items-center px-4 py-2 bg-slate-50 rounded-lg border border-slate-100">
                     <div className="flex gap-2 items-center text-xs">
                         <span className="font-bold text-slate-500 uppercase">Muelle Sugerido:</span> 
-                        <span className="bg-indigo-900 text-white px-2 py-0.5 rounded text-[10px]">2</span>
+                        {/* Antes tenías un 2 fijo, ahora usa la prop */}
+                        <span className="bg-indigo-900 text-white px-2 py-0.5 rounded text-[10px]">
+                          {suggestedDock} 
+                        </span>
                     </div>
                     <div className="flex gap-2 items-center text-xs">
                         <span className="font-bold text-slate-500 uppercase">Cantidad:</span> 
-                        <span className="font-bold text-orange-600">{appointment.quantityOrdered || 10000}</span>
+                        <span className="font-bold text-orange-600">{appointment.quantityOrdered || 0}</span>
                     </div>
-                 </div>
+                  </div>
               </div>
            </div>
         </div>
@@ -1295,7 +1386,7 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
   const [allAppointmentsState, setAllAppointmentsState] = useState(pendingAppointments);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -1309,6 +1400,14 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
   const [createModalAppointment, setCreateModalAppointment] = useState<any>(null);
   const [selectedAptIds, setSelectedAptIds] = useState<string[]>([]);
   const [requestModalAppointments, setRequestModalAppointments] = useState<Appointment[] | null>(null);
+
+  const [isSelectionExpanded, setIsSelectionExpanded] = useState(false);
+  const [targetDockIdAfterModal, setTargetDockIdAfterModal] = useState<string | null>(null);
+   
+  const [isSearchOpen, setIsSearchOpen] = useState(false); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const isExpandedSidebar = searchQuery.length > 0 || selectedAptIds.length > 0 || isSearchOpen;
+ 
 
   // --- NUEVOS ESTADOS PARA FECHA Y FILTRO LOCAL ---
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -1437,14 +1536,23 @@ const filteredAppointments = useMemo(() => {
     });
   }, [filteredDocks, currentDate]);
 
+    // --- LÓGICA PARA EL NOMBRE DEL MUELLE SUGERIDO ---
+  const suggestedDockDisplay = useMemo(() => {
+    if (!targetDockIdAfterModal) return "2"; // Por defecto si no es arrastre
+    const dock = allDocksState.find(d => d.id === targetDockIdAfterModal);
+    if (!dock) return "2";
+    // Limpiamos el nombre para que quepa en el badge (ej: "Muelle A-03" -> "A-03")
+    return dock.name.replace("Muelle ", "");
+  }, [targetDockIdAfterModal, allDocksState]);
 
-  // --- HANDLERS ---
-  const handleDrop = (appointmentId: string, dockId: string) => {
+ const handleDrop = (appointmentId: string, dockId: string) => {
     const apt = allAppointmentsState.find((a) => a.id === appointmentId);
     if (!apt) return;
-    setAllDocksState(prev => prev.map(d => d.id === dockId ? { ...d, status: "occupied", occupancy: 100, currentAppointment: { ...apt, status: "in-progress", duration: 60 } } as any : d));
-    setAllAppointmentsState(prev => prev.filter(a => a.id !== appointmentId));
-    setDraggingId(null); setDropTargetId(null); setSelectedAppointment(null);
+
+    setTargetDockIdAfterModal(dockId); // Guardamos el ID del muelle soltado
+    setRequestModalAppointments([apt]); 
+    setDraggingId(null); 
+    setDropTargetId(null); 
   };
 
   const handleDockClick = (dockId: string) => { setHighlightedDockId(dockId); setViewMode("timeline"); setTimeFrame("day"); };
@@ -1483,7 +1591,8 @@ const filteredAppointments = useMemo(() => {
   );
 
   return (
-    <div className={isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-4 gap-3 overflow-hidden"}>
+    
+     <div className={isExpanded ? "fixed inset-0 z-50 bg-white overflow-y-auto" : "h-full flex flex-col p-1 gap-2 overflow-hidden"}>
       {editingAppointment && <AppointmentEditModal appointment={editingAppointment.apt} dockName={editingAppointment.dockName} currentDockId={editingAppointment.dockId} availableDocks={filteredDocks} onClose={() => setEditingAppointment(null)} onSave={handleSaveAppointment} onDelete={handleDeleteAppointment} />}
 
       {requestModalAppointments && (
@@ -1494,105 +1603,137 @@ const filteredAppointments = useMemo(() => {
         />
       )}
 
-      {createModalAppointment && (
+  {createModalAppointment && (
         <CreateAppointmentModal 
           appointment={createModalAppointment} 
-          onClose={() => setCreateModalAppointment(null)} 
+          suggestedDock={suggestedDockDisplay} 
+          onClose={() => {
+            setCreateModalAppointment(null);
+            setTargetDockIdAfterModal(null);
+          }} 
           onConfirm={(finalData) => { 
-              const targetDockId = "dock-1a-2";
-              setAllDocksState(prev => prev.map(dock => dock.id === targetDockId ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: { ...finalData, status: "scheduled", time: finalData.loadTime || "10:00" } } : dock));
-              setAllAppointmentsState(prev => prev.filter(a => !selectedAptIds.includes(a.id)));
-              setSelectedAptIds([]);
+              const targetDockId = targetDockIdAfterModal || "dock-1a-1"; 
+              setAllDocksState(prev => prev.map(dock => 
+                dock.id === targetDockId 
+                  ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: { ...finalData, status: "scheduled", time: finalData.loadTime || "10:00" } } 
+                  : dock
+              ));
+              setAllAppointmentsState(prev => prev.filter(a => a.id !== finalData.id));
               setCreateModalAppointment(null); 
-              setSelectedAppointment(null);
+              setTargetDockIdAfterModal(null);
           }} 
         />
       )}
 
-      <div className={cn("flex-1 flex gap-4 min-h-0", isExpanded && "p-4")}>
+       <div className={cn("h-full flex gap-2 p-1 bg-[#f8fafc] overflow-hidden transition-all duration-500", isExpanded && "fixed inset-0 z-50 bg-white")}>
       {/* PANEL IZQUIERDO (DOCUMENTOS) */}
-<div className="w-80 shrink-0 flex flex-col min-h-0 bg-white rounded-[1.5rem] border border-slate-200 shadow-xl overflow-hidden">
-  
-  {/* CABECERA */}
-  <div className="px-5 py-4 bg-[#1C1E59] flex items-center justify-between shrink-0">
-    <div className="flex items-center gap-2.5">
-      <div className="p-1.5 bg-orange-500/20 rounded-lg"><LayoutList className="w-4 h-4 text-orange-400" /></div>
-      <h2 className="text-white font-bold text-[11px] uppercase tracking-[0.1em]">Disponibilidad</h2>
-    </div>
-    <Badge className="bg-orange-500 text-white border-none text-[10px] font-black h-6 w-6 flex items-center justify-center rounded-full shadow-lg">
-      {filteredAppointments.length}
-    </Badge>
-  </div>
+        <div 
+          className={cn(
+            "shrink-0 flex flex-col bg-white rounded-[1.5rem] border border-slate-200 shadow-2xl transition-all duration-500 ease-in-out relative overflow-hidden",
+            // CAMBIO: Anchos reducidos (800->600 y 380->320)
+            isExpandedSidebar ? "w-[600px]" : "w-[320px]" 
+          )}
+        >
+          {/* HEADER NAVY INTEGRADO */}
+          <div className="bg-[#1C1E59] shrink-0">
+            {/* CAMBIO: Padding reducido en el header (py-5 -> py-3) */}
+            <div className="px-4 py-3 flex items-center justify-between gap-3">
+              
+              {/* Titulo */}
+              <div className={cn("flex items-center gap-3 transition-all duration-500", isSearchOpen ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100")}>
+                 <div className="p-1.5 bg-orange-500 text-white rounded-lg shadow-lg flex items-center justify-center">
+                    <LayoutList className="w-4 h-4" strokeWidth={2.5} />
+                 </div>
+                 <div className="whitespace-nowrap">
+                    <h2 className="text-white font-black text-base uppercase leading-none tracking-tighter">Disponibilidad</h2>
+                    <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5">Gestor de Documentos</p>
+                 </div>
+              </div>
 
-  {/* BUSCADOR */}
-  <div className="p-3 border-b border-slate-100 bg-slate-50/50">
-    <div className="relative group">
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-      <input 
-        type="text" 
-        placeholder="FILTRAR ÓRDENES / PROVEEDOR..." 
-        className="w-full pl-9 pr-4 py-2 text-[10px] font-black uppercase tracking-widest bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-orange-500/20 transition-all"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-    </div>
-  </div>
+              {/* Acciones */}
+              <div className={cn("flex items-center gap-2 transition-all duration-500", isSearchOpen ? "flex-1" : "w-auto")}>
+                <div className={cn("relative transition-all duration-500 ease-in-out", isSearchOpen ? "flex-1" : "w-8")}>
+                  {isSearchOpen ? (
+                    <div className="flex items-center gap-2 animate-in slide-in-from-right-4">
+                      <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={14} />
+                        <input 
+                          autoFocus
+                          type="text" 
+                          placeholder="FILTRAR..." 
+                          className="w-full pl-9 pr-8 py-2 bg-white/10 border border-white/10 rounded-lg text-[10px] font-black text-white placeholder:text-white/30 uppercase outline-none focus:bg-white/20 transition-all shadow-inner"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button 
+                          onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button variant="ghost" onClick={() => setIsSearchOpen(true)} className="h-8 w-8 rounded-lg bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all">
+                      <Search size={16} />
+                    </Button>
+                  )}
+                </div>
 
-  {/* BARRA DE SELECCIONADOS (Imagen 1 badge resumido) */}
-  {selectedAptIds.length > 0 && (
-    <div className="px-3 py-2 bg-[#050038] flex items-center justify-between animate-in slide-in-from-top-1">
-      <div className="flex items-center gap-2 overflow-hidden">
-        <span className="text-[8px] font-black text-orange-400 uppercase shrink-0">Sel ({selectedAptIds.length}):</span>
-        <div className="flex gap-1 overflow-x-auto no-scrollbar">
-          {selectedAptIds.map(id => (
-            <span key={id} className="text-[8px] font-bold text-white/70 whitespace-nowrap">#{id.slice(-4)}</span>
-          ))}
-        </div>
-      </div>
-      <Button 
-        size="sm" 
-        onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))}
-        className="bg-orange-500 hover:bg-orange-600 text-white text-[8px] font-black uppercase h-6 px-3 rounded-lg ml-2 shrink-0 shadow-lg shadow-orange-500/20"
-      >
-        Citar
-      </Button>
-    </div>
-  )}
-
-  {/* LISTADO DE DOCUMENTOS POR DEFECTO */}
-  <div className="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar bg-white">
-    {!locationId ? (
-      <div className="h-full flex flex-col items-center justify-center p-6 text-center opacity-40">
-        <MapPin className="text-slate-300 w-10 h-10 mb-2" />
-        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Selecciona una localidad</p>
-      </div>
-    ) : (
-      <>
-        {filteredAppointments.map(apt => (
-          <DocumentCard 
-            key={apt.id}
-            apt={apt}
-            isSelected={selectedAptIds.includes(apt.id)}
-            onSelect={toggleAptSelection}
-            onOpenDetails={(item: any) => {
-              setSelectedAppointment(item);
-              setIsTechnicalModalOpen(true);
-            }}
-          />
-        ))}
-        {filteredAppointments.length === 0 && (
-          <div className="py-10 text-center opacity-40">
-             <p className="text-[9px] font-black uppercase tracking-widest">Sin coincidencias</p>
+                {selectedAptIds.length > 0 && (
+                  <Button 
+                    onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))}
+                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center gap-2 px-3 h-8 shadow-xl border-none animate-in zoom-in-95"
+                  >
+                    <span className="font-black uppercase text-[9px] tracking-widest whitespace-nowrap">Solicitar Cita ({selectedAptIds.length})</span>
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
-        )}
-      </>
-    )}
-  </div>
-</div>
+
+          {/* LISTADO DE CARDS TÉCNICAS */}
+          {/* CAMBIO: Padding reducido (px-6 py-5 -> px-3 py-3) */}
+          <div className="flex-1 overflow-y-auto px-3 py-3 custom-scrollbar bg-slate-50/50">
+            {!locationId ? (
+              <div className="h-full flex flex-col items-center justify-center opacity-30">
+                 <MapPin size={48} className="mb-4 text-slate-400" />
+                 <p className="font-black uppercase text-[10px] tracking-widest text-slate-500">Selecciona una localidad</p>
+              </div>
+            ) : (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Dentro de DockManager, en el mapeo de filteredAppointments */}
+                  {filteredAppointments.map(doc => (
+                    <DocumentMaestroCard 
+                      key={doc.id}
+                      apt={doc}
+                      isSelected={selectedAptIds.includes(doc.id)}
+                      onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)}
+                      
+                      // NUEVAS PROPS:
+                      onDragStart={(e: React.DragEvent, id: string) => {
+                        setDraggingId(id);
+                        e.dataTransfer.setData("appointmentId", id); // Importante: guarda el ID en el buffer de drag
+                        e.dataTransfer.effectAllowed = "move";
+                      }}
+                      onDragEnd={() => {
+                        setDraggingId(null);
+                        setDropTargetId(null);
+                      }}
+                    />
+                  ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+
+
+
 
         {/* PANEL DERECHO (MUELLES) */}
-        <div className="flex-1 flex flex-col min-h-0 bg-white border border-yms-border rounded-[1.5rem] overflow-hidden shadow-sm">
-          <div className="p-3 border-b flex justify-between items-center bg-slate-50/20">
+        <div className="flex-1 flex flex-col min-h-0 bg-white border border-slate-200 rounded-[1.5rem] overflow-hidden shadow-sm">
+          <div className="p-2 border-b flex justify-between items-center bg-slate-50/20">
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="bg-white text-slate-600 font-bold px-3 py-1 border-slate-200 shadow-sm">{filteredDocks.length} Muelles</Badge>
               
