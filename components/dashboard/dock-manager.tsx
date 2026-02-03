@@ -572,7 +572,6 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
 }
 
 // ... [Mantén los modales RequestAppointmentModal, CreateAppointmentModal, AppointmentEditModal, OrderDetailsTechnicalModal igual que antes] ...
-// (Para ahorrar espacio, asumo que estos componentes se mantienen idénticos al código proporcionado anteriormente)
 
 function RequestAppointmentModal({ 
   appointments, 
@@ -586,7 +585,6 @@ function RequestAppointmentModal({
   const [quantities, setQuantities] = useState<{ [key: string]: number }>(() => {
     const initial: { [key: string]: number } = {};
     appointments.forEach(apt => {
-      // Valor por defecto: Lo que falta por entregar (Pedida - Recibida)
       initial[apt.id] = (apt.quantityOrdered || 0) - (apt.quantityDelivered || 0);
     });
     return initial;
@@ -602,58 +600,82 @@ function RequestAppointmentModal({
   }, [appointments]);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-2">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col border border-slate-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-2">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col border border-slate-300 max-h-[95vh]">
         
-        {/* HEADER PRINCIPAL */}
-        <div className="flex items-center justify-between px-4 py-2 border-b bg-white">
-          <h3 className="text-sm font-black text-[#1C1E59] uppercase tracking-tight">DETALLE DEL CARGUE</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+        {/* HEADER PRINCIPAL - AGREGADO CONTADOR TOTAL */}
+        <div className="flex items-center justify-between px-5 py-3 bg-[#1C1E59] text-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="bg-orange-500 p-1.5 rounded-lg">
+              <ClipboardList className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xs font-black uppercase tracking-widest">Detalles de entrega</h3>
+                <span className="bg-white/20 px-2 py-0.5 rounded text-[10px] font-black border border-white/10 text-orange-400">
+                  {appointments.length} DOCUMENTOS SELECCIONADOS
+                </span>
+              </div>
+    
+            </div>
+          </div>
+          <button onClick={onClose} className="hover:bg-white/10 p-1.5 rounded-full transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 bg-white">
-          <div className="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-            {Object.entries(groupedByCarrier).map(([carrier, items]) => (
-              <div key={carrier} className="mb-0">
-                {/* Banner Gris de Sección */}
-                <div className="bg-[#E9ECEF] text-center py-1 border-b border-slate-300">
-                  <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Detalle del Cargue</span>
+        {/* CONTENIDO CON BLOQUES - ESPACIADO REDUCIDO */}
+        <div className="flex-1 overflow-y-auto p-4 bg-slate-100/50 space-y-4 custom-scrollbar">
+          
+          {Object.entries(groupedByCarrier).map(([carrier, items]) => (
+            <div key={carrier} className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+              
+              {/* BANNER DE PROVEEDOR - PADDING REDUCIDO */}
+              <div className="bg-slate-50 border-b border-slate-200 px-4 py-2">
+                <div className="flex flex-wrap items-center gap-x-8 gap-y-1">
+                  <div className="min-w-[150px]">
+                    <span className="text-[7px] font-black text-slate-400 uppercase block leading-none mb-1">Generador de carga</span>
+                    <span className="text-[10px] font-black text-[#1C1E59] uppercase">{carrier}</span>
+                  </div>
+                  <div>
+                    <span className="text-[7px] font-black text-slate-400 uppercase block leading-none mb-1">Id Generador de carga</span>
+                    <span className="text-[10px] font-bold text-slate-600 font-mono">{items[0].nit}</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-[7px] font-black text-slate-400 uppercase block leading-none mb-1">Localidad</span>
+                    <span className="text-[10px] font-bold text-[#1C1E59] uppercase">{items[0].locationName}</span>
+                  </div>
                 </div>
+              </div>
 
-                {/* Info Proveedor y Lugar */}
-                <div className="grid grid-cols-3 bg-white py-2 px-4 gap-2 border-b border-slate-200 text-[10px]">
-                  <div className="truncate"><span className="font-black text-[#1C1E59]">Proveedor:</span> <span className="text-slate-600 uppercase">{carrier}</span></div>
-                  <div className="text-center truncate"><span className="font-black text-[#1C1E59]">Nit:</span> <span className="text-slate-600">{items[0].nit}</span></div>
-                  <div className="text-right truncate"><span className="font-black text-[#1C1E59]">Lugar de entrega:</span> <span className="text-slate-600 uppercase">{items[0].locationName}</span></div>
-                </div>
-
-                {/* Tabla de Documentos */}
-                <table className="w-full text-left border-collapse">
+              {/* TABLA DE DETALLES - PADDING REDUCIDO */}
+              <div className="overflow-x-auto">
+                <table className="w-full table-fixed border-collapse">
                   <thead>
-                    <tr className="bg-white border-b border-slate-200">
-                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase w-[30%]">Orden de compra</th>
-                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[20%]">Cantidad pedida</th>
-                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[20%]">Cantidad entregada</th>
-                      <th className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase text-center w-[30%]">Cantidad a entregar</th>
+                    <tr className="bg-white border-b border-slate-100">
+                      <th className="w-[15%] px-4 py-2 text-[8px] font-black text-slate-400 uppercase text-left tracking-widest"># Documento</th>
+                      <th className="w-[12%] px-4 py-2 text-[8px] font-black text-slate-400 uppercase text-left tracking-widest">Producto</th>
+                      <th className="w-[33%] px-4 py-2 text-[8px] font-black text-slate-400 uppercase text-left tracking-widest">Descripción Artículo</th>
+                      <th className="w-[10%] px-4 py-2 text-[8px] font-black text-slate-400 uppercase text-right tracking-widest">Cantidad ordenada</th>
+                      <th className="w-[10%] px-4 py-2 text-[8px] font-black text-slate-400 uppercase text-right tracking-widest">Cantidad entregada</th>
+                      <th className="w-[20%] px-4 py-2 text-[8px] font-black text-orange-600 uppercase text-center tracking-widest bg-orange-50/30">Cantidad a entregar</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    {items.map(apt => (
-                      <tr key={apt.id} className="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/50">
-                        <td className="px-4 py-2 text-[11px] font-bold text-[#1C1E59] uppercase">{apt.id}</td>
-                        <td className="px-4 py-2 text-[11px] font-medium text-slate-600 text-center">{apt.quantityOrdered}</td>
-                        <td className="px-4 py-2 text-[11px] font-medium text-slate-600 text-center">
-                          {apt.quantityDelivered} {/* Aquí ya se muestra el dato que no es cero */}
-                        </td>
-                        <td className="px-4 py-1.5">
+                  <tbody className="divide-y divide-slate-50">
+                    {items.map((doc) => (
+                      <tr key={doc.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-4 py-2 text-[10px] font-black text-[#1C1E59]">{doc.id}</td>
+                        <td className="px-4 py-2 text-[9px] font-bold text-slate-500 font-mono">{doc.codigoArticulo || "---"}</td>
+                        <td className="px-4 py-2 text-[9px] font-bold text-slate-600 uppercase truncate" title={doc.product}>{doc.product}</td>
+                        <td className="px-4 py-2 text-[10px] font-black text-slate-400 text-right">{doc.quantityOrdered}</td>
+                        <td className="px-4 py-2 text-[10px] font-black text-emerald-600 text-right">{doc.quantityDelivered || 0}</td>
+                        <td className="px-4 py-1.5 bg-orange-50/10">
                           <div className="flex justify-center">
                             <input 
                               type="number"
-                              className="w-full max-w-[150px] h-7 text-right text-[11px] font-bold border border-slate-300 rounded-lg px-2 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                              value={quantities[apt.id]}
-                              onChange={(e) => setQuantities({...quantities, [apt.id]: Number(e.target.value)})}
+                              className="w-full max-w-[90px] h-7 text-center text-[10px] font-black border-2 border-slate-200 rounded-lg focus:border-orange-500 outline-none transition-all text-[#1C1E59] bg-white"
+                              value={quantities[doc.id]}
+                              onChange={(e) => setQuantities({...quantities, [doc.id]: Number(e.target.value)})}
                             />
                           </div>
                         </td>
@@ -662,30 +684,29 @@ function RequestAppointmentModal({
                   </tbody>
                 </table>
               </div>
-            ))}
-          </div>
+
+              
+            </div>
+          ))}
+
         </div>
 
-        {/* FOOTER CON BOTONES ESTILO IMAGEN */}
-        <div className="px-8 py-4 flex justify-center gap-6 bg-white border-t border-slate-100">
+        {/* FOOTER GENERAL - REDUCIDO */}
+        <div className="px-6 py-3 flex justify-end items-center gap-4 bg-white border-t border-slate-200">
+          <button onClick={onClose} className="text-[9px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">
+            Cancelar Operación
+          </button>
           <Button 
-            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-12 h-9 rounded-lg shadow-md transition-transform active:scale-95 uppercase text-xs tracking-wider"
+            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-8 h-9 rounded-xl shadow-lg shadow-orange-200 transition-all hover:scale-[1.02] active:scale-95 uppercase text-[10px] tracking-widest flex items-center gap-2"
             onClick={() => onContinue({ items: appointments, quantities })}
           >
-            Confirmar
-          </Button>
-          <Button 
-            className="bg-[#EF4444] hover:bg-[#dc2626] text-white font-black px-12 h-9 rounded-lg shadow-md transition-transform active:scale-95 uppercase text-xs tracking-wider border-none"
-            onClick={onClose}
-          >
-            Cancelar
+            Continuar a Cita <ArrowRight size={14} />
           </Button>
         </div>
       </div>
     </div>
   );
 }
-
 
 function CreateAppointmentModal({ 
   selectedItems, 
@@ -1205,20 +1226,63 @@ function DockTimeline({
   const currentPosition = (currentMinutes / 1440) * 100;
 
   // -- VISTA MENSUAL --
+ // -- VISTA MENSUAL ACTUALIZADA --
   if (timeFrame === "month") {
+    const today = new Date();
+    // Verificamos si el mes/año que estamos viendo es el actual
+    const isCurrentMonth = currentTime.getMonth() === today.getMonth() && 
+                          currentTime.getFullYear() === today.getFullYear();
+    const currentDayNumber = today.getDate();
+
     const daysInMonth = Array.from({ length: 30 }, (_, i) => i + 1);
+    
     return (
-      <div className="flex flex-col h-full bg-slate-50 p-4 overflow-auto">
+      <div className="flex flex-col h-full bg-slate-50 p-4 overflow-auto custom-scrollbar">
          <div className="grid grid-cols-7 gap-px bg-slate-200 border border-slate-300 rounded-lg overflow-hidden shadow-sm">
              {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(d => (
-                <div key={d} className="bg-slate-100 p-2 text-center text-xs font-bold text-gray-500 uppercase">{d}</div>
+                <div key={d} className="bg-slate-100 p-2 text-center text-[10px] font-black text-slate-500 uppercase tracking-widest">{d}</div>
              ))}
-             {daysInMonth.map(day => (
-                <div key={day} className="bg-white h-24 p-2 relative hover:bg-slate-50 transition-colors">
-                   <span className="text-xs font-bold text-gray-400">{day}</span>
-                   {day === 19 && (<div className="mt-1 space-y-1"><div className="text-[9px] bg-yms-cyan/10 text-yms-cyan rounded px-1 py-0.5 truncate font-medium border border-yms-cyan/20">3 Citas</div></div>)}
-                </div>
-             ))}
+             {daysInMonth.map(day => {
+                const isToday = isCurrentMonth && day === currentDayNumber;
+                
+                return (
+                  <div key={day} className={cn(
+                    "bg-white h-24 p-2 relative hover:bg-slate-50 transition-colors group",
+                    isToday && "bg-orange-50/40" // Fondo suave para el día actual
+                  )}>
+                     {/* Círculo indicador del día */}
+                     <div className={cn(
+                       "text-xs font-bold w-7 h-7 flex items-center justify-center rounded-full transition-all",
+                       isToday 
+                        ? "bg-[#FF6C01] text-white shadow-lg shadow-orange-200 scale-110" 
+                        : "text-gray-400 group-hover:text-[#1C1E59]"
+                     )}>
+                       {day}
+                     </div>
+
+                     {/* Badge de "HOY" */}
+                     {isToday && (
+                       <span className="absolute top-2 right-2 text-[8px] font-black text-orange-600 uppercase tracking-tighter">
+                         Hoy
+                       </span>
+                     )}
+
+                     {/* Contenido de ejemplo (Citas) */}
+                     {day === 19 && (
+                       <div className="mt-2 space-y-1">
+                          <div className="text-[9px] bg-blue-50 text-[#1C1E59] rounded px-1.5 py-0.5 truncate font-black border border-blue-100">
+                            3 Citas
+                          </div>
+                       </div>
+                     )}
+                     
+                     {/* Punto indicador si hay actividad en otros días */}
+                     {!isToday && day % 7 === 0 && (
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-slate-300" />
+                     )}
+                  </div>
+                );
+             })}
          </div>
       </div>
     );
@@ -1960,15 +2024,8 @@ const handleSelectLocation = (id: string) => {
     </>
   )}
 
-  <div className="w-px h-4 bg-slate-300 mx-1" />
-  <Button 
-    variant="ghost" 
-    size="icon" 
-    className="h-7 w-7 text-slate-500 hover:bg-white rounded-lg" 
-    onClick={() => setIsExpanded(!isExpanded)}
-  >
-    {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-  </Button>
+
+  
 </div>
             </div>
           </div>
@@ -1978,7 +2035,7 @@ const handleSelectLocation = (id: string) => {
   {!locationId ? (
     <SelectLocationState minimalist={false} />
   ) : viewMode === 'grid' ? (
-    <div className="p-4 flex flex-wrap gap-4 overflow-y-auto h-full bg-slate-50/20 backdrop-blur-[1px]">
+    <div className="p-4 flex flex-wrap gap-3 content-start items-start overflow-y-auto h-full bg-slate-50/20 backdrop-blur-[1px]">
       {/* CAMBIO AQUÍ: Usar docksWithTemporalStatus */}
       {docksWithTemporalStatus.map(dock => (
         <DockSlot 
