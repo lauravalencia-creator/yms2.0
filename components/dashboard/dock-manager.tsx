@@ -708,235 +708,304 @@ function RequestAppointmentModal({
   );
 }
 
+
 function CreateAppointmentModal({ 
   selectedItems, 
   suggestedDock, 
   onClose, 
-  onConfirm 
+  onConfirm,
+  availableDocks = [] 
 }: { 
   selectedItems: any[], 
   suggestedDock: string, 
   onClose: () => void, 
-  onConfirm: (updatedData: any) => void 
+  onConfirm: (updatedData: any) => void,
+  availableDocks?: Dock[]
 }) {
   const baseItem = selectedItems[0];
-  
-  // ESTADOS DE CREACIÓN (Restaurados de la versión anterior)
-  const [isNewCarrier, setIsNewCarrier] = useState(false);
-  const [isNewDriver, setIsNewDriver] = useState(false);
+
+  const [selectedDockId, setSelectedDockId] = useState(suggestedDock);
+
+  const carriers = ["FERRIAMARILLA S.A.S", "DISTRIBUIDORA NACIONAL", "LOGISTICA EXPRESS"];
+  const drivers = [
+    { name: "SARA PEREZ", id: "1.020.455.890", phone: "310 455 6677", email: "yuliana@transporte.com" },
+    { name: "CARLOS RUIZ", id: "71.344.555", phone: "300 123 4455", email: "cruiz@logistica.com" },
+    { name: "PEDRO NEL", id: "8.900.111", phone: "320 999 8877", email: "pedronel@envios.com" }
+  ];
+
+  const [isManualCarrier, setIsManualCarrier] = useState(false);
+  const [isManualDriver, setIsManualDriver] = useState(false);
+  const [selectedDock, setSelectedDock] = useState(suggestedDock);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
-    appointmentId: "4006038", // Número de cita por defecto
-    transportCompany: baseItem.carrier || "",
-    loadType: "Bultos",
-    vehicleType: baseItem.vehicleType || "Turbo",
-    unloadTime: "gfssgs", // Tiempo descargue
-    estimatedTime: "1.5", // NUEVO: Tiempo estimado (decimal)
-    loadDate: baseItem.date || "2026-01-08",
-    loadTime: baseItem.time || "15:30",
-    driver: baseItem.driver || "",
-    driverId: baseItem.driverId || "",
-    driverPhone: baseItem.driverPhone || "",
+    appointmentId: "4006038",
+    transportCompany: carriers[0],
+    loadType: "BULTOS",
+    vehicleType: "TURBO",
+    unloadTime: "30 MINUTOS",
+    loadDate: "2026-01-28",
+    loadTime: "15:28",
+    driver: drivers[0].name,
+    driverId: drivers[0].id,
+    driverPhone: drivers[0].phone,
     truckId: baseItem.truckId === "---" ? "TRK-ANT-001" : baseItem.truckId,
-    comments: "fsdsdgs"
+    comments: ""
   });
+
+
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (formErrors.includes(field)) {
+      setFormErrors(prev => prev.filter(item => item !== field));
+    }
   };
 
-  // Estilos de la tabla tipo grid de la imagen
-  const labelClass = "text-[9px] font-black text-slate-500 uppercase pr-3 text-right bg-[#F8FAFC] border-r border-slate-200 w-40 shrink-0 flex items-center justify-end leading-tight";
-  const cellClass = "flex border-b border-slate-200 min-h-[36px]";
-  const inputClass = "flex-1 px-3 text-[11px] font-bold text-indigo-900 outline-none focus:bg-orange-50/30 uppercase";
+  const handleDriverSelect = (name: string) => {
+    const driverObj = drivers.find(d => d.name === name);
+    if (driverObj) {
+      setFormData(prev => ({
+        ...prev,
+        driver: driverObj.name,
+        driverId: driverObj.id,
+        driverPhone: driverObj.phone
+      }));
+    }
+  };
 
   const handleFinalCreate = () => {
-    onConfirm({
+    const errors = [];
+    if (!formData.transportCompany || formData.transportCompany.trim() === "") errors.push("transportCompany");
+    if (!formData.loadType || formData.loadType === "") errors.push("loadType");
+    if (!formData.vehicleType || formData.vehicleType === "") errors.push("vehicleType");
+    if (!formData.loadDate || formData.loadDate === "") errors.push("loadDate");
+    if (!formData.loadTime || formData.loadTime === "") errors.push("loadTime");
+
+    if (errors.length > 0) {
+      setFormErrors(errors);
+      return; // Detiene la ejecución y NO cierra el modal
+    }
+
+   onConfirm({
       ...formData,
       items: selectedItems,
-      suggestedDock,
+      assignedDockId: selectedDockId, 
+      locationName: baseItem.locationName,
       status: "scheduled",
+      type: baseItem.type,
       carrier: formData.transportCompany,
       time: formData.loadTime
     });
   };
 
+  const labelClass = "text-[9px] font-black text-slate-500 uppercase pr-4 text-right bg-[#F8FAFC] border-r border-slate-200 w-48 shrink-0 flex items-center justify-end leading-tight";
+  const cellClass = "flex border-b border-slate-200 min-h-[40px]";
+  const inputClass = "flex-1 px-4 text-[10px] font-bold text-indigo-900 outline-none focus:bg-orange-50/30 uppercase transition-colors";
+  const selectClass = "flex-1 px-4 text-[10px] font-bold text-indigo-900 outline-none bg-transparent cursor-pointer uppercase";
+  const cellLabelClass = "bg-slate-50 border border-slate-200 px-4 py-2 text-[9px] font-black text-slate-500 uppercase flex items-center w-1/4";
+  const cellValueClass = "bg-white border border-slate-200 px-4 py-2 text-[10px] font-bold text-slate-700 flex items-center w-1/4";
+  
+  // Estilo de error más agresivo
+  const errorStyle = "bg-red-50 ring-2 ring-red-500 ring-inset z-10";
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[95vh] border border-slate-300">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-300 animate-in zoom-in-95 duration-200">
         
-        {/* HEADER */}
-        <div className="bg-white px-6 py-3 border-b flex justify-between items-center shrink-0">
-          <h3 className="text-base font-black text-slate-600 tracking-tighter w-full text-center uppercase italic">
-            Detalle de la Cita para Cargue
-          </h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
+        <div className="flex items-center justify-between px-6 py-3 bg-[#1C1E59] text-white shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="bg-orange-500 p-1.5 rounded-lg shadow-lg">
+              <ClipboardList className="w-5 h-5 text-white" />
+            </div>
+            <h3 className="text-xs font-black uppercase tracking-widest italic">Detalles de la cita</h3>
+          </div>
+          <button onClick={onClose} className="hover:bg-white/10 p-2 rounded-full transition-all text-white/70 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-5 custom-scrollbar">
           
-          {/* GRID DE FORMULARIO PRINCIPAL */}
-          <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
+          {/* Alerta de error si el formulario es inválido */}
+          {formErrors.length > 0 && (
+            <div className="bg-red-100 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-[10px] font-bold uppercase flex items-center gap-2 animate-bounce">
+              <AlertTriangle size={14} /> Faltan campos obligatorios por completar (*)
+            </div>
+          )}
+
+          <div className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
             <div className="grid grid-cols-2">
+              <div className={cellClass}>
+                <span className={labelClass}>LOCALIDAD:</span>
+                <span className="flex-1 px-4 text-[9px] font-black text-slate-500 flex items-center truncate uppercase italic">{baseItem.locationName}</span>
+              </div>
+              <div className={cellClass}>
+                <span className={labelClass}>NÚMERO DE LA CITA:</span>
+                <input className={cn(inputClass, "text-slate-400 font-normal")} value={formData.appointmentId} onChange={(e)=>handleChange('appointmentId', e.target.value)} />
+              </div>
+
+              <div className={cellClass}>
+                <span className={labelClass}>CITA EMPRESA DE TRANSPORTE:</span>
+                <div className="flex-1 px-4 flex items-center">
+                  <input type="checkbox" checked className="w-4 h-4 accent-blue-600 rounded cursor-pointer" readOnly />
+                </div>
+              </div>
               
-              {/* FILA 1 */}
-              <div className={cellClass}>
-                <span className={labelClass}>Destino:</span>
-                <span className="flex-1 px-3 text-[10px] font-bold flex items-center text-slate-500">{baseItem.locationName}</span>
-              </div>
-              <div className={cellClass}>
-                <span className={labelClass}>Cita:</span>
-                <input className={cn(inputClass, "text-slate-400 italic font-normal")} value={formData.appointmentId} onChange={(e)=>handleChange('appointmentId', e.target.value)} />
-              </div>
-
-              {/* FILA 2 */}
-              <div className={cellClass}>
-                <span className={labelClass}>Cita para transportista:</span>
-                <div className="flex-1 px-3 flex items-center">
-                  <input type="checkbox" checked className="w-4 h-4 accent-blue-600 cursor-pointer" />
-                </div>
-              </div>
-              <div className={cellClass}>
-                <span className={labelClass}>Transportista:<span className="text-red-500 ml-0.5">*</span></span>
-                <div className="flex-1 flex items-center pr-2">
-                   <input className={inputClass} value={formData.transportCompany} onChange={(e)=>handleChange('transportCompany', e.target.value)} />
-                   <button onClick={() => setIsNewCarrier(!isNewCarrier)} className="text-orange-500 p-1 hover:bg-orange-50 rounded">
-                     <Plus size={16} strokeWidth={3} />
-                   </button>
+              <div className={cn(cellClass, formErrors.includes("transportCompany") && errorStyle)}>
+                <span className={labelClass}>EMPRESA DE TRANSPORTE:*</span>
+                <div className="flex-1 flex items-center pr-3">
+                  {!isManualCarrier ? (
+                    <select 
+                      className={selectClass} 
+                      value={formData.transportCompany} 
+                      onChange={(e) => handleChange('transportCompany', e.target.value)}
+                    >
+                      <option value="">SELECCIONE...</option>
+                      {carriers.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  ) : (
+                    <input className={inputClass} autoFocus placeholder="ESCRIBIR EMPRESA..." value={formData.transportCompany} onChange={(e)=>handleChange('transportCompany', e.target.value)} />
+                  )}
+                  <button onClick={() => {setIsManualCarrier(!isManualCarrier); if(!isManualCarrier) handleChange('transportCompany', '')}} className="text-orange-500 hover:scale-110 transition-transform">
+                    <Plus size={18} strokeWidth={3} />
+                  </button>
                 </div>
               </div>
 
-              {/* FILA 3 */}
-              <div className={cellClass}>
-                <span className={labelClass}>Tipo de cargue:<span className="text-red-500 ml-0.5">*</span></span>
-                <select className={cn(inputClass, "bg-transparent")} value={formData.loadType} onChange={(e)=>handleChange('loadType', e.target.value)}>
-                  <option>Bultos</option><option>Granel</option><option>Pallets</option>
+              <div className={cn(cellClass, formErrors.includes("loadType") && errorStyle)}>
+                <span className={labelClass}>TIPO DE CARGUE:*</span>
+                <select className={selectClass} value={formData.loadType} onChange={(e)=>handleChange('loadType', e.target.value)}>
+                  <option value="">SELECCIONE...</option>
+                  <option value="BULTOS">BULTOS</option><option value="GRANEL">GRANEL</option><option value="PALLETS">PALLETS</option>
                 </select>
               </div>
-              <div className={cellClass}><span className={labelClass}></span></div>
+              <div className={cn(cellClass, formErrors.includes("vehicleType") && errorStyle)}>
+                <span className={labelClass}>TIPOLOGÍA DE VEHÍCULO:*</span>
+                <select className={selectClass} value={formData.vehicleType} onChange={(e)=>handleChange('vehicleType', e.target.value)}>
+                  <option value="">SELECCIONE...</option>
+                  <option value="TURBO">TURBO</option><option value="SENCILLO">SENCILLO</option><option value="TRACTOMULA">TRACTOMULA</option>
+                </select>
+              </div>
+              
+              <div className={cn(cellClass, formErrors.includes("loadDate") && errorStyle)}>
+                <span className={labelClass}>FECHA DE LA CITA:*</span>
+                <input type="date" className={inputClass} value={formData.loadDate} onChange={(e)=>handleChange('loadDate', e.target.value)} />
+              </div>
+              <div className={cn(cellClass, formErrors.includes("loadTime") && errorStyle)}>
+                <span className={labelClass}>HORA DE LA CITA:*</span>
+                <input type="time" className={inputClass} value={formData.loadTime} onChange={(e)=>handleChange('loadTime', e.target.value)} />
+              </div>
 
-              {/* FILA 4 */}
               <div className={cellClass}>
-                <span className={labelClass}>Tipo de vehículo:<span className="text-red-500 ml-0.5">*</span></span>
-                <select className={cn(inputClass, "bg-transparent")} value={formData.vehicleType} onChange={(e)=>handleChange('vehicleType', e.target.value)}>
-                  <option>Turbo</option><option>Sencillo</option><option>Tractomula</option>
-                </select>
+                <span className={labelClass}>PLACAS:</span>
+                <input className={cn(inputClass, "tracking-widest font-black text-orange-600")} value={formData.truckId} onChange={(e)=>handleChange('truckId', e.target.value)} />
               </div>
               <div className={cellClass}>
-                <span className={labelClass}>Tiempo descargue:</span>
+                <span className={labelClass}>TIEMPO ESTIMADO CARGUE/DESCARGUE:</span>
                 <input className={inputClass} value={formData.unloadTime} onChange={(e)=>handleChange('unloadTime', e.target.value)} />
               </div>
 
-              {/* FILA 5 */}
-              <div className={cellClass}>
-                <span className={labelClass}>Fecha de cita:<span className="text-red-500 ml-0.5">*</span></span>
-                <div className="flex-1 relative flex items-center">
-                  <input type="date" className={inputClass} value={formData.loadDate} onChange={(e)=>handleChange('loadDate', e.target.value)} />
+              <div className="col-span-2 flex border-b border-slate-200 min-h-[120px]">
+                <div className={cn(labelClass, "min-h-[120px]")}>CONDUCTOR:</div>
+                <div className="flex-1 flex flex-col">
+                  <div className="flex-1 flex border-b border-slate-100 items-center">
+                    <span className="text-[8px] font-black text-slate-400 w-40 text-right pr-4 uppercase">Nombre:</span>
+                    {!isManualDriver ? (
+                      <select className={selectClass} value={formData.driver} onChange={(e) => handleDriverSelect(e.target.value)}>
+                        {drivers.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
+                      </select>
+                    ) : (
+                      <input className={inputClass} autoFocus placeholder="NOMBRE COMPLETO..." value={formData.driver} onChange={(e)=>handleChange('driver', e.target.value)} />
+                    )}
+                    <button onClick={() => {setIsManualDriver(!isManualDriver); if(!isManualDriver) { handleChange('driver', ''); handleChange('driverId', ''); handleChange('driverPhone', '')}}} className="text-orange-500 mx-3 hover:scale-110 transition-transform">
+                      <Plus size={18} strokeWidth={3} />
+                    </button>
+                  </div>
+                  <div className="flex-1 flex border-b border-slate-100 items-center">
+                    <span className="text-[8px] font-black text-slate-400 w-40 text-right pr-4 uppercase">Identificación:</span>
+                    <input className={inputClass} readOnly={!isManualDriver} value={formData.driverId} onChange={(e)=>handleChange('driverId', e.target.value)} />
+                  </div>
+                  <div className="flex-1 flex items-center">
+                    <span className="text-[8px] font-black text-slate-400 w-40 text-right pr-4 uppercase">Número de contacto:</span>
+                    <input className={inputClass} readOnly={!isManualDriver} value={formData.driverPhone} onChange={(e)=>handleChange('driverPhone', e.target.value)} />
+                   
+                  </div>
                 </div>
               </div>
-              <div className={cellClass}>
-                <span className={labelClass}>Hora de cita:<span className="text-red-500 ml-0.5">*</span></span>
-                <div className="flex-1 relative flex items-center">
-                  <input type="time" className={inputClass} value={formData.loadTime} onChange={(e)=>handleChange('loadTime', e.target.value)} />
-                </div>
-              </div>
 
-              {/* FILA 6: CONDUCTOR (MODO CREACIÓN) */}
-              <div className="col-span-2 flex border-b border-slate-200 min-h-[108px]">
-                 <div className={cn(labelClass, "min-h-[108px]")}>Conductor:</div>
-                 <div className="flex-1 flex flex-col">
-                    <div className="flex-1 flex border-b border-slate-100 items-center">
-                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Nombre completo:</span>
-                       <input className={inputClass} value={formData.driver} onChange={(e)=>handleChange('driver', e.target.value)} />
-                       <button onClick={() => setIsNewDriver(!isNewDriver)} className="text-orange-500 mx-2 p-1 hover:bg-orange-50 rounded">
-                         <Plus size={16} strokeWidth={3} />
-                       </button>
-                    </div>
-                    <div className="flex-1 flex border-b border-slate-100 items-center">
-                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Cédula:</span>
-                       <input className={inputClass} value={formData.driverId} onChange={(e)=>handleChange('driverId', e.target.value)} />
-                       <button className="text-orange-500 mx-2 p-1 opacity-100"><Plus size={16} strokeWidth={3} /></button>
-                    </div>
-                    <div className="flex-1 flex items-center">
-                       <span className="text-[9px] font-bold text-slate-400 w-32 text-right pr-3 uppercase">Celular:</span>
-                       <input className={inputClass} value={formData.driverPhone} onChange={(e)=>handleChange('driverPhone', e.target.value)} />
-                       <div className="w-10"></div>
-                    </div>
-                 </div>
-              </div>
-
-              {/* FILA 7 */}
-              <div className={cellClass}>
-                <span className={labelClass}>Placas:</span>
-                <input className={cn(inputClass, "tracking-widest font-black")} value={formData.truckId} onChange={(e)=>handleChange('truckId', e.target.value)} />
-              </div>
-              <div className={cellClass}>
-                <span className={labelClass}>Tiempo estimado:</span>
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  className={cn(inputClass, "text-orange-600")} 
-                  value={formData.estimatedTime} 
-                  onChange={(e)=>handleChange('estimatedTime', e.target.value)} 
-                  placeholder="0.0"
-                />
-              </div>
-
-              {/* FILA 8 */}
-              <div className="col-span-2 flex min-h-[50px]">
-                <span className={cn(labelClass, "min-h-[50px]")}>Comentario:</span>
-                <textarea className="flex-1 p-2 text-[11px] font-medium outline-none resize-none uppercase" value={formData.comments} onChange={(e)=>handleChange('comments', e.target.value)} />
+              <div className="col-span-2 flex min-h-[60px]">
+                <span className={cn(labelClass, "min-h-[60px]")}>OBSERVACIONES:</span>
+                <textarea className="flex-1 p-3 text-[10px] font-medium outline-none resize-none uppercase" rows={2} value={formData.comments} onChange={(e)=>handleChange('comments', e.target.value)} />
               </div>
             </div>
           </div>
 
-          <p className="text-[10px] text-red-500 font-bold">* Campos obligatorios.</p>
-
-          {/* LISTA DE DOCUMENTOS (DISEÑO IGUAL A LA IMAGEN) */}
-          <div className="space-y-3">
+           {/* LISTA DOCUMENTOS VINCULADOS */}
+          <div className="space-y-4">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Documentos vinculados:</span>
             {selectedItems.map((doc) => (
-              <div key={doc.id} className="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
-                <div className="flex bg-[#F8FAFC] border-b border-slate-200 text-[10px] font-bold">
-                  <div className="p-2 border-r border-slate-200 uppercase w-32 text-slate-500">Documento:</div>
-                  <div className="p-2 flex-1 text-blue-700 uppercase">{doc.id}</div>
-                  <div className="p-2 border-l border-slate-200 uppercase w-40 text-slate-500">Muelle sugerido:</div>
-                  <div className="p-2 bg-[#1C1E59] text-white text-center w-12 font-black">{suggestedDock}</div>
+              <div key={doc.id} className="bg-white rounded-lg overflow-hidden shadow-sm border border-slate-200">
+                <div className="bg-[#F8FAFC] px-4 py-2 border-b border-slate-200 flex justify-between items-center">
+                   <span className="text-[10px] font-black text-[#1C1E59]">DOCUMENTO: {doc.id}</span>
                 </div>
-                <div className="grid grid-cols-3 bg-white text-[9px] font-black text-slate-400 uppercase border-b border-slate-100">
-                  <div className="p-1.5 px-3">Artículo</div>
-                  <div className="p-1.5 px-3">Cantidad a entregar</div>
-                  <div className="p-1.5 px-3">Producto</div>
-                </div>
-                <div className="grid grid-cols-3 bg-white text-[11px] font-bold text-slate-700">
-                  <div className="p-2 px-3">{doc.codigoArticulo || "001"}</div>
-                  <div className="p-2 px-3 text-orange-600 font-black">{doc.quantityToDeliver || doc.quantityOrdered}</div>
-                  <div className="p-2 px-3 text-slate-400">{doc.product}</div>
+                <div className="flex flex-col">
+                  {/* FILA 1 */}
+                  <div className="flex w-full">
+                    <div className={cellLabelClass}>Muelle sugerido</div>
+                    <div className={cellValueClass}>
+                      <select 
+                        value={selectedDockId} 
+                        onChange={(e) => setSelectedDockId(e.target.value)}
+                        className="w-full bg-transparent outline-none cursor-pointer text-blue-600 font-black border-b border-blue-200 hover:border-blue-500"
+                      >
+                        {/* Filtramos muelles que NO estén en mantenimiento y pertenezcan a la localidad */}
+                        {availableDocks
+                          .filter(d => d.status !== 'maintenance')
+                          .map(dock => (
+                            <option key={dock.id} value={dock.id}>
+                              {dock.name} {dock.occupancy > 0 ? `(${dock.occupancy}%)` : '(Libre)'}
+                            </option>
+                          ))
+                        }
+                      </select>
+                    </div>
+                    <div className={cellLabelClass}>Mercancía</div>
+                    <div className={cellValueClass}>{doc.merchandiseCode || "900030"}</div>
+                  </div>
+                  {/* FILA 2 */}
+                  <div className="flex w-full">
+                    <div className={cellLabelClass}>Cantidad a entregar</div>
+                    <div className={cellValueClass}>{doc.quantityToDeliver || doc.quantityOrdered || "0"}</div>
+                    <div className={cellLabelClass}>Tipo de mercancía</div>
+                    <div className={cellValueClass}>{doc.tipoMercancia || "No Alimentos"}</div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* FOOTER ACCIONES */}
-        <div className="px-8 py-5 flex justify-center gap-6 bg-white border-t shrink-0">
-          <Button 
-            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-16 h-10 rounded-xl uppercase text-xs shadow-lg shadow-orange-200 transition-transform active:scale-95"
-            onClick={handleFinalCreate}
-          >
-            Confirmar
-          </Button>
-          <Button 
-            className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-16 h-10 rounded-xl uppercase text-xs shadow-lg shadow-orange-200 transition-transform active:scale-95"
-            onClick={onClose}
-          >
-            Cancelar
-          </Button>
+        <div className="px-8 py-4 flex flex-col items-center gap-3 bg-white border-t border-slate-100 shrink-0">
+          <div className="flex justify-center gap-4 w-full">
+            <Button 
+              className="bg-[#FF6C01] hover:bg-[#e66000] text-white font-black px-10 h-10 rounded-xl uppercase text-[10px] shadow-lg transition-all active:scale-95 flex items-center gap-2"
+              onClick={handleFinalCreate}
+            >
+              Confirmar cITA <ArrowRight size={14} />
+            </Button>
+            <Button variant="outline" className="border-slate-200 text-slate-400 font-black px-10 h-10 rounded-xl uppercase text-[10px] hover:bg-slate-50 transition-all active:scale-95" onClick={onClose}>
+              Cancelar
+            </Button>
+          </div>
+          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
+            Al confirmar, se enviarán notificaciones automáticas al conductor, empresa de transporte y proveedor vía correo electrónico.
+          </span>
         </div>
       </div>
     </div>
   );
 }
-
 
 function AppointmentEditModal({ 
   appointment, 
@@ -1736,21 +1805,30 @@ const handleSelectLocation = (id: string) => {
  {createModalAppointment && (
   <CreateAppointmentModal 
 
-    selectedItems={Array.isArray(createModalAppointment) ? createModalAppointment : [createModalAppointment]} 
-    suggestedDock={suggestedDockDisplay} 
+      selectedItems={Array.isArray(createModalAppointment) ? createModalAppointment : [createModalAppointment]} 
+    suggestedDock={targetDockIdAfterModal || ""} // Pasamos el ID real
+    availableDocks={allDocksState.filter(d => d.locationId === locationId)} // Pasamos la lista real de muelles
     onClose={() => {
       setCreateModalAppointment(null);
       setTargetDockIdAfterModal(null);
     }} 
     onConfirm={(finalAppointment) => { 
-        const targetDockId = targetDockIdAfterModal || "dock-1a-1"; 
+        const targetDockId = finalAppointment.assignedDockId; 
+        
         
         setAllDocksState(prev => prev.map(dock => 
           dock.id === targetDockId 
-            ? { ...dock, status: "occupied", occupancy: 100, currentAppointment: finalAppointment } 
+            ? { 
+                ...dock, 
+                status: "occupied", 
+                occupancy: 100, 
+                currentAppointment: {
+                   ...finalAppointment,
+                   duration: 90 // O la duración que estimes para que se vea en el timeline
+                } 
+              } 
             : dock
         ));
-
         // Filtramos para quitar todos los documentos seleccionados de la lista lateral
         const idsToRemove = finalAppointment.items.map((item: any) => item.id);
         setAllAppointmentsState(prev => prev.filter(a => !idsToRemove.includes(a.id)));
