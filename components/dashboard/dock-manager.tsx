@@ -1464,30 +1464,38 @@ const resize = React.useCallback(
     setCurrentDate(newDate);
   };
 
-  const dateDisplayLabel = useMemo(() => {
-    const today = new Date();
-    const isSameDay = currentDate.toDateString() === today.toDateString();
+ // --- LÓGICA DE NAVEGACIÓN DE FECHAS MODIFICADA ---
+const dateDisplayLabel = useMemo(() => {
+  const today = new Date();
+  const isSameDay = currentDate.toDateString() === today.toDateString();
+  
+  // Formateamos la fecha actual (ej: "03 feb")
+  const formattedDate = currentDate.toLocaleDateString('es-ES', { 
+    day: '2-digit', 
+    month: 'short' 
+  }).replace('.', ''); // Quitamos el punto que a veces pone el locale es-ES
 
-    if (viewMode === 'grid' || timeFrame === 'day') {
-      return isSameDay ? "Hoy" : currentDate.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
-    }
+  if (viewMode === 'grid' || timeFrame === 'day') {
+    // Si es hoy, combinamos la palabra "Hoy" con la fecha formateada
+    return isSameDay ? `Hoy, ${formattedDate}` : formattedDate;
+  }
 
-    if (timeFrame === 'week') {
-      const start = new Date(currentDate);
-      const day = start.getDay();
-      const diff = start.getDate() - day + (day === 0 ? -6 : 1);
-      start.setDate(diff);
-      const end = new Date(start);
-      end.setDate(start.getDate() + 6);
-      return `${start.getDate()} - ${end.getDate()} ${end.toLocaleDateString('es-ES', { month: 'short' })}`;
-    }
+  if (timeFrame === 'week') {
+    const start = new Date(currentDate);
+    const day = start.getDay();
+    const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+    start.setDate(diff);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return `${start.getDate()} - ${end.getDate()} ${end.toLocaleDateString('es-ES', { month: 'short' })}`;
+  }
 
-    if (timeFrame === 'month') {
-      return currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
-    }
+  if (timeFrame === 'month') {
+    return currentDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+  }
 
-    return "Hoy";
-  }, [currentDate, viewMode, timeFrame]);
+  return formattedDate;
+}, [currentDate, viewMode, timeFrame]);
 
 
 
