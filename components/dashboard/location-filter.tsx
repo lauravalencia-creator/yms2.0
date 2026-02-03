@@ -23,13 +23,14 @@ import { cn } from "@/lib/utils";
 import { 
   Search, BarChart3, Settings, Users, Upload, Calendar as CalendarIcon,
   FileUp, CheckCircle2, FileText, History as HistoryIcon, Eye, Download, 
-  RotateCw, Filter, UserPlus, ChevronRight, AlertTriangle,MapPin,
-  Package, X, QrCode, ArrowRight, LayoutGrid, Type,  Plus, Map,
+  RotateCw, Filter, UserPlus, ChevronRight, AlertTriangle,MapPin, Warehouse, CalendarClock,
+  Package, X, QrCode, ArrowRight, LayoutGrid, Type,  Plus, Map,Activity,
   Truck, Box, Calendar, Building2, Hash, ArrowLeft, RefreshCw, ChevronDown, Check
 } from 'lucide-react';
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
+import { AuditHistoryContent } from "./audit";
 
 
 
@@ -101,26 +102,35 @@ const DashboardNavButton = React.forwardRef(({
   label, 
   onClick, 
   variant = "orange",
-  className 
+  className,
+  isActive 
 }: any, ref: any) => {
   return (
     <button
       ref={ref}
       onClick={onClick}
       className={cn(
-        "flex items-center h-10 rounded-xl transition-all duration-300 ease-in-out overflow-hidden group shadow-sm border-none text-white",
+        "flex items-center h-10 rounded-full transition-all duration-300 ease-in-out overflow-hidden group shadow-sm border-none text-white px-3 shrink-0",
         variant === "orange" ? "bg-[#ff6b00] hover:bg-[#e66000]" : "bg-[#1e2b58] hover:bg-[#151f40]",
-        "w-10 hover:w-36 px-2.5 shrink-0", 
+        
+        // CAMBIO AQUÍ: Aumentamos de w-36 a w-48 para que quepa "Gestión de Citas"
+        isActive ? "w-42" : "w-10 hover:w-48", 
+        
         className
       )}
     >
       <Icon size={18} className="shrink-0" strokeWidth={2.5} />
-      <span className="ml-3 font-black text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+      <span className={cn(
+        "ml-3 font-black text-[10px] uppercase tracking-widest transition-opacity duration-300 whitespace-nowrap",
+        isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      )}>
         {label}
       </span>
     </button>
   );
 });
+
+
 DashboardNavButton.displayName = "DashboardNavButton";
 
 // --- ICONOS ---
@@ -979,159 +989,7 @@ function ReprocessConfirmModal({ isOpen, onClose }: { isOpen: boolean, onClose: 
   );
 }
 
-// --- COMPONENTE: MODAL HISTORIAL  ---
-function AuditHistoryContent() {
 
-  const [selectedDoc, setSelectedDoc] = useState<string | null>(null);
-  const [isReprocessOpen, setIsReprocessOpen] = useState(false);
-  const [operationType, setOperationType] = useState<"creacion" | "actualizacion">("creacion");
-
-  // 2. Datos de ejemplo (Asegúrate de que tengan la propiedad 'operation')
-  const auditData = [
-    { id: "DOC-1024", type: "PACKING LIST", status: "FAILED", auditor: "J.GARCIA", time: "26/01/2026, 17:27", operation: "creacion" },
-    { id: "DOC-1025", type: "ASN", status: "SUCCESS", auditor: "M.RODRIGUEZ", time: "26/01/2026, 16:27", operation: "creacion" },
-    { id: "DOC-2048", type: "WAYBILL", status: "SUCCESS", auditor: "A.MARTINEZ", time: "26/01/2026, 15:27", operation: "actualizacion" },
-    { id: "DOC-2049", type: "CUSTOMS", status: "FAILED", auditor: "L.PEREZ", time: "26/01/2026, 12:27", operation: "actualizacion" },
-  ];
-
-  // 3. Lógica de filtrado (Aquí se define filteredData)
-  const filteredData = auditData.filter(row => row.operation === operationType);
-
-  return (
-    <div className="flex flex-col h-full space-y-6 animate-in fade-in duration-500">
-      {/* RENDER DE MODALES HIJOS */}
-      <LogAnalysisModal docId={selectedDoc || ""} onClose={() => setSelectedDoc(null)} />
-      <ReprocessConfirmModal isOpen={isReprocessOpen} onClose={() => setIsReprocessOpen(false)} />
-
-      {/* BARRA DE HERRAMIENTAS (TOOLBAR) */}
-      <div className="flex items-center justify-between px-1">
-        {/* Buscador */}
-        <div className="relative w-full max-w-md group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-[#ff6b00] transition-colors" />
-          <Input 
-            placeholder="Buscar por ID o Auditor..." 
-            className="bg-white border-none h-12 rounded-2xl w-full shadow-sm pl-12 text-sm font-medium focus-visible:ring-1 focus-visible:ring-orange-200" 
-          />
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {/* Selector Creación / Actualización */}
-          <div className="bg-white p-1.5 rounded-[1.25rem] flex items-center shadow-sm border border-gray-50 h-12">
-            <button 
-              onClick={() => setOperationType("creacion")} 
-              className={cn(
-                "px-6 h-full rounded-xl text-[10px] font-black uppercase transition-all", 
-                operationType === "creacion" ? "bg-slate-50 text-[#1C1E59] shadow-inner" : "text-gray-400 hover:text-gray-600"
-              )}
-            >
-              Creación
-            </button>
-            <button 
-              onClick={() => setOperationType("actualizacion")} 
-              className={cn(
-                "px-6 h-full rounded-xl text-[10px] font-black uppercase transition-all", 
-                operationType === "actualizacion" ? "bg-slate-50 text-[#1C1E59] shadow-inner" : "text-gray-400 hover:text-gray-600"
-              )}
-            >
-              Actualización
-            </button>
-          </div>
-
-          {/* BOTÓN FILTROS (DISEÑO EXACTO IMAGEN) */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button className="h-12 px-6 rounded-[1.25rem] bg-[#ff6b00] hover:bg-[#e66000] text-white font-black uppercase text-[10px] tracking-widest gap-2 shadow-lg shadow-orange-100 transition-all active:scale-95">
-                <Filter size={18} strokeWidth={2.5} />
-                <span>Filtros</span>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80 p-6 rounded-[2rem] shadow-2xl border-none z-[120]" align="end">
-              <div className="space-y-6">
-                <h4 className="font-black text-[#1C1E59] text-xs uppercase italic tracking-wider">Filtros Avanzados</h4>
-                <div className="grid grid-cols-2 gap-3">
-                   <div className="relative">
-                      <Input type="date" className="h-12 rounded-xl border-gray-100 bg-gray-50/50 text-[10px] font-bold uppercase" />
-                   </div>
-                   <div className="relative">
-                      <Input type="date" className="h-12 rounded-xl border-gray-100 bg-gray-50/50 text-[10px] font-bold uppercase" />
-                   </div>
-                </div>
-                <Button className="w-full h-12 bg-[#1C1E59] hover:bg-[#0A0E3F] text-white text-[10px] font-black uppercase rounded-2xl shadow-xl transition-all">
-                  Aplicar
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-
-          <Button className="h-12 w-12 p-0 bg-[#ff6b00] text-white rounded-[1.25rem] shadow-lg shadow-orange-100 hover:bg-[#e66000] transition-all active:scale-95">
-            <FileText size={20} />
-          </Button>
-        </div>
-      </div>
-
-      {/* TABLA PRINCIPAL */}
-      <div className="bg-white rounded-[2rem] shadow-2xl border border-gray-50 overflow-hidden flex flex-col flex-1">
-        <Table>
-          <TableHeader className="bg-[#1C1E59]">
-            <TableRow className="hover:bg-transparent border-none h-14">
-              <TableHead className="text-[10px] font-black uppercase text-white pl-8 tracking-widest">Documento ID</TableHead>
-              <TableHead className="text-[10px] font-black uppercase text-white tracking-widest">Tipo Logístico</TableHead>
-              <TableHead className="text-[10px] font-black uppercase text-white text-center tracking-widest">Estado</TableHead>
-              <TableHead className="text-[10px] font-black uppercase text-white text-right pr-12 tracking-widest">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="h-32 text-center text-gray-400 font-bold italic">No se encontraron registros</TableCell>
-              </TableRow>
-            ) : (
-              filteredData.map((row) => (
-                <TableRow key={row.id} className="hover:bg-slate-50/50 border-b border-gray-50 h-20 transition-colors">
-                  <TableCell className="font-black text-sm text-[#1C1E59] pl-8">{row.id}</TableCell>
-                  <TableCell className="text-[10px] font-bold text-gray-500 uppercase italic">{row.type}</TableCell>
-                  <TableCell className="text-center">
-                    <Badge className={cn(
-                      "text-[8px] px-3 py-1 font-black rounded-full border-none shadow-none", 
-                      row.status === "FAILED" ? "bg-red-50 text-red-400" : "bg-emerald-50 text-emerald-400"
-                    )}>
-                      {row.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right pr-8">
-                    <div className="flex items-center justify-end gap-2">
-                      {/* BOTÓN OJO -> Abre Análisis de Logs */}
-                      <button 
-                        onClick={() => setSelectedDoc(row.id)} 
-                        className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-300 hover:text-cyan-500 hover:border-cyan-100 transition-all bg-white shadow-sm active:scale-90"
-                      >
-                        <Eye size={18} />
-                      </button>
-                      
-                      <button className="w-10 h-10 rounded-full border border-gray-100 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-all bg-white shadow-sm active:scale-90">
-                        <Download size={18} />
-                      </button>
-
-                      {/* BOTÓN RECARGAR -> Abre Confirmar Reproceso (Solo si FAILED) */}
-                      {row.status === "FAILED" && (
-                        <button 
-                          onClick={() => setIsReprocessOpen(true)} 
-                          className="w-10 h-10 rounded-full border border-orange-100 flex items-center justify-center text-[#ff6b00] hover:bg-orange-50 transition-all bg-white shadow-sm active:scale-90"
-                        >
-                          <RotateCw size={18} />
-                        </button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
-}
 
 // --- CONTENIDO: CARGA ARCHIVOS ---
 function FileUploadContent({ onUpload }: { onUpload: () => void }) {
@@ -1313,8 +1171,12 @@ const MenuGridButton = ({
   </button>
 );
 
+
 interface LocationFilterProps {
-  onFilterChange: (locationId: string | null, dockGroupId: string | null) => void;
+  onFilterChange: (id: string | null) => void; 
+  onViewChange: (view: "muelles" | "monitoreo" | "gestion" | "auditoria" | "registros" | "mapa" | "reportes" | "carga", subview?: string) => void;
+  currentView: string;
+  selectedLocationId: string | null;
 }
 
 function RegistrosModalContent({ registroId }: { registroId: string }) {
@@ -1331,7 +1193,6 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
     let timer: NodeJS.Timeout;
 
     if (step === 'scanner' || step === 'tracking-scanner') {
-      // Simulamos que el hardware del escáner tarda 2.5 segundos en enfocar y leer
       timer = setTimeout(() => {
         handleScannerDetection();
       }, 2500);
@@ -1562,8 +1423,13 @@ function RegistrosModalContent({ registroId }: { registroId: string }) {
 
 
 
-export function LocationFilter({ onFilterChange }: LocationFilterProps) {
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+export function LocationFilter({ 
+  onFilterChange, 
+  onViewChange, 
+  currentView, 
+  selectedLocationId 
+}: LocationFilterProps) {
+
   const [selectedDockGroupId, setSelectedDockGroupId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   
@@ -1583,16 +1449,18 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
   };
 
 
-  useEffect(() => {
-    onFilterChange(selectedLocationId, selectedDockGroupId);
-  }, [selectedLocationId, selectedDockGroupId, onFilterChange]);
+// SI DECIDES MANTENERLO, DEBE SER ASÍ:
+useEffect(() => {
+  // Solo pasamos el ID de localidad, que es lo que espera la interface
+  onFilterChange(selectedLocationId); 
+}, [selectedLocationId, onFilterChange]);
 
-  const handleLocationChange = (value: string) => {
-    setSelectedLocationId(value);
-    setSelectedDockGroupId(null);
-    setIsLoaded(true);
-  };
-
+  // AHORA (CORRECTO):
+const handleLocationChange = (value: string) => {
+  onFilterChange(value); // <--- Llamamos a la función del padre
+  setSelectedDockGroupId(null);
+  setIsLoaded(true);
+};
   const handleDockGroupChange = (value: string) => {
     setSelectedDockGroupId(value);
   };
@@ -1622,31 +1490,7 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
           
           <div className="h-8 w-px bg-gray-100 mx-2" />
 
-              {/* 2. SELECTOR LOCALIDAD */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-yms-gray">
-            <MapPinIcon className="w-5 h-5 text-yms-secondary" />
-            <span className="font-bold text-sm text-gray-600">Localidad:</span>
-          </div>
-          <Select value={selectedLocationId || ""} onValueChange={handleLocationChange}>
-            <SelectTrigger className={cn(
-              "w-[320px] h-10 rounded-full border-gray-200 bg-white focus:ring-2 focus:ring-yms-cyan transition-all text-sm", 
-              !selectedLocationId && "text-gray-400"
-            )}>
-              <SelectValue placeholder="Seleccionar localidad..." />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-gray-100 shadow-xl">
-              {locationsData.map((location) => (
-                <SelectItem key={location.id} value={location.id} className="cursor-pointer focus:bg-gray-100 focus:text-gray-900 rounded-lg m-1">
-                  <div className="flex flex-col py-1">
-                    <span className="font-bold text-yms-primary">{location.name}</span>
-                    <span className="text-[10px] text-gray-400 leading-tight">{location.address}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        
         </div>
 
         {/* LADO DERECHO: BARRA DE ACCIONES DASHBOARD */}
@@ -1664,207 +1508,129 @@ export function LocationFilter({ onFilterChange }: LocationFilterProps) {
             />
           </div>
           
+         <DashboardNavButton 
+            icon={Warehouse} 
+            label="Muelles" 
+            variant={currentView === "muelles" ? "orange" : "navy"}
+            onClick={() => onViewChange("muelles")}
+            isActive={currentView === "muelles"}
+          />
+
+          <DashboardNavButton 
+            icon={CalendarClock} 
+            label="Gestión de Citas" 
+            variant={currentView === "gestion" ? "orange" : "navy"}
+            onClick={() => onViewChange("gestion")} 
+            isActive={currentView === "gestion"}
+          />
+
+          <DashboardNavButton 
+            icon={Activity} 
+            label="Monitoreo" 
+            variant={currentView === "monitoreo" ? "orange" : "navy"}
+            onClick={() => onViewChange("monitoreo")} 
+            isActive={currentView === "monitoreo"}
+          />
           {/* BOTÓN ÚNICO DE REGISTROS (EXPANDIBLE + POPOVER) */}
-          <Popover>
-            <PopoverTrigger asChild>
-              <DashboardNavButton icon={LayoutGrid} label="Registros" variant="orange" />
-            </PopoverTrigger>
-            <PopoverContent className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100" align="center">
-              <div className="grid grid-cols-1 gap-1">
-                <div className="px-3 py-2 border-b border-gray-50 mb-1">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gestión de Patio</span>
-                </div>
-                {REGISTRO_OPCIONES.map((opt) => (
-                  <button
-                    key={opt.id}
-                    onClick={() => { setSelectedRegistro(opt.id); setIsModalOpen(true); }}
-                    className="flex items-center gap-3 p-3 w-full hover:bg-orange-50 rounded-xl transition-colors group text-left"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
-                      <opt.icon size={16} />
-                    </div>
-                    <span className="text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter">{opt.label}</span>
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+
+          {/* BOTÓN ÚNICO DE REGISTROS (EXPANDIBLE + POPOVER) */}
+<Popover>
+  <PopoverTrigger asChild>
+    <DashboardNavButton 
+      icon={LayoutGrid} 
+      label="Registros" 
+      variant={currentView === "registros" ? "orange" : "navy"}
+      isActive={currentView === "registros"}
+    />
+  </PopoverTrigger>
+  
+  {/* El PopoverContent debe tener un Z-index alto y ser vertical */}
+  <PopoverContent 
+    className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100 bg-white z-[110]" 
+    align="center"
+    sideOffset={8}
+  >
+    <div className="flex flex-col gap-1">
+      {/* Título interno del menú */}
+      <div className="px-3 py-2 border-b border-gray-50 mb-1">
+        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            Gestión de Patio
+        </span>
+      </div>
+      
+      {/* Mapeo de opciones: AQUÍ ES DONDE SE VUELVEN VERTICALES */}
+      {REGISTRO_OPCIONES.map((opt) => (
+        <button
+          key={opt.id}
+          onClick={() => {
+            onViewChange("registros", opt.id);
+          }}
+          className="flex items-center gap-3 p-3 w-full hover:bg-orange-50 rounded-xl transition-colors group text-left"
+        >
+          <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
+            <opt.icon size={16} />
+          </div>
+          <span className="text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter">
+            {opt.label}
+          </span>
+        </button>
+      ))}
+    </div>
+  </PopoverContent>
+</Popover>
 
           {/* BOTÓN MAPA EN EL NAVBAR */}
- <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
-  <DialogTrigger asChild>
-    <DashboardNavButton icon={MapPin} label="Mapa" variant="orange" />
-  </DialogTrigger>
-  <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-white z-[100] flex flex-col [&>button]:hidden">
-    <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-      <div className="flex items-center gap-3 text-white">
-        <MapPin size={20} className="text-[#ff6b00]" />
-        <h2 className="text-sm font-bold uppercase tracking-tight italic">Monitoreo Satelital de Arribos</h2>
-      </div>
-      <button onClick={() => setIsMapOpen(false)} className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-        <X size={20} />
-      </button>
-    </div>
-    <div className="flex-1 relative overflow-hidden">
-      <VehicleMap locationName={selectedLocation?.name || "SIN LOCALIDAD"} />
-    </div>
-  </DialogContent>
-</Dialog>
+          <DashboardNavButton 
+            icon={MapPin} 
+            label="Mapa" 
+            // Cambia a naranja si estamos en la vista de mapa
+            variant={currentView === "mapa" ? "orange" : "navy"}
+            isActive={currentView === "mapa"}
+            onClick={() => onViewChange("mapa")} 
+          />
 
          {/* AUDITORÍA */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <DashboardNavButton icon={HistoryIcon} label="Auditoría" variant="navy" />
-            </DialogTrigger>
-            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
-              {/* Header de Pantalla Completa */}
-              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-                <div className="flex items-center gap-3">
-                  <HistoryIcon className="text-white" size={20} />
-                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Auditoría General de Documentos</h2>
-                </div>
-                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-                  <X size={20} />
-                </DialogPrimitive.Close>
-              </div>
-
-              {/* Contenido con Scroll */}
-              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                <div className="max-w-7xl mx-auto h-full">
-                   <AuditHistoryContent />
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <DashboardNavButton 
+            icon={HistoryIcon} 
+            label="Auditoría" 
+            // Si la vista activa es auditoria, se pone naranja, si no, azul (navy)
+            variant={currentView === "auditoria" ? "orange" : "navy"}
+            onClick={() => onViewChange("auditoria")}
+            isActive={currentView === "auditoria"}
+          />
 
           {/* REPORTES (PANTALLA COMPLETA + FORM CENTRADO) */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <DashboardNavButton icon={BarChart3} label="Reportes" variant="navy" />
-            </DialogTrigger>
-            
-            {/* Contenedor Full Screen */}
-            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
-              
-              {/* Header Navy (Consistente con Auditoría) */}
-              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="text-white" size={20} />
-                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Módulo de Reportes y Estadísticas</h2>
-                </div>
-                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-                  <X size={20} />
-                </DialogPrimitive.Close>
-              </div>
+          <DashboardNavButton 
+              icon={BarChart3} 
+              label="Reportes" 
+              variant={currentView === "reportes" ? "orange" : "navy"}
+              isActive={currentView === "reportes"}
+              onClick={() => onViewChange("reportes")}
+            />
 
-              {/* Cuerpo del Modal: Centrado perfecto del Formulario */}
-              <div className="flex-1 flex items-center justify-center p-6 overflow-y-auto custom-scrollbar">
-                
-                {/* Caja del Formulario Estilo Dashboard */}
-                <div className="w-full max-w-4xl bg-white p-12 rounded-[3rem] shadow-[0_20px_70px_rgba(0,0,0,0.05)] border border-gray-100 animate-in fade-in zoom-in-95 duration-500">
-                  <div className="mb-8 text-center">
-                    <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <BarChart3 className="text-[#ff6b00]" size={32} />
-                    </div>
-                    <h3 className="text-2xl font-black text-[#1C1E59] uppercase italic tracking-tighter">Filtros de Búsqueda</h3>
-                    <p className="text-gray-400 text-xs font-medium">Define los parámetros para generar tu reporte logístico</p>
-                  </div>
-
-                  {/* Tu componente original de filtros */}
-                  <ReportFiltersContent />
-                </div>
-
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          {/* USUARIOS (PANTALLA COMPLETA) */}
-         <Dialog>
-  <DialogTrigger asChild>
-    <DashboardNavButton icon={Users} label="Usuarios" variant="navy" />
-  </DialogTrigger>
-  <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
-    
-    <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-      <div className="flex items-center gap-3">
-        <Users className="text-white" size={20} />
-        <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Gestión de Usuarios y Accesos</h2>
-      </div>
-      <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-        <X size={20} />
-      </DialogPrimitive.Close>
-    </div>
-
-    <div className="flex-1 p-8 overflow-hidden flex flex-col">
-       <Tabs defaultValue="usuarios" className="h-full flex flex-col">
-          <div className="flex items-center justify-between mb-2 shrink-0">
-             <TabsList className="bg-white p-1 rounded-2xl h-12 w-fit shadow-sm border border-gray-100">
-                <TabsTrigger value="usuarios" className="rounded-xl px-10 h-full text-[10px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white transition-all">Administración de Usuarios</TabsTrigger>
-                <TabsTrigger value="perfiles" className="rounded-xl px-10 h-full text-[10px] font-black uppercase data-[state=active]:bg-[#ff6b00] data-[state=active]:text-white transition-all">Administración de Perfiles</TabsTrigger>
-             </TabsList>
-             <Badge variant="outline" className="bg-white border-gray-100 text-gray-300 font-black px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest">Control de accesos YMS v2.0</Badge>
-          </div>
-
-          <TabsContent value="usuarios" className="flex-1 min-h-0 m-0 outline-none">
-             <UsuariosTable />
-          </TabsContent>
-
-          <TabsContent value="perfiles" className="flex-1 min-h-0 m-0 outline-none py-6">
-             <PerfilesTabContent />
-          </TabsContent>
-       </Tabs>
-    </div>
-  </DialogContent>
-</Dialog>
+      
 
           {/* CARGA DOCUMENTOS */}
-          {/* CARGA DOCUMENTOS (PANTALLA COMPLETA) */}
-          <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
-            <DialogTrigger asChild>
-              <DashboardNavButton icon={Upload} label="Cargar" variant="navy" />
-            </DialogTrigger>
-            
-            {/* Contenedor Full Screen: !fixed !inset-0 !w-screen !h-screen */}
-            <DialogContent className="!fixed !inset-0 !translate-x-0 !translate-y-0 !max-w-none !w-screen !h-screen !m-0 !p-0 !rounded-none border-none bg-[#f8fafc] z-[100] flex flex-col [&>button]:hidden">
-              
-              {/* Cabecera Navy Estilo Dashboard */}
-              <div className="bg-[#1C1E59] h-14 flex items-center justify-between px-6 shrink-0 w-full shadow-sm z-10">
-                <div className="flex items-center gap-3">
-                  <Upload className="text-white" size={20} />
-                  <h2 className="text-sm font-bold text-white uppercase tracking-tight italic">Carga Masiva de Documentos</h2>
-                </div>
-                <DialogPrimitive.Close className="text-white/40 hover:text-white outline-none p-1.5 hover:bg-white/10 rounded-full transition-colors">
-                  <X size={20} />
-                </DialogPrimitive.Close>
-              </div>
-
-              {/* Cuerpo del Modal: Contenedor de carga centrado */}
-              <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto custom-scrollbar">
-                
-                {/* Caja Blanca Premium para el Dropzone */}
-                <div className="w-full max-w-6xl bg-white rounded-[3rem] shadow-[0_20px_70px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
-                  <div className="p-10">
-                    <FileUploadContent onUpload={() => { setIsUploadModalOpen(false); setIsResultsModalOpen(true); }} />
-                  </div>
-                </div>
-
-              </div>
-            </DialogContent>
-          </Dialog>
+          <DashboardNavButton 
+            icon={Upload} 
+            label="Cargar" 
+            variant={currentView === "carga" ? "orange" : "navy"}
+            isActive={currentView === "carga"}
+            onClick={() => onViewChange("carga")}
+          />
           
 
           <div className="w-px h-6 bg-gray-200 mx-1" />
 
           {/* GRUPO 3: ICONOS DE PERFIL (SOLICITADOS) */}
           <div className="flex items-center gap-5">
-              {/* ICONO COG (ENGRANAJE REAL) */}
            
 
-  <button className="text-[#1e2b58] hover:scale-110 transition-transform active:scale-95">
-    <SettingsIcon 
-      className="w-[22px] h-[22px]" 
-    />
-  </button>
+          <button className="text-[#1e2b58] hover:scale-110 transition-transform active:scale-95">
+            <SettingsIcon 
+              className="w-[22px] h-[22px]" 
+            />
+          </button>
 
             <button className="text-[#1e2b58] hover:scale-110 transition-transform">
               <LayoutGrid size={22} strokeWidth={2.5} fill="#1e2b58" className="stroke-none" />

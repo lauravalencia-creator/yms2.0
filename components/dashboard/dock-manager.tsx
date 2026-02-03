@@ -34,10 +34,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+// --- NUEVOS IMPORTS PARA EL SELECT DE LOCALIDAD ---
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 // --- TIPOS (Sin cambios) ---
 type AppointmentStatus = "scheduled" | "in-progress" | "completed" | "delayed" | "pending";
 type ViewMode = "grid" | "timeline";
 type TimeFrame = "day" | "week" | "month";
+
+// --- TIPOS PARA LOCALIDADES (Traídos del segundo componente) ---
+export interface DockGroup {
+  id: string;
+  name: string;
+  dockCount: number;
+  type: "inbound" | "outbound" | "mixed";
+}
+
 
 export interface Appointment {
   id: string;
@@ -111,8 +129,10 @@ export interface Dock {
 // CAMBIO 1: Renombramos la prop para aceptar un ID de muelle específico
 interface DockManagerProps {
   locationId: string | null;
-  selectedDockId: string | null; // Antes dockGroupId
+  onLocationChange: (id: string | null) => void; // <-- Agregar esto a la interfaz
+  selectedDockId: string | null;
 }
+
 
 // ... [Mantén aquí todas las funciones auxiliares de iconos (TruckIcon, etc.)] ...
 // ... [Mantén aquí las funciones auxiliares de estilos (getOccupancyStyle, etc.)] ...
@@ -135,309 +155,118 @@ function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
   return <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}><path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clipRule="evenodd" /></svg>;
 }
 
+
+
 const locationsData = [
   {
     id: "loc-1",
-    name: "Centro de Distribucion Norte",
-    dockGroups: [
-      { id: "dg-1a", name: "Muelle A" },
-      { id: "dg-1b", name: "Muelle B" },
-      { id: "dg-1c", name: "Muelle Despacho" },
-      { id: "dg-1d", name: "Muelle Mixto" },
-    ],
+    name: "Centro de Distribución Norte",
   },
-  // ... resto de localidades
+  {
+    id: "loc-2",
+    name: "Centro Logístico Sur",
+  },
+  {
+    id: "loc-3",
+    name: "Terminal Portuaria Occidente",
+  }
 ];
 
 
-// --- DATOS COMPLETOS DE MUELLES ---
+
 const allDocks: Dock[] = [
+  // === LOCALIDAD 1: NORTE (11 Muelles) ===
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-1", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
     driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue",
-    route: "NORTE-01", priority: "ALTA", logisticProfile: "SECA" }}, // Campos agregados
-  
+    route: "NORTE-01", priority: "ALTA", logisticProfile: "SECA" }},
   { id: "dock-1a-2", name: "Muelle A-02", type: "inbound", status: "available", occupancy: 20, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-gray-1", carrier: "TransFuturo", truckId: "FUT-2026", time: "14:00", type: "inbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1a", duration: 60,
     driver: "Esteban Quito", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Planta Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
-    route: "BOG-02", priority: "MEDIA", logisticProfile: "FRIO" }}, // Campos agregados
-
+    route: "BOG-02", priority: "MEDIA", logisticProfile: "FRIO" }},
   { id: "dock-1a-3", name: "Muelle A-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1a" },
-
   { id: "dock-1a-4", name: "Muelle A-04", type: "inbound", status: "available", occupancy: 15, locationId: "loc-1", dockGroupId: "dg-1a",
     currentAppointment: { id: "apt-completed-1", carrier: "Historic Logistics", truckId: "TRK-OLD", time: "05:00", type: "inbound", status: "completed", locationId: "loc-1", dockGroupId: "dg-1a", duration: 120, 
     driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
-    route: "URBANA-01", priority: "NORMAL", logisticProfile: "FRIO" } // Campos agregados
-  },
-
+    route: "URBANA-01", priority: "NORMAL", logisticProfile: "FRIO" }},
   { id: "dock-1b-1", name: "Muelle B-01", type: "inbound", status: "occupied", occupancy: 50, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-2", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
     driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue",
-    route: "SUR-05", priority: "MEDIA", logisticProfile: "SECA" }}, // Campos agregados
-
+    route: "SUR-05", priority: "MEDIA", logisticProfile: "SECA" }},
   { id: "dock-1b-2", name: "Muelle B-02", type: "inbound", status: "available", occupancy: 10, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-gray-2", carrier: "Andina Carga", truckId: "AND-99", time: "16:30", type: "inbound", status: "pending", locationId: "loc-1", dockGroupId: "dg-1b", duration: 90,
     driver: "Julian Alvarez", city: "CALI", department: "VALLE", locationName: "Bodega B", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
-    route: "EJE-01", priority: "NORMAL", logisticProfile: "GRANEL" }}, // Campos agregados
-
+    route: "EJE-01", priority: "NORMAL", logisticProfile: "GRANEL" }},
   { id: "dock-1b-3", name: "Muelle B-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1b" },
-
   { id: "dock-1b-4", name: "Muelle B-04", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1b",
     currentAppointment: { id: "apt-3", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
     driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
-    route: "LOCAL-04", priority: "ALTA", logisticProfile: "GRANEL" }}, // Campos agregados
-
+    route: "LOCAL-04", priority: "ALTA", logisticProfile: "GRANEL" }},
   { id: "dock-1c-1", name: "Despacho 01", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c",
     currentAppointment: { id: "apt-4", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue",
-    route: "NACIONAL-01", priority: "ALTA", logisticProfile: "SECA" }}, // Campos agregados
-
+    route: "NACIONAL-01", priority: "ALTA", logisticProfile: "SECA" }},
   { id: "dock-1c-2", name: "Despacho 02", type: "outbound", status: "maintenance", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c" },
-
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
     currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane",
-    route: "URBANA", priority: "NORMAL", logisticProfile: "PAQUETEO" } }, // Campos agregados
+    route: "URBANA", priority: "NORMAL", logisticProfile: "PAQUETEO" } },
 
-  { id: "dock-2a-1", name: "Norte 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
-    currentAppointment: { id: "apt-5", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola",
-    route: "R-10", priority: "MEDIA", logisticProfile: "SECA" }}, // Campos agregados
+  // === LOCALIDAD 2: SUR (5 Muelles) ===
+  { id: "dock-2a-1", name: "Muelle S-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2a",
+    currentAppointment: { id: "apt-sur-1", carrier: "TransGlobal", truckId: "TRK-9012", time: "08:00", type: "inbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2a", duration: 60, driver: "Pedro Sola",
+    route: "R-10", priority: "MEDIA", logisticProfile: "SECA" }},
+  { id: "dock-2a-2", name: "Muelle S-02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
+  { id: "dock-2a-3", name: "Muelle S-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2a" },
+  { id: "dock-2b-1", name: "Despacho S-01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-2", dockGroupId: "dg-2b" },
+  { id: "dock-2b-2", name: "Despacho S-02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
+    currentAppointment: { id: "apt-sur-2", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane",
+    route: "EJE-11", priority: "NORMAL", logisticProfile: "SECA" }},
 
-  { id: "dock-2b-2", name: "Sur 02", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-2", dockGroupId: "dg-2b",
-    currentAppointment: { id: "apt-7", carrier: "ExpressLine", truckId: "TRK-2345", time: "10:00", type: "outbound", status: "in-progress", locationId: "loc-2", dockGroupId: "dg-2b", duration: 90, driver: "Luisa Lane",
-    route: "EJE-11", priority: "NORMAL", logisticProfile: "SECA" }}, // Campos agregados
+  // === LOCALIDAD 3: PUERTO (8 Muelles) ===
+  { id: "dock-3a-1", name: "Contenedor 01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3a",
+    currentAppointment: { id: "apt-prt-1", carrier: "Maersk", truckId: "CONT-99", time: "06:00", type: "inbound", status: "in-progress", locationId: "loc-3", dockGroupId: "dg-3a", duration: 240, driver: "John Doe",
+    route: "INT-01", priority: "ALTA", logisticProfile: "CONTENEDOR" }},
+  { id: "dock-3a-2", name: "Contenedor 02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3a" },
+  { id: "dock-3a-3", name: "Contenedor 03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3a" },
+  { id: "dock-3a-4", name: "Contenedor 04", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3a" },
+  { id: "dock-3b-1", name: "Carga Granel 01", type: "outbound", status: "maintenance", occupancy: 100, locationId: "loc-3", dockGroupId: "dg-3b" },
+  { id: "dock-3b-2", name: "Carga Granel 02", type: "inbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3b" },
+  { id: "dock-3c-1", name: "Patio 01", type: "outbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3c" },
+  { id: "dock-3c-2", name: "Patio 02", type: "outbound", status: "available", occupancy: 0, locationId: "loc-3", dockGroupId: "dg-3c" },
 ];
+
+
+
+
+
+
 
 // --- Citas pendientes ---
 const pendingAppointments: Appointment[] = [
+  // LOCALIDAD 1
   { 
-    id: "NOTAPRUEBAABI5002",
-    carrier: "FERRIAMARILLA S.A.S",
-    truckId: "TRK-ANT-001",
-    time: "15:28",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-28",
-    nit: "900.742.771-9",
-    quantityOrdered: 150,
-    quantityDelivered: 50,
-    peso: "5,000",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "MEDELLIN_ANT",
-    product: "PRODUCTO EJEMPLO 1",
-    canal: "MODERNO",
-    route: "RUTA SUR-01",
-    priority: "ALTA",
-    logisticProfile: "REFRIGERADO"
+    id: "NOTAPRUEBAABI5002", carrier: "FERRIAMARILLA S.A.S", truckId: "TRK-ANT-001", time: "15:28", type: "inbound", status: "pending", 
+    locationId: "loc-1", locationName: "CENTRO DE DISTRIBUCIÓN NORTE", date: "2026-01-28", nit: "900.742.771-9", quantityOrdered: 150, quantityDelivered: 50, peso: "5,000", operationType: "Descargue", isReadyForAssignment: false, zone: "MEDELLIN_ANT", product: "PRODUCTO EJEMPLO 1", canal: "MODERNO", route: "RUTA SUR-01", priority: "ALTA", logisticProfile: "REFRIGERADO"
   },
   { 
-    id: "ABI10200",
-    carrier: "DISTRIBUIDORA NACIONAL",
-    truckId: "TRK-DC-014",
-    time: "08:00",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-28",
-    nit: "860.001.002-4",
-    quantityOrdered: 2400,
-    quantityDelivered: 1200,
-    peso: "3,500",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "BOGOTA_DC",
-    product: "ABARROTES VARIOS",
-    canal: "TRADICIONAL",
-    route: "NORTE-05",
-    priority: "MEDIA",
-    logisticProfile: "SECA"
+    id: "ABI10200", carrier: "DISTRIBUIDORA NACIONAL", truckId: "TRK-DC-014", time: "08:00", type: "inbound", status: "pending",
+    locationId: "loc-1", locationName: "CENTRO DE DISTRIBUCIÓN NORTE", date: "2026-01-28", nit: "860.001.002-4", quantityOrdered: 2400, quantityDelivered: 1200, peso: "3,500", operationType: "Descargue", isReadyForAssignment: false, zone: "BOGOTA_DC", product: "ABARROTES VARIOS", canal: "TRADICIONAL", route: "NORTE-05", priority: "MEDIA", logisticProfile: "SECA"
+  },
+  
+  // LOCALIDAD 2 (SUR)
+  { 
+    id: "SUR-88921", carrier: "ALIMENTOS DEL VALLE", truckId: "TRK-CALI-223", time: "09:30", type: "outbound", status: "pending",
+    locationId: "loc-2", locationName: "CENTRO LOGÍSTICO SUR", date: "2026-01-29", nit: "890.900.120-1", quantityOrdered: 500, quantityDelivered: 0, peso: "12,000", operationType: "Cargue", isReadyForAssignment: false, zone: "CALI", product: "AZUCAR", canal: "MODERNO", route: "SUR-02", priority: "ALTA", logisticProfile: "GRANEL"
   },
   { 
-    id: "DOC-88921",
-    carrier: "SOLA S.A.",
-    truckId: "TRK-ANT-223",
-    time: "09:30",
-    type: "outbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-29",
-    nit: "890.900.120-1",
-    quantityOrdered: 500,
-    quantityDelivered: 0,
-    peso: "12,000",
-    operationType: "Cargue",
-    isReadyForAssignment: false,
-    zone: "BELLO_ANT",
-    product: "HARINA DE TRIGO",
-    canal: "MODERNO",
-    route: "ORIENTE-02",
-    priority: "ALTA",
-    logisticProfile: "GRANEL"
+    id: "SUR-99281", carrier: "CARGAS DEL PACIFICO", truckId: "TRK-PAC-078", time: "11:45", type: "inbound", status: "pending",
+    locationId: "loc-2", locationName: "CENTRO LOGÍSTICO SUR", date: "2026-01-28", nit: "800.123.456-0", quantityOrdered: 1200, quantityDelivered: 800, peso: "8,200", operationType: "Descargue", isReadyForAssignment: false, zone: "PASTO", product: "PAPA", canal: "DIRECTO", route: "SUR-01", priority: "BAJA", logisticProfile: "SECA"
   },
+
+  // LOCALIDAD 3 (PUERTO)
   { 
-    id: "TRK-99281",
-    carrier: "ALIMENTOS POLAR",
-    truckId: "TRK-ATL-078",
-    time: "11:45",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-28",
-    nit: "800.123.456-0",
-    quantityOrdered: 1200,
-    quantityDelivered: 800,
-    peso: "8,200",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "SOLEDAD_ATL",
-    product: "CEREALES PACK",
-    canal: "DIRECTO",
-    route: "COSTA-01",
-    priority: "BAJA",
-    logisticProfile: "SECA"
-  },
-  { 
-    id: "GUID-77261",
-    carrier: "LOGISTICA INTEGRAL S.A.",
-    truckId: "TRK-EJE-031",
-    time: "14:15",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-29",
-    nit: "900.555.666-8",
-    quantityOrdered: 85,
-    quantityDelivered: 85,
-    peso: "1,200",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "DOSQUEBRADAS",
-    product: "REPUESTOS INDUSTRIALES",
-    canal: "MODERNO",
-    route: "EJE-03",
-    priority: "MEDIA",
-    logisticProfile: "ESTIBADO"
-  },
-  { 
-    id: "NOTA-44332",
-    carrier: "PRODUCTOS DIANA",
-    truckId: "TRK-VLL-119",
-    time: "07:20",
-    type: "outbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-30",
-    nit: "860.444.555-1",
-    quantityOrdered: 3000,
-    quantityDelivered: 1000,
-    peso: "15,000",
-    operationType: "Cargue",
-    isReadyForAssignment: false,
-    zone: "YUMBO_VALLE",
-    product: "ARROZ PREMIUM",
-    canal: "TRADICIONAL",
-    route: "SUR-02",
-    priority: "ALTA",
-    logisticProfile: "SECA"
-  },
-  { 
-    id: "ABI-55667",
-    carrier: "CERVECERIA UNION",
-    truckId: "TRK-ANT-542",
-    time: "10:00",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-28",
-    nit: "890.101.202-3",
-    quantityOrdered: 450,
-    quantityDelivered: 200,
-    peso: "22,000",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "ITAGUI_ANT",
-    product: "LIQUIDOS EMBOTELLADOS",
-    canal: "MODERNO",
-    route: "CENTRO-04",
-    priority: "MEDIA",
-    logisticProfile: "PESADA"
-  },
-  { 
-    id: "DOC-11223",
-    carrier: "NESTLE COLOMBIA",
-    truckId: "TRK-ANT-611",
-    time: "13:00",
-    type: "outbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-29",
-    nit: "860.000.123-9",
-    quantityOrdered: 600,
-    quantityDelivered: 300,
-    peso: "4,500",
-    operationType: "Cargue",
-    isReadyForAssignment: false,
-    zone: "ENVIGADO_ANT",
-    product: "LACTEOS VARIOS",
-    canal: "MODERNO",
-    route: "VALLE-06",
-    priority: "ALTA",
-    logisticProfile: "REFRIGERADO"
-  },
-  { 
-    id: "GUID-99001",
-    carrier: "COLGATE PALMOLIVE",
-    truckId: "TRK-VLL-204",
-    time: "16:45",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-28",
-    nit: "800.999.888-7",
-    quantityOrdered: 1500,
-    quantityDelivered: 750,
-    peso: "6,800",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "CALI_VALLE",
-    product: "CUIDADO PERSONAL",
-    canal: "DIRECTO",
-    route: "PACIFICO-01",
-    priority: "MEDIA",
-    logisticProfile: "SECA"
-  },
-  { 
-    id: "NOTA-88776",
-    carrier: "POSTOBON S.A.",
-    truckId: "TRK-CUN-901",
-    time: "06:00",
-    type: "inbound",
-    status: "pending",
-    locationId: "loc-1",
-    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
-    date: "2026-01-30",
-    nit: "890.333.222-1",
-    quantityOrdered: 5000,
-    quantityDelivered: 2500,
-    peso: "30,000",
-    operationType: "Descargue",
-    isReadyForAssignment: false,
-    zone: "CHIA_CUN",
-    product: "BEBIDAS CARBONATADAS",
-    canal: "MODERNO",
-    route: "SABANA-03",
-    priority: "ALTA",
-    logisticProfile: "PESADA"
+    id: "PORT-77261", carrier: "NAVIERA INTERNACIONAL", truckId: "TRK-BUN-031", time: "14:15", type: "inbound", status: "pending",
+    locationId: "loc-3", locationName: "TERMINAL PORTUARIA OCCIDENTE", date: "2026-01-29", nit: "900.555.666-8", quantityOrdered: 85, quantityDelivered: 85, peso: "1,200", operationType: "Descargue", isReadyForAssignment: false, zone: "BUENAVENTURA", product: "IMPORTACION CHINA", canal: "MODERNO", route: "INT-03", priority: "MEDIA", logisticProfile: "CONTENEDOR"
   }
 ];
 
@@ -1520,7 +1349,14 @@ function DockTimeline({
 
 // ... (Mantén los imports y tipos iniciales igual)
 
-export function DockManager({ locationId, selectedDockId: propSelectedDockId }: DockManagerProps) {
+export function DockManager({ 
+  locationId,         // Viene del padre (DashboardPage)
+  onLocationChange,   // Función para avisar al padre
+  selectedDockId      
+}: DockManagerProps) {
+
+
+
   const [isTechnicalModalOpen, setIsTechnicalModalOpen] = useState(false);
   const [allDocksState, setAllDocksState] = useState(allDocks);
   const [allAppointmentsState, setAllAppointmentsState] = useState(pendingAppointments);
@@ -1528,6 +1364,12 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
   const [dropTargetId, setDropTargetId] = useState<string | null>(null);
   
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+// --- NUEVOS ESTADOS PARA REDIMENSIÓN MANUAL ---
+  const [sidebarWidth, setSidebarWidth] = useState(320); // Ancho inicial
+  const [isResizing, setIsResizing] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  
   
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [timeFrame, setTimeFrame] = useState<TimeFrame>("day");
@@ -1546,14 +1388,48 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
    
   const [isSearchOpen, setIsSearchOpen] = useState(false); 
   const [searchQuery, setSearchQuery] = useState("");
-  const isExpandedSidebar = searchQuery.length > 0 || selectedAptIds.length > 0 || isSearchOpen;
- 
+  //const isExpandedSidebar = searchQuery.length > 0 || selectedAptIds.length > 0 || isSearchOpen;
+  const isExpandedSidebar = locationId !== null || searchQuery.length > 0;
 
   // --- NUEVOS ESTADOS PARA FECHA Y FILTRO LOCAL ---
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [localDockGroupId, setLocalDockGroupId] = useState<string>("all");
+  const [selectedDockIds, setSelectedDockIds] = useState<string[]>([]);
 
-  // Obtener la data de la localidad actual para el select de muelles
+   // --- LÓGICA DE REDIMENSIÓN ---
+  const startResizing = React.useCallback(() => setIsResizing(true), []);
+  const stopResizing = React.useCallback(() => setIsResizing(false), []);
+
+
+const resize = React.useCallback(
+    (mouseMoveEvent: MouseEvent) => {
+      if (isResizing && sidebarRef.current) {
+        const newWidth = mouseMoveEvent.clientX - sidebarRef.current.getBoundingClientRect().left;
+        // Límites: Mínimo 280px, Máximo 800px
+        if (newWidth > 280 && newWidth < 800) {
+          setSidebarWidth(newWidth);
+        }
+      }
+    },
+    [isResizing]
+  );
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener("mousemove", resize);
+      window.addEventListener("mouseup", stopResizing);
+    } else {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    }
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [isResizing, resize, stopResizing]);
+
+
+
+  // 2. Obtener datos de la localidad activa
   const currentLocationData = useMemo(() => 
     locationsData.find(l => l.id === locationId), 
   [locationId]);
@@ -1565,13 +1441,13 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
 
   // Sincronizar vista si cambia la selección desde el Navbar
   useEffect(() => {
-    if (propSelectedDockId && propSelectedDockId !== 'all') {
+    if (selectedDockId && selectedDockId !== 'all') {
       setViewMode('timeline');
-      setHighlightedDockId(propSelectedDockId);
+      setHighlightedDockId(selectedDockId);
     } else {
       setViewMode('grid');
     }
-  }, [propSelectedDockId]);
+  }, [selectedDockId]);
 
   // --- LÓGICA DE NAVEGACIÓN DE FECHAS ---
   const handleNavigate = (direction: 'next' | 'prev') => {
@@ -1613,18 +1489,29 @@ export function DockManager({ locationId, selectedDockId: propSelectedDockId }: 
     return "Hoy";
   }, [currentDate, viewMode, timeFrame]);
 
-  // --- FILTRADO DE DATOS ---
+
+
+
+  // 1. Filtrar Localidades para la búsqueda inicial
+  const filteredLocations = useMemo(() => {
+    if (locationId) return []; // Si ya hay ID, no mostramos la lista de sedes
+    if (!searchQuery.trim()) return locationsData;
+    return locationsData.filter(loc => 
+      loc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, locationId]);
+
+
   const filteredDocks = useMemo(() => {
-    if (!locationId) return [];
+    if (!locationId) return []; 
     let filtered = allDocksState.filter((dock) => dock.locationId === locationId);
-    if (localDockGroupId !== "all") {
-      filtered = filtered.filter((dock) => dock.dockGroupId === localDockGroupId);
-    }
-    if (propSelectedDockId && propSelectedDockId !== "all" && propSelectedDockId.startsWith('dock')) {
-       filtered = filtered.filter(dock => dock.id === propSelectedDockId);
+    if (selectedDockIds.length > 0) {
+      filtered = filtered.filter((dock) => selectedDockIds.includes(dock.id));
     }
     return filtered;
-  }, [allDocksState, locationId, localDockGroupId, propSelectedDockId]);
+  }, [allDocksState, locationId, selectedDockIds]);
+
+
 
 const filteredAppointments = useMemo(() => {
     if (!locationId) return [];
@@ -1636,13 +1523,14 @@ const filteredAppointments = useMemo(() => {
         apt.carrier.toLowerCase().includes(query) || 
         apt.id.toLowerCase().includes(query) ||
         apt.city?.toLowerCase().includes(query) ||
-        apt.loadType?.toLowerCase().includes(query)
+        apt.product?.toLowerCase().includes(query)
       );
     }
     return filtered;
   }, [allAppointmentsState, locationId, searchQuery]);
 
-  // --- LÓGICA DE ESTADO DINÁMICO POR FECHA (Pégalo aquí) ---
+
+
   const docksWithTemporalStatus = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1716,6 +1604,26 @@ const filteredAppointments = useMemo(() => {
     setEditingAppointment(null);
   };
 
+   // --- NUEVOS HANDLERS PARA EL FLUJO DE SEDE ---
+const handleSelectLocation = (id: string) => {
+    onLocationChange(id); 
+    setSearchQuery("");
+  };
+
+  const handleClearLocation = () => {
+    onLocationChange(null);
+    setSearchQuery("");
+  };
+
+// --- HANDLER PARA SOLICITAR CITA MÚLTIPLE ---
+  const handleRequestMultipleAppointments = () => {
+    const selectedDocs = allAppointmentsState.filter(doc => selectedAptIds.includes(doc.id));
+    
+    if (selectedDocs.length > 0) {
+      setRequestModalAppointments(selectedDocs);
+    }
+  };
+
   const toggleAptSelection = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedAptIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]);
@@ -1755,9 +1663,7 @@ const filteredAppointments = useMemo(() => {
 
  {createModalAppointment && (
   <CreateAppointmentModal 
-    // PASO CLAVE: Ahora pasamos el array completo de items seleccionados
-    // Si vino de un drop, 'createModalAppointment' es un array de 1 item.
-    // Si vino de selección múltiple, ya es un array.
+
     selectedItems={Array.isArray(createModalAppointment) ? createModalAppointment : [createModalAppointment]} 
     suggestedDock={suggestedDockDisplay} 
     onClose={() => {
@@ -1785,108 +1691,114 @@ const filteredAppointments = useMemo(() => {
 )}
 
        <div className={cn("h-full flex gap-2 p-1 bg-[#f8fafc] overflow-hidden transition-all duration-500", isExpanded && "fixed inset-0 z-50 bg-white")}>
-      {/* PANEL IZQUIERDO (DOCUMENTOS) */}
+  {/* === PANEL IZQUIERDO (AHORA REDIMENSIONABLE) === */}
         <div 
+          ref={sidebarRef}
+          style={{ width: sidebarWidth }}
           className={cn(
-            "shrink-0 flex flex-col bg-white rounded-[1.5rem] border border-slate-200 shadow-2xl transition-all duration-500 ease-in-out relative overflow-hidden",
-            // CAMBIO: Anchos reducidos (800->600 y 380->320)
-            isExpandedSidebar ? "w-[600px]" : "w-[320px]" 
+            "shrink-0 flex flex-col bg-white rounded-[1.5rem] border border-slate-200 shadow-xl relative overflow-hidden",
+            !isResizing && "transition-[width] duration-300 ease-in-out"
           )}
         >
-          {/* HEADER NAVY INTEGRADO */}
-          <div className="bg-[#1C1E59] shrink-0">
-            {/* CAMBIO: Padding reducido en el header (py-5 -> py-3) */}
-            <div className="px-4 py-3 flex items-center justify-between gap-3">
-              
-              {/* Titulo */}
-              <div className={cn("flex items-center gap-3 transition-all duration-500", isSearchOpen ? "w-0 opacity-0 overflow-hidden" : "w-auto opacity-100")}>
-                 <div className="p-1.5 bg-orange-500 text-white rounded-lg shadow-lg flex items-center justify-center">
-                    <LayoutList className="w-4 h-4" strokeWidth={2.5} />
-                 </div>
-                 <div className="whitespace-nowrap">
-                    <h2 className="text-white font-black text-base uppercase leading-none tracking-tighter">Disponibilidad</h2>
-                    <p className="text-[7px] font-bold text-white/40 uppercase tracking-[0.2em] mt-0.5">Gestor de Documentos</p>
-                 </div>
-              </div>
-
-              {/* Acciones */}
-              <div className={cn("flex items-center gap-2 transition-all duration-500", isSearchOpen ? "flex-1" : "w-auto")}>
-                <div className={cn("relative transition-all duration-500 ease-in-out", isSearchOpen ? "flex-1" : "w-8")}>
-                  {isSearchOpen ? (
-                    <div className="flex items-center gap-2 animate-in slide-in-from-right-4">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={14} />
-                        <input 
-                          autoFocus
-                          type="text" 
-                          placeholder="FILTRAR..." 
-                          className="w-full pl-9 pr-8 py-2 bg-white/10 border border-white/10 rounded-lg text-[10px] font-black text-white placeholder:text-white/30 uppercase outline-none focus:bg-white/20 transition-all shadow-inner"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        <button 
-                          onClick={() => { setIsSearchOpen(false); setSearchQuery(""); }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <Button variant="ghost" onClick={() => setIsSearchOpen(true)} className="h-8 w-8 rounded-lg bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all">
-                      <Search size={16} />
-                    </Button>
-                  )}
-                </div>
-
-                {selectedAptIds.length > 0 && (
-                  <Button 
-                    onClick={() => setRequestModalAppointments(filteredAppointments.filter(a => selectedAptIds.includes(a.id)))}
-                    className="bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center gap-2 px-3 h-8 shadow-xl border-none animate-in zoom-in-95"
-                  >
-                    <span className="font-black uppercase text-[9px] tracking-widest whitespace-nowrap">Solicitar Cita ({selectedAptIds.length})</span>
-                  </Button>
-                )}
-              </div>
-            </div>
+          {/* 1. BUSCADOR */}
+          <div className="bg-white p-3 border-b border-slate-100 flex items-center gap-2 shrink-0 z-10">
+             <div className="relative flex-1">
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+               <input 
+                 type="text"
+                 placeholder={locationId ? "BUSCAR DOCUMENTO / SKU..." : "BUSCAR SEDE OPERATIVA..."}
+                 className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold text-[#1C1E59] placeholder:text-slate-400 uppercase outline-none focus:ring-1 focus:ring-orange-500 transition-all"
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+               />
+               {searchQuery && (<button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><X size={14} /></button>)}
+             </div>
           </div>
 
-          {/* LISTADO DE CARDS TÉCNICAS */}
-          {/* CAMBIO: Padding reducido (px-6 py-5 -> px-3 py-3) */}
-          <div className="flex-1 overflow-y-auto px-3 py-3 custom-scrollbar bg-slate-50/50">
+          {/* 2. ITEM SELECCIONADO */}
+          {locationId && currentLocationData && (
+             <div className="px-3 py-2 bg-slate-50 border-b border-slate-100 animate-in slide-in-from-top-2 duration-200 shrink-0">
+                <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-2 shadow-sm">
+                   <div className="flex items-center gap-2 overflow-hidden">
+                      <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                         <MapPin className="w-3 h-3 text-orange-600" />
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                         <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Sede Seleccionada</span>
+                         <span className="text-[10px] font-black text-[#1C1E59] uppercase truncate">{currentLocationData.name}</span>
+                      </div>
+                   </div>
+                   <button onClick={handleClearLocation} className="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 hover:text-red-500 transition-colors" title="Cambiar Sede"><X size={14} strokeWidth={3} /></button>
+                </div>
+             </div>
+          )}
+
+          {/* 3. LISTADO (SEDES o DOCUMENTOS) */}
+          <div className="flex-1 overflow-y-auto px-3 py-3 custom-scrollbar bg-white/50">
             {!locationId ? (
-              <div className="h-full flex flex-col items-center justify-center opacity-30">
-                 <MapPin size={48} className="mb-4 text-slate-400" />
-                 <p className="font-black uppercase text-[10px] tracking-widest text-slate-500">Selecciona una localidad</p>
-              </div>
+               <div className="space-y-2 animate-in fade-in duration-300">
+                  <div className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2 px-1">Resultados ({filteredLocations.length})</div>
+                  {filteredLocations.map(loc => {
+                    const dockCount = allDocksState.filter(d => d.locationId === loc.id).length;
+                    return (
+                      <div key={loc.id} onClick={() => handleSelectLocation(loc.id)} className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-orange-200 hover:bg-orange-50/10 cursor-pointer transition-all hover:shadow-sm">
+                         <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-white flex items-center justify-center border border-slate-200 group-hover:border-orange-200 transition-colors">
+                               <MapPin className="w-4 h-4 text-slate-400 group-hover:text-orange-500" />
+                            </div>
+                            <div>
+                               <h4 className="text-[11px] font-black text-[#1C1E59] uppercase group-hover:text-orange-600 transition-colors">{loc.name}</h4>
+                               <p className="text-[9px] font-medium text-slate-400 uppercase">{dockCount} Muelles Operativos</p>
+                            </div>
+                         </div>
+                         <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-orange-400" />
+                      </div>
+                    );
+                  })}
+                  {filteredLocations.length === 0 && (<div className="text-center py-10 text-slate-400 text-[10px] font-bold uppercase">No se encontraron sedes</div>)}
+               </div>
             ) : (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Dentro de DockManager, en el mapeo de filteredAppointments */}
-                  {filteredAppointments.map(doc => (
-                    <DocumentMaestroCard 
-                      key={doc.id}
-                      apt={doc}
-                      isSelected={selectedAptIds.includes(doc.id)}
-                      onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)}
-                      
-                      // NUEVAS PROPS:
-                      onDragStart={(e: React.DragEvent, id: string) => {
-                        setDraggingId(id);
-                        e.dataTransfer.setData("appointmentId", id); // Importante: guarda el ID en el buffer de drag
-                        e.dataTransfer.effectAllowed = "move";
-                      }}
-                      onDragEnd={() => {
-                        setDraggingId(null);
-                        setDropTargetId(null);
-                      }}
-                    />
-                  ))}
-              </div>
+               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  
+                     {/* HEADER DE SELECCIÓN CON BOTÓN SOLICITAR CITA */}
+                   <div className="flex justify-between items-center mb-3 px-1 h-8">
+                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Documentos ({filteredAppointments.length})</span>
+                      {selectedAptIds.length > 0 && (
+                         <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
+                            <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">{selectedAptIds.length} selec.</span>
+                            <Button 
+                              size="sm" 
+                              className="h-6 px-3 text-[9px] font-black bg-orange-500 hover:bg-orange-600 text-white border-none rounded-lg shadow-sm"
+                              onClick={handleRequestMultipleAppointments}
+                            >
+                              SOLICITAR CITA
+                            </Button>
+                         </div>
+                      )}
+                   </div>
+                   {filteredAppointments.length > 0 ? (
+                     filteredAppointments.map(doc => (
+                       <DocumentMaestroCard key={doc.id} apt={doc} isSelected={selectedAptIds.includes(doc.id)} onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)} onDragStart={(e: React.DragEvent, id: string) => { setDraggingId(id); e.dataTransfer.setData("appointmentId", id); }} onDragEnd={() => setDraggingId(null)} />
+                     ))
+                   ) : (
+                     <div className="flex flex-col items-center justify-center py-12 text-slate-300 gap-2"><Package size={32} strokeWidth={1.5} /><p className="text-[10px] font-bold uppercase">No hay documentos pendientes</p></div>
+                   )}
+               </div>
             )}
           </div>
         </div>
 
-
+        {/* === RESIZER (BARRA DE ARRASTRE) === */}
+        <div
+          className="w-4 z-20 cursor-col-resize flex items-center justify-center group hover:scale-110 active:scale-110 transition-transform -ml-2"
+          onMouseDown={startResizing}
+        >
+          {/* Línea visual del resizer */}
+          <div className={cn(
+            "w-1 h-12 rounded-full transition-all duration-200",
+            isResizing ? "bg-orange-500 scale-y-110" : "bg-slate-300/50 group-hover:bg-orange-400"
+          )} />
+        </div>
 
 
 
@@ -1896,24 +1808,86 @@ const filteredAppointments = useMemo(() => {
             <div className="flex items-center gap-4">
               <Badge variant="outline" className="bg-white text-slate-600 font-bold px-3 py-1 border-slate-200 shadow-sm">{filteredDocks.length} Muelles</Badge>
               
-              {/* --- SELECT DE MUELLES INTEGRADO --- */}
-              {locationId && (
-                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="w-px h-6 bg-slate-200" />
-                  <LayoutGrid className="w-4 h-4 text-yms-cyan" />
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Grupo:</span>
-                  <select 
-                    value={localDockGroupId} 
-                    onChange={(e) => setLocalDockGroupId(e.target.value)}
-                    className="text-xs font-bold text-[#1C1E59] bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-yms-cyan/20 cursor-pointer"
-                  >
-                    <option value="all">Todos los muelles</option>
-                    {currentLocationData?.dockGroups.map((group) => (
-                      <option key={group.id} value={group.id}>{group.name}</option>
-                    ))}
-                  </select>
+              {/* --- SELECT DE MUELLES INTEGRADO (MODIFICADO) --- */}
+{/* --- SELECTOR MULTI-MUELLE (POPOVER) --- */}
+{locationId && (
+  <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+    <div className="w-px h-6 bg-slate-200" />
+    <LayoutGrid className="w-4 h-4 text-yms-cyan" />
+    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Ver:</span>
+    
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button 
+          variant="outline" 
+          role="combobox" 
+          className="h-8 justify-between text-xs font-bold text-[#1C1E59] border-slate-200 bg-white min-w-[180px]"
+        >
+          {selectedDockIds.length === 0 
+            ? "Todos los muelles" 
+            : selectedDockIds.length === 1 
+              ? allDocksState.find(d => d.id === selectedDockIds[0])?.name 
+              : `${selectedDockIds.length} muelles seleccionados`}
+          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      
+      <PopoverContent className="w-[220px] p-0 bg-white border border-slate-200 shadow-xl rounded-lg" align="start">
+        <div className="max-h-[300px] overflow-y-auto p-1 custom-scrollbar">
+          
+          {/* OPCIÓN: TODOS */}
+          <div 
+            className="flex items-center px-2 py-2 cursor-pointer hover:bg-slate-50 rounded-md transition-colors"
+            onClick={() => setSelectedDockIds([])} // Vaciar array = Todos
+          >
+            <div className={cn(
+              "mr-2 flex h-4 w-4 items-center justify-center rounded border border-slate-300",
+              selectedDockIds.length === 0 ? "bg-[#1C1E59] border-[#1C1E59]" : "bg-white"
+            )}>
+               {selectedDockIds.length === 0 && <CheckCircle className="h-3 w-3 text-white" />}
+            </div>
+            <span className="text-xs font-bold text-slate-700">Todos los muelles</span>
+          </div>
+
+          <div className="h-px bg-slate-100 my-1" />
+
+          {/* LISTA DE MUELLES INDIVIDUALES */}
+          {allDocksState
+            .filter(d => d.locationId === locationId)
+            .map((dock) => {
+              const isSelected = selectedDockIds.includes(dock.id);
+              return (
+                <div 
+                  key={dock.id}
+                  className={cn(
+                    "flex items-center px-2 py-1.5 cursor-pointer rounded-md transition-colors",
+                    isSelected ? "bg-blue-50" : "hover:bg-slate-50"
+                  )}
+                  onClick={() => {
+                    setSelectedDockIds(prev => 
+                      isSelected 
+                        ? prev.filter(id => id !== dock.id) // Deseleccionar
+                        : [...prev, dock.id] // Seleccionar
+                    );
+                  }}
+                >
+                  <div className={cn(
+                    "mr-2 flex h-4 w-4 items-center justify-center rounded border transition-all",
+                    isSelected ? "bg-orange-500 border-orange-500" : "border-slate-300 bg-white"
+                  )}>
+                    {isSelected && <CheckCircle className="h-3 w-3 text-white" />}
+                  </div>
+                  <span className={cn("text-xs font-bold", isSelected ? "text-[#1C1E59]" : "text-slate-600")}>
+                    {dock.name}
+                  </span>
                 </div>
-              )}
+              );
+            })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  </div>
+)}
             </div>
 
             <div className="flex items-center gap-3">

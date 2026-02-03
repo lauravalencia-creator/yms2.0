@@ -60,9 +60,9 @@ import {
 /* ---------------- PROPS ---------------- */
 interface TablesSectionProps {
   locationId: string | null;
-  dockGroupId?: string | null;
+  initialSection?: "monitoreo" | "gestion"; 
+  onClose?: () => void;
 }
-
 
 export interface Appointment {
   id: string;
@@ -474,9 +474,10 @@ function DeleteConfirmDialog({ isOpen, onClose, onConfirm }: { isOpen: boolean, 
 
 /* ---------------- COMPONENT ---------------- */
 /* ---------------- COMPONENT ---------------- */
-export function TablesSection({ locationId }: TablesSectionProps) {
+export function TablesSection({ locationId, initialSection = "monitoreo", onClose }: TablesSectionProps) {
+  const [section, setSection] = useState<"monitoreo" | "gestion">(initialSection);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [section, setSection] = useState<"monitoreo" | "gestion">("monitoreo");
+  //const [section, setSection] = useState<"monitoreo" | "gestion">("monitoreo");
   const [monitoreoView, setMonitoreoView] = useState("appointments");
   const [gestionView, setGestionView] = useState("solicitudes");
 
@@ -495,6 +496,11 @@ export function TablesSection({ locationId }: TablesSectionProps) {
       setItemAEliminar(null);
     }
   };
+
+  // Sincronizar si la prop cambia mientras el componente está montado
+  React.useEffect(() => {
+    setSection(initialSection);
+  }, [initialSection]);
 
   const monitoringTabs = [
     { id: "appointments", label: "Consulta de Citas", icon: CalendarRange, count: 24 },
@@ -525,11 +531,11 @@ export function TablesSection({ locationId }: TablesSectionProps) {
 
   return (
     <div className={cn(
-      "bg-white border border-slate-200 rounded-3xl flex flex-col transition-all duration-500 ease-in-out",
-      isExpanded ? "fixed inset-4 z-[100] shadow-2xl" : "h-full w-full shadow-lg"
+      "bg-white border border-slate-200 rounded-3xl flex flex-col transition-all duration-500 ease-in-out h-full w-full shadow-lg",
+      isExpanded && "fixed inset-4 z-[110] shadow-2xl"
     )}>
       
-      <Tabs value={section} onValueChange={(v) => setSection(v as any)} className="flex-1 flex flex-col min-h-0">
+       <Tabs value={section} onValueChange={(v) => setSection(v as any)} className="flex-1 flex flex-col min-h-0">
         
         {/* --- TOOLBAR SUPERIOR --- */}
         <div className="px-5 py-3 border-b flex items-center justify-between bg-white shrink-0 gap-4">
@@ -580,13 +586,7 @@ export function TablesSection({ locationId }: TablesSectionProps) {
                 {locationId ? <FilterModal /> : (
                    <Button disabled variant="ghost" size="icon" className="h-9 w-9 rounded-xl text-slate-400"><Filter className="w-4 h-4"/></Button>
                 )}
-                <Button 
-                    variant="ghost" size="icon" 
-                    className={cn("h-9 w-9 rounded-xl transition-all", isExpanded ? "text-orange-500 bg-orange-50" : "text-slate-400 hover:bg-slate-50")}
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                </Button>
+              
             </div>
         </div>
 

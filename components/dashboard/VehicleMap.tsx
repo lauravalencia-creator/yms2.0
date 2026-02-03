@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, MapPin, Truck, CheckCircle2, 
   Building2, Calendar, Clock, 
-  User, ShieldCheck, FileText, Hash,
+  User, AlertTriangle, FileText, Hash,
   Scale, Droplets, Box, Phone, Anchor, ArrowRightLeft,
   Timer, BarChart3, LogOut, Package
 } from "lucide-react";
@@ -22,6 +22,8 @@ const createCustomIcon = (placa: string, type: 'carga' | 'descarga', isInside: b
   const arrowIcon = type === 'carga' 
     ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4CCAC8" stroke-width="4"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>`
     : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FF6C01" stroke-width="4"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>`;
+
+
 
   return L.divIcon({
     className: "custom-div-icon",
@@ -69,6 +71,8 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
     </div>
   );
 
+const isEnSitio = vehicle.status === 'EN SITIO';
+
   return (
     <div className="flex flex-col w-full h-full bg-white font-sans text-left">
       <div className="bg-[#050038] p-4 text-white shrink-0 sticky top-0 z-20 shadow-sm flex justify-between items-start">
@@ -86,8 +90,17 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
              <Badge className={cn("text-[9px] font-black border-none px-2 py-0.5", vehicle.type === 'carga' ? "bg-cyan-500 text-white" : "bg-[#ff6b00] text-white")}>
                 {vehicle.type.toUpperCase()}
             </Badge>
-            <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1">
-               <CheckCircle2 size={11} /> {vehicle.status}
+            <span className={cn(
+                "text-[9px] font-bold flex items-center gap-1 transition-colors",
+                isEnSitio ? "text-emerald-400" : "text-rose-500" // Verde si está, Rojo si no
+            )}>
+                {/* Cambiamos también el icono según el estado para mayor claridad visual */}
+                {isEnSitio ? (
+                    <CheckCircle2 size={11} /> 
+                ) : (
+                    <AlertTriangle size={11} className="animate-pulse" /> 
+                )}
+                {vehicle.status}
             </span>
         </div>
       </div>
@@ -252,7 +265,7 @@ export default function VehicleMap({ locationName }: { locationName: string }) {
       qty_req: '8500 L',
       qty_del: '8000 L',
       exit_time: '---',
-      status: 'EN SITIO',
+      status: 'FUERA DE LOCALIDAD',
       supplier: 'FRUTAS FRESCAS', 
       business_unit: 'CEDI SUR', 
       lat: 6.315, 

@@ -1,43 +1,121 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { LocationFilter } from "@/components/dashboard/location-filter";
+import { useState } from "react";
+import dynamic from "next/dynamic"; 
+import { LocationFilter, locationsData } from "@/components/dashboard/location-filter"; 
 import { DockManager } from "@/components/dashboard/dock-manager";
 import { TablesSection } from "@/components/dashboard/tables-section";
+import { AuditHistoryContent } from "@/components/dashboard/audit";
+import { RegisterManagerContent } from "@/components/dashboard/register-manager";
+import { ReportsManagerContent } from "@/components/dashboard/reports";
+import { UploadManagerContent } from "@/components/dashboard/upload-files";
+
+
+const VehicleMap = dynamic(
+  () => import('@/components/dashboard/VehicleMap'), 
+  { 
+    ssr: false,
+    loading: () => <div className="h-full w-full bg-slate-100 animate-pulse" /> 
+  }
+);
 
 export default function DashboardPage() {
+  // Estado único de la verdad para la localidad
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
-  // Renombramos el estado para que tenga sentido semántico (ahora es un ID de muelle específico)
-  const [selectedDockId, setSelectedDockId] = useState<string | null>(null);
+  
+  // Estado para la vista activa
+    const [activeView, setActiveView] = useState<"muelles" | "monitoreo" | "gestion" | "auditoria" | "registros" | "mapa" | "reportes" | "carga">("muelles");
 
-  const handleFilterChange = useCallback((locationId: string | null, dockId: string | null) => {
-    setSelectedLocationId(locationId);
-    setSelectedDockId(dockId);
-  }, []);
+  // Estado para el sub-tipo de registro (entrada, salida, etc.)
+  const [registerType, setRegisterType] = useState<string>("entrada");
+
+  // Buscamos el nombre de la localidad para el mapa
+  const selectedLocationName = locationsData.find(l => l.id === selectedLocationId)?.name || "SIN LOCALIDAD";
+
+  // 4. Esta es la función que procesa los clics del Navbar
+  const handleViewChange = (view: any, subView?: string) => {
+    setActiveView(view);
+    if (subView) {
+      setRegisterType(subView); 
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
-   
-      {/* Location Filter Bar */}
-      <LocationFilter onFilterChange={handleFilterChange} />
+      
+       <LocationFilter 
+        onFilterChange={setSelectedLocationId}
+        onViewChange={handleViewChange} // <--- CAMBIO: Usar handleViewChange, no setActiveView
+        currentView={activeView}
+        selectedLocationId={selectedLocationId}
+      />
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0">
-        {/* Dock Manager Section - 50% height */}
-        <section className="h-1/2 min-h-0 bg-slate-50">
-          <DockManager 
-            locationId={selectedLocationId} 
-            selectedDockId={selectedDockId} // <-- Aquí estaba el error, ahora usamos el nombre correcto
-          />
-        </section>
+      <main className="flex-1 flex flex-col min-h-0 bg-slate-50 relative overflow-hidden">
+        
+        {/* VISTA 1: GESTOR DE MUELLES */}
+        {activeView === "muelles" && (
+          <div className="h-full animate-in fade-in duration-500">
+            <DockManager 
+              locationId={selectedLocationId} 
+              onLocationChange={setSelectedLocationId} 
+              selectedDockId={null} 
+            />
+          </div>
+        )}
 
-        {/* Tables Section - 50% height */}
-        <section className="h-1/2 min-h-0">
-          <TablesSection 
-            locationId={selectedLocationId}
-            dockGroupId={selectedDockId} // Mantenemos el nombre antiguo si TablesSection no se ha actualizado, o pasamos el ID
-          />
-        </section>
+        {/* VISTA 2: MONITOREO */}
+        {activeView === "monitoreo" && (
+          <div className="h-full p-4 animate-in fade-in zoom-in-95 duration-300">
+            <TablesSection locationId={selectedLocationId} initialSection="monitoreo" />
+          </div>
+        )}
+
+        {/* VISTA 3: GESTIÓN */}
+        {activeView === "gestion" && (
+          <div className="h-full p-4 animate-in fade-in zoom-in-95 duration-300">
+            <TablesSection locationId={selectedLocationId} initialSection="gestion" />
+          </div>
+        )}
+
+        {/* VISTA 4: AUDITORÍA */}
+        {activeView === "auditoria" && (
+          <div className="h-full p-6 animate-in fade-in duration-500 overflow-hidden">
+             <AuditHistoryContent locationId={selectedLocationId} />
+          </div>
+        )}
+
+        {/* VISTA 5: REGISTROS */}
+       {activeView === "registros" && (
+          <div className="h-full p-8 overflow-y-auto bg-slate-50">
+             <RegisterManagerContent 
+               locationId={selectedLocationId} 
+               initialOption={registerType} 
+               onClose={() => setActiveView("muelles")} 
+             />
+          </div>
+        )}
+
+        {/* VISTA 6: MAPA */}
+        {activeView === "mapa" && (
+          <div className="h-full w-full animate-in fade-in duration-500 bg-white">
+             <VehicleMap locationName={selectedLocationName} />
+          </div>
+        )}
+
+         {/* VISTA REPORTES */}
+        {activeView === "reportes" && (
+          <div className="h-full bg-slate-50 overflow-y-auto">
+            <ReportsManagerContent />
+          </div>
+        )}
+
+        {/* VISTA CARGA */}
+        {activeView === "carga" && (
+          <div className="h-full bg-slate-50 overflow-y-auto">
+            <UploadManagerContent onSuccess={() => setActiveView("gestion")} />
+          </div>
+        )}
+
       </main>
     </div>
   );
