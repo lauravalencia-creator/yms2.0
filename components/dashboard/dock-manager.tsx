@@ -177,38 +177,38 @@ const locationsData = [
 const allDocks: Dock[] = [
   // === LOCALIDAD 1: NORTE (11 Muelles) ===
   { id: "dock-1a-1", name: "Muelle A-01", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1a",
-    currentAppointment: { id: "apt-1", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
+    currentAppointment: { id: "3442442", carrier: "Swift Transport", truckId: "JPM378", time: "08:30", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1a", duration: 90, 
     driver: "Yuliana Perez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Descargue Materia Prima", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Descargue",
     route: "NORTE-01", priority: "ALTA", logisticProfile: "SECA" }},
   { id: "dock-1a-2", name: "Muelle A-02", type: "inbound", status: "available", occupancy: 20, locationId: "loc-1", dockGroupId: "dg-1a",
-    currentAppointment: { id: "apt-gray-1", carrier: "TransFuturo", truckId: "FUT-2026", time: "14:00", type: "inbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1a", duration: 60,
+    currentAppointment: { id: "84672", carrier: "TransFuturo", truckId: "FUT-2026", time: "14:00", type: "inbound", status: "scheduled", locationId: "loc-1", dockGroupId: "dg-1a", duration: 60,
     driver: "Esteban Quito", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Planta Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
     route: "BOG-02", priority: "MEDIA", logisticProfile: "FRIO" }},
   { id: "dock-1a-3", name: "Muelle A-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1a" },
   { id: "dock-1a-4", name: "Muelle A-04", type: "inbound", status: "available", occupancy: 15, locationId: "loc-1", dockGroupId: "dg-1a",
-    currentAppointment: { id: "apt-completed-1", carrier: "Historic Logistics", truckId: "TRK-OLD", time: "05:00", type: "inbound", status: "completed", locationId: "loc-1", dockGroupId: "dg-1a", duration: 120, 
+    currentAppointment: { id: "2342424", carrier: "Historic Logistics", truckId: "TRK-OLD", time: "05:00", type: "inbound", status: "completed", locationId: "loc-1", dockGroupId: "dg-1a", duration: 120, 
     driver: "Roberto Gómez", city: "MEDELLIN", department: "ANTIOQUIA", locationName: "Centro Dist. Norte", zone: "Zona A", date: "MIE 19 NOV 2025", vehicleType: "Tractomula", loadType: "Refrigerada", operationType: "Descargue",
     route: "URBANA-01", priority: "NORMAL", logisticProfile: "FRIO" }},
   { id: "dock-1b-1", name: "Muelle B-01", type: "inbound", status: "occupied", occupancy: 50, locationId: "loc-1", dockGroupId: "dg-1b",
-    currentAppointment: { id: "apt-2", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
+    currentAppointment: { id: "442731", carrier: "LogiCargo", truckId: "TRK-1193", time: "09:15", type: "inbound", status: "delayed", locationId: "loc-1", dockGroupId: "dg-1b", duration: 60,
     driver: "Maria Diaz", city: "BOGOTA", department: "CUNDINAMARCA", locationName: "Bodega Central", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Turbo", loadType: "Seca", operationType: "Descargue",
     route: "SUR-05", priority: "MEDIA", logisticProfile: "SECA" }},
   { id: "dock-1b-2", name: "Muelle B-02", type: "inbound", status: "available", occupancy: 10, locationId: "loc-1", dockGroupId: "dg-1b",
-    currentAppointment: { id: "apt-gray-2", carrier: "Andina Carga", truckId: "AND-99", time: "16:30", type: "inbound", status: "pending", locationId: "loc-1", dockGroupId: "dg-1b", duration: 90,
+    currentAppointment: { id: "425426", carrier: "Andina Carga", truckId: "AND-99", time: "16:30", type: "inbound", status: "pending", locationId: "loc-1", dockGroupId: "dg-1b", duration: 90,
     driver: "Julian Alvarez", city: "CALI", department: "VALLE", locationName: "Bodega B", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
     route: "EJE-01", priority: "NORMAL", logisticProfile: "GRANEL" }},
   { id: "dock-1b-3", name: "Muelle B-03", type: "inbound", status: "available", occupancy: 0, locationId: "loc-1", dockGroupId: "dg-1b" },
   { id: "dock-1b-4", name: "Muelle B-04", type: "inbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1b",
-    currentAppointment: { id: "apt-3", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
+    currentAppointment: { id: "112122", carrier: "CargoMax", truckId: "TRK-7890", time: "10:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1b", duration: 120,
     driver: "Carlos Ruiz", city: "CALI", department: "VALLE", locationName: "Planta Sur", zone: "Zona B", date: "MIE 19 NOV 2025", vehicleType: "Doble Troque", loadType: "Granel", operationType: "Descargue",
     route: "LOCAL-04", priority: "ALTA", logisticProfile: "GRANEL" }},
   { id: "dock-1c-1", name: "Despacho 01", type: "outbound", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c",
-    currentAppointment: { id: "apt-4", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
+    currentAppointment: { id: "2349076", carrier: "FastFreight", truckId: "TRK-7832", time: "09:00", type: "outbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1c", duration: 45,
     driver: "Ana Lopez", city: "BELLO", department: "ANTIOQUIA", locationName: "Planta Solla Bello 1405", zone: "Cargue", date: "MIE 19 NOV 2025", vehicleType: "Camión Sencillo", loadType: "Seca", operationType: "Cargue",
     route: "NACIONAL-01", priority: "ALTA", logisticProfile: "SECA" }},
   { id: "dock-1c-2", name: "Despacho 02", type: "outbound", status: "maintenance", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1c" },
   { id: "dock-1d-2", name: "Mixto 02", type: "both", status: "occupied", occupancy: 100, locationId: "loc-1", dockGroupId: "dg-1d",
-    currentAppointment: { id: "apt-mixed-1", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane",
+    currentAppointment: { id: "53453543", carrier: "InterRapidísimo", truckId: "INT-88", time: "13:00", type: "inbound", status: "in-progress", locationId: "loc-1", dockGroupId: "dg-1d", duration: 30, driver: "Luisa Lane",
     route: "URBANA", priority: "NORMAL", logisticProfile: "PAQUETEO" } },
 
   // === LOCALIDAD 2: SUR (5 Muelles) ===
@@ -1057,26 +1057,26 @@ function AppointmentEditModal({
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
         
         {/* --- ENCABEZADO CON COLOR DINÁMICO --- */}
-        <div className={cn("px-6 py-4 flex justify-between items-center text-white shadow-md relative overflow-hidden", headerColor)}>
-          {/* Decoración de fondo */}
-          <div className="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-2">
-            {appointment.type === 'inbound' ? <ArrowDownIcon className="w-24 h-24" /> : <ArrowUpIcon className="w-24 h-24" />}
-          </div>
+       <div className={cn("px-6 py-4 flex justify-between items-center text-white shadow-md relative overflow-hidden", headerColor)}>
+  <div className="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-2">
+    {appointment.type === 'inbound' ? <ArrowDownIcon className="w-24 h-24" /> : <ArrowUpIcon className="w-24 h-24" />}
+  </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-1">
-               {appointment.type === 'inbound' 
-                 ? <ArrowDownIcon className="w-5 h-5 text-white/90" /> 
-                 : <ArrowUpIcon className="w-5 h-5 text-white/90" />
-               }
-               <h3 className="text-lg font-black font-serif tracking-wide uppercase">
-                 {appointment.type === 'inbound' ? 'DESCARGUE' : 'CARGUE'}
-               </h3>
-            </div>
-            <p className="text-white/90 text-xs font-medium flex items-center gap-1 uppercase tracking-wider">
-              {getStatusSubtitle(appointment.status)}
-            </p>
-          </div>
+  <div className="relative z-10">
+    <div className="flex items-center gap-2 mb-1">
+       {appointment.type === 'inbound' 
+         ? <ArrowDownIcon className="w-5 h-5 text-white/90" /> 
+         : <ArrowUpIcon className="w-5 h-5 text-white/90" />
+       }
+       {/* AGREGADO: ID de la cita en el header */}
+       <h3 className="text-lg font-black font-serif tracking-wide uppercase">
+         {appointment.type === 'inbound' ? 'DESCARGUE' : 'CARGUE'} | Cita #{appointment.id}
+       </h3>
+    </div>
+    <p className="text-white/90 text-xs font-medium flex items-center gap-1 uppercase tracking-wider">
+      {getStatusSubtitle(appointment.status)}
+    </p>
+  </div>
           <button onClick={onClose} className="relative z-10 text-white/70 hover:text-white transition-colors bg-black/10 hover:bg-black/20 rounded-full p-1.5">
             <X className="w-5 h-5" />
           </button>
@@ -1282,7 +1282,8 @@ function DockTimeline({
   onDrop,
   onDragOver,
   onDragLeave,
-  dropTargetId
+  dropTargetId,
+  onMoveAppointment
 }: { 
   docks: Dock[], 
   timeFrame: TimeFrame, 
@@ -1292,7 +1293,8 @@ function DockTimeline({
   onDrop: (aptId: string, dockId: string) => void,
   onDragOver: (dockId: string) => void,
   onDragLeave: () => void,
-  dropTargetId: string | null 
+  dropTargetId: string | null,
+  onMoveAppointment: (aptId: string, dockId: string, newTime: string) => void
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dockStartIndex, setDockStartIndex] = useState(0);
@@ -1469,13 +1471,11 @@ function DockTimeline({
                </div>
 
                {/* COLUMNAS DE MUELLES (Aquí habilitamos el Drop) */}
-               {visibleDocks.map((dock) => (
+       {visibleDocks.map((dock) => (
                   <div 
                     key={dock.id} 
-                    // --- LÓGICA DE DROP EN COLUMNA ---
                     onDragOver={(e) => {
-                      e.preventDefault();
-                      // Solo permitimos si no es mantenimiento y no está full
+                      e.preventDefault(); // IMPORTANTE para permitir el drop
                       if (dock.status !== 'maintenance' && dock.occupancy < 100) {
                         onDragOver(dock.id);
                       }
@@ -1483,31 +1483,61 @@ function DockTimeline({
                     onDragLeave={onDragLeave}
                     onDrop={(e) => {
                       e.preventDefault();
-                      const appointmentId = e.dataTransfer.getData("appointmentId");
-                      if (appointmentId && dock.status !== 'maintenance' && dock.occupancy < 100) {
-                        onDrop(appointmentId, dock.id);
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const y = e.clientY - rect.top; 
+                      const totalMinutes = (y / rect.height) * 1440;
+                      const hours = Math.floor(totalMinutes / 60);
+                      const mins = Math.round((totalMinutes % 60) / 15) * 15;
+                      const newTime = `${hours.toString().padStart(2, '0')}:${(mins >= 60 ? 45 : mins).toString().padStart(2, '0')}`;
+                      
+                      const moveAptId = e.dataTransfer.getData("moveAppointmentId");
+                      const newDocId = e.dataTransfer.getData("appointmentId");
+
+                      if (moveAptId) {
+                        // CASO 1: MOVER CITA EXISTENTE
+                        onMoveAppointment(moveAptId, dock.id, newTime);
+                      } else if (newDocId) {
+                        // CASO 2: ASIGNAR NUEVO DOCUMENTO
+                        onDrop(newDocId, dock.id);
                       }
+                      onDragLeave();
                     }}
                     className={cn(
-                      "flex-1 min-w-[120px] border-r border-slate-100 relative z-10 transition-colors group",
+                      "flex-1 min-w-[120px] border-r border-slate-100 relative z-10 transition-colors",
                       getTimelineColumnColor(dock),
-                      // Feedback visual cuando se arrastra algo encima
                       dropTargetId === dock.id && "bg-cyan-50/50 ring-2 ring-inset ring-cyan-400"
                     )}
                   >
-                     {dock.status === 'maintenance' && (<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZTJlOGYwIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>)}
-                     
-                     {/* Renderizado de citas existentes igual... */}
                      {dock.currentAppointment && (
-                        <div onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)} className={cn("absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all cursor-pointer group-hover:shadow-md", getTimelineAppointmentStyle(dock.currentAppointment.status))} style={{ top: `${getTopFromTime(dock.currentAppointment.time)}%`, height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`, minHeight: '28px' }}>
+                        <div 
+                          draggable={dock.currentAppointment.status !== 'completed'} // NO ARRASTRA VERDES
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("moveAppointmentId", dock.currentAppointment!.id);
+                            e.dataTransfer.setData("originDockId", dock.id);
+                          }}
+                          onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)} 
+                          className={cn(
+                            "absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all z-10", 
+                            getTimelineAppointmentStyle(dock.currentAppointment.status),
+                            dock.currentAppointment.status === 'completed' ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+                          )} 
+                          style={{ top: `${getTopFromTime(dock.currentAppointment.time)}%`, height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`, minHeight: '28px' }}
+                        >
                            <div className="font-bold text-xs truncate text-indigo-950/90 mb-0.5">{dock.currentAppointment.carrier}</div>
-                           <div className="flex items-center gap-1 opacity-80 truncate mb-0.5"><Truck className="w-3 h-3" /><span className="truncate">{dock.currentAppointment.truckId}</span></div>
+                           <div className="flex items-center gap-1 opacity-80 truncate mb-0.5">
+                             <Truck className="w-3 h-3" />
+                             <span className="truncate">{dock.currentAppointment.truckId}</span>
+                           </div>
+                           <div className="text-[8px] font-black opacity-50 uppercase tracking-tighter">
+                             ID: {dock.currentAppointment.id}
+                           </div>
                         </div>
                      )}
                   </div>
                ))}
                
-               {/* Línea de tiempo actual igual... */}
+               
+
                <div className="absolute left-0 right-0 border-t-2 border-blue-600 z-30 pointer-events-none" style={{ top: `${currentPosition}%` }}>
                   <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center shadow-sm">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                </div>
@@ -1569,6 +1599,38 @@ export function DockManager({
    // --- LÓGICA DE REDIMENSIÓN ---
   const startResizing = React.useCallback(() => setIsResizing(true), []);
   const stopResizing = React.useCallback(() => setIsResizing(false), []);
+
+
+const handleMoveAppointment = (appointmentId: string, newDockId: string, newTime: string) => {
+  setAllDocksState(prev => {
+    // 1. Buscamos la cita en el estado actual
+    let movedApt: Appointment | undefined;
+    
+    // 2. Limpiamos el muelle de origen
+    const cleanedDocks = prev.map(dock => {
+      if (dock.currentAppointment?.id === appointmentId) {
+        movedApt = { ...dock.currentAppointment, time: newTime };
+        return { ...dock, status: 'available', occupancy: 0, currentAppointment: undefined } as Dock;
+      }
+      return dock;
+    });
+
+    // 3. Colocamos en el nuevo muelle
+    if (!movedApt) return prev;
+
+    return cleanedDocks.map(dock => {
+      if (dock.id === newDockId) {
+        return { 
+          ...dock, 
+          status: 'occupied', 
+          occupancy: 100, 
+          currentAppointment: movedApt 
+        } as Dock;
+      }
+      return dock;
+    });
+  });
+};
 
 
 const resize = React.useCallback(
@@ -2147,17 +2209,18 @@ const handleSelectLocation = (id: string) => {
           </div>
           
           {/* VISTA CON FONDO CUADRICULADO */}
-<div className="flex-1 overflow-hidden bg-white relative">
+{/* VISTA CON FONDO CUADRICULADO RESTAURADO */}
+<div className="flex-1 overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] relative">
   {!locationId ? (
     <SelectLocationState minimalist={false} />
   ) : viewMode === 'grid' ? (
-    <div className="p-4 flex flex-wrap gap-3 content-start items-start overflow-y-auto h-full">
+    <div className="p-4 flex flex-wrap gap-3 content-start items-start overflow-y-auto h-full bg-slate-50/20 backdrop-blur-[1px]">
       {docksWithTemporalStatus.map(dock => (
         <DockSlot 
           key={dock.id} 
           dock={dock} 
           isDragging={!!draggingId} 
-          onDrop={handleDrop} // Esta ya la tenías
+          onDrop={handleDrop} 
           onDragOver={() => setDropTargetId(dock.id)} 
           onDragLeave={() => setDropTargetId(null)} 
           isDropTarget={dropTargetId === dock.id} 
@@ -2172,11 +2235,11 @@ const handleSelectLocation = (id: string) => {
       highlightedDockId={highlightedDockId} 
       onAppointmentClick={handleAppointmentClick} 
       currentTime={currentTime} 
-      // --- PASAMOS LAS FUNCIONES AQUÍ ---
       onDrop={handleDrop} 
       onDragOver={(id) => setDropTargetId(id)}
       onDragLeave={() => setDropTargetId(null)}
       dropTargetId={dropTargetId}
+      onMoveAppointment={handleMoveAppointment} // Ahora ya no debería dar error
     />
   )}
 </div>
