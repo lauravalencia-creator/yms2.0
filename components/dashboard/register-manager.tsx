@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   X, ArrowRight, ArrowLeft, Package, Check, QrCode, 
-  Plus, Hash, Calendar as CalendarIcon, Truck, Building2, 
-  RefreshCw, CheckCircle2, AlertCircle, ShoppingCart, Archive, RotateCcw
+  Plus, Truck, RefreshCw, CheckCircle2, AlertCircle, ShoppingCart, Archive, RotateCcw
 } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -29,8 +28,9 @@ interface RegisterManagerProps {
 export function RegisterManagerContent({ locationId, initialOption, onClose }: RegisterManagerProps) {
   const [registroId, setRegistroId] = useState(initialOption || "entrada");
   
-  // AHORA: Tanto entrada como salida activan el formulario completo
-  const esProcesoCompleto = registroId === "entrada" || registroId === "salida";
+  // Determinamos si es entrada para saltarnos pasos
+  const esEntrada = registroId === "entrada";
+  const esSalida = registroId === "salida";
 
   const [vehicleState, setVehicleState] = useState<"cargado" | "vacio" | "devuelto" | null>(null);
   const [returnReason, setReturnReason] = useState("");
@@ -57,8 +57,15 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
         if (step === 'scanner') {
           setCodigo("QR-8821-AUTO");
           setTrackingCodes(["PKG-7721", "PKG-9902"]);
-          if (esProcesoCompleto) setStep('process-details');
-          else setStep('result');
+          
+          // CAMBIO CLAVE: Si es entrada, ve directo al resultado. Si es salida, pide estado.
+          if (esEntrada) {
+            setStep('result');
+          } else if (esSalida) {
+            setStep('process-details');
+          } else {
+            setStep('result');
+          }
         } else {
           const newCode = `PKG-${Math.floor(Math.random() * 9000) + 1000}`;
           setTrackingCodes(prev => [...prev, newCode]);
@@ -67,7 +74,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
       }, 2200);
     }
     return () => clearTimeout(timer);
-  }, [step, esProcesoCompleto]);
+  }, [step, esEntrada, esSalida]);
 
   const handleSubmitManual = () => {
     if (codigo) setStep('result');
@@ -75,18 +82,18 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
 
   const isButtonDisabled = () => {
     if (!codigo) return true;
-    if (esProcesoCompleto) {
+    if (esSalida) {
       if (!vehicleState) return true;
       if (vehicleState === "devuelto" && returnReason.trim().length < 5) return true;
     }
     return false;
   };
 
-  // --- COMPONENTE: SELECTOR DE ESTADO (Dinámico según entrada/salida) ---
+  // --- COMPONENTE: SELECTOR DE ESTADO (Solo para Salida) ---
   const VehicleStateSelector = () => (
     <div className="space-y-4 animate-in slide-in-from-top-4 duration-500">
       <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center block">
-        Estado del Vehículo al {registroId === 'entrada' ? 'Ingresar' : 'Salir'}
+        Estado del Vehículo al Salir
       </label>
       <div className="grid grid-cols-3 gap-3">
         {[
@@ -151,7 +158,8 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
               />
            </div>
 
-           {esProcesoCompleto && <VehicleStateSelector />}
+           {/* El selector solo aparece en el formulario manual si es salida */}
+           {esSalida && <VehicleStateSelector />}
 
            <Button 
             onClick={handleSubmitManual} 
@@ -161,7 +169,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
                 !isButtonDisabled() ? "bg-[#ff6b00] text-white shadow-lg hover:bg-[#e66000]" : "bg-slate-100 text-slate-300"
             )}
            >
-             Confirmar Registro
+             Confirmar {opcion.label}
            </Button>
         </div>
 
@@ -179,7 +187,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
     );
   }
 
-  // --- VISTA: DETALLES DE PROCESO (POST-ESCANEO PARA ENTRADA/SALIDA) ---
+  // --- VISTA: DETALLES DE PROCESO (Solo para Salida post-escaneo) ---
   if (step === 'process-details') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] py-4 animate-in fade-in zoom-in-95 duration-300">
@@ -190,7 +198,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
            <div>
              <h3 className="text-[#050038] font-black text-xl uppercase tracking-tighter">Cita detectada: {codigo}</h3>
              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-               Complete la información de {registroId === 'entrada' ? 'entrada' : 'salida'}
+               Complete la información de salida
              </p>
            </div>
            
@@ -201,7 +209,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
             disabled={!vehicleState || (vehicleState === "devuelto" && returnReason.trim().length < 5)} 
             className="h-14 rounded-xl bg-[#ff6b00] text-white font-black uppercase text-[10px] tracking-[0.2em] shadow-lg"
            >
-             Finalizar Registro de {registroId === 'entrada' ? 'Entrada' : 'Salida'}
+             Finalizar Registro de Salida
            </Button>
         </div>
       </div>
@@ -217,7 +225,6 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
           .scan-line { position: absolute; left: 0; width: 100%; height: 4px; background: #ff6b00; box-shadow: 0 0 30px 6px #ff6b00; animation: scanMove 2.5s ease-in-out infinite; z-index: 20; }
         `}</style>
         <div className="text-center mb-10 space-y-2 relative z-10">
-   
             <h3 className="text-white font-black text-2xl uppercase tracking-tighter animate-pulse">
                 Leyendo {step === 'scanner' ? 'Documento Principal' : 'Guía de Paquete'}...
             </h3>
@@ -237,10 +244,9 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
     );
   }
 
-  // --- VISTA 3: RESULTADOS ---
+  // --- VISTA 3: RESULTADOS (A la que llega Entrada directamente) ---
   const opcionActiva = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
   
-  // Datos para Proceso Completo (Entrada/Salida)
   const infoDetallada = [
     { label: "ID Cita", val: codigo || "QR-8821-AUTO" },
     { label: "Fecha Cita", val: "29 ENE 2026" },
@@ -257,22 +263,14 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
     { label: "Vehículo", val: "Scania R450" },
     { label: "Placa", val: "JPL-092" },
     { label: "Tipo Carga", val: vehicleState === 'vacio' ? "Vacío" : "Carga General" },
-    { label: registroId === 'entrada' ? "Hora Entrada" : "Hora Salida", val: "16:45:12" },
+    { label: esEntrada ? "Hora Entrada" : "Hora Salida", val: "16:45:12" },
     { label: "Muelle Asignado", val: "Muelle 04" },
-    { label: "Estado", val: vehicleState?.toUpperCase() || "N/A" },
+    { label: "Estado Vehículo", val: vehicleState?.toUpperCase() || "N/A" },
     { label: "Observaciones", val: returnReason || "Sin novedades", fullWidth: true },
-  ];
-
-  const infoBasica = [
-    { label: "Código Detectado", val: codigo || "AUTO-SCAN" },
-    { label: "Marca de Tiempo", val: "29 ENE 2026 - 16:45:12" },
-    { label: "Unidad Vehicular", val: "SCANIA R450 - [JPL-092]" },
-    { label: "Punto de Acceso", val: "ZONA DE PATIO A-12" },
   ];
 
   return (
     <div className="max-w-4xl mx-auto py-6 space-y-6 animate-in slide-in-from-bottom-8 duration-700">
-        {/* ENCABEZADO DE ÉXITO */}
         <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mb-4 border-2 border-emerald-100 shadow-inner">
                 <Check className="text-emerald-500" size={32} strokeWidth={3} />
@@ -290,10 +288,8 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
             </div>
         </div>
 
-        {/* CONTENEDOR DE INFORMACIÓN */}
-        
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg p-8 space-y-6">
-                 <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg p-8 space-y-6">
+                <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                     <Truck size={18} className="text-[#1C1E59]" />
                     <span className="font-black text-[#1C1E59] text-xs uppercase tracking-widest">Detalle Completo de Operación</span>
                 </div>
@@ -305,11 +301,9 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
                         </div>
                     ))}
                 </div>
-            </div>
-        
-        
+        </div>
 
-        {/* TRACKING */}
+        {/* TRACKING CODES */}
         <div className="bg-white rounded-[2rem] border border-orange-100 shadow-lg p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-orange-50 pb-3">
                 <div className="flex items-center gap-3">
@@ -358,7 +352,6 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
             </div>
         </div>
 
-        {/* BOTONES DE ACCIÓN */}
         <div className="flex gap-4 pt-4 max-w-md mx-auto">
             <Button 
                 onClick={() => { setStep('form'); setCodigo(""); setTrackingCodes([]); setVehicleState(null); setReturnReason(""); }} 
