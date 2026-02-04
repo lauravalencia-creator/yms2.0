@@ -1924,6 +1924,7 @@ const handleSelectLocation = (id: string) => {
                 occupancy: 100, 
                 currentAppointment: {
                    ...finalAppointment,
+                   id: finalAppointment.appointmentId, 
                    duration: 90 // O la duración que estimes para que se vea en el timeline
                 } 
               } 
