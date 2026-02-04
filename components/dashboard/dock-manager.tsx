@@ -1278,13 +1278,21 @@ function DockTimeline({
   timeFrame, 
   highlightedDockId, 
   onAppointmentClick, 
-  currentTime 
+  currentTime,
+  onDrop,
+  onDragOver,
+  onDragLeave,
+  dropTargetId
 }: { 
   docks: Dock[], 
   timeFrame: TimeFrame, 
   highlightedDockId: string | null, 
   onAppointmentClick: any, 
-  currentTime: Date 
+  currentTime: Date,
+  onDrop: (aptId: string, dockId: string) => void,
+  onDragOver: (dockId: string) => void,
+  onDragLeave: () => void,
+  dropTargetId: string | null 
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dockStartIndex, setDockStartIndex] = useState(0);
@@ -1446,7 +1454,7 @@ function DockTimeline({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]" ref={containerRef}>
+     <div className="flex-1 overflow-y-auto relative custom-scrollbar h-[600px]" ref={containerRef}>
          <div className="flex relative min-h-[1440px]"> 
             <div className="w-16 shrink-0 border-r border-slate-200 bg-slate-50/50 relative">
                {HOURS.map((hour) => (
@@ -1455,12 +1463,41 @@ function DockTimeline({
             </div>
 
             <div className="flex-1 flex relative">
+               {/* Líneas horizontales de horas */}
                <div className="absolute inset-0 z-0 pointer-events-none">
                   {HOURS.map((hour) => (<div key={hour} className="absolute w-full border-b border-slate-100" style={{ top: `${(hour / 24) * 100}%` }}></div>))}
                </div>
+
+               {/* COLUMNAS DE MUELLES (Aquí habilitamos el Drop) */}
                {visibleDocks.map((dock) => (
-                  <div key={dock.id} className={cn("flex-1 min-w-[120px] border-r border-slate-100 relative z-10 transition-colors group", getTimelineColumnColor(dock))}>
+                  <div 
+                    key={dock.id} 
+                    // --- LÓGICA DE DROP EN COLUMNA ---
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      // Solo permitimos si no es mantenimiento y no está full
+                      if (dock.status !== 'maintenance' && dock.occupancy < 100) {
+                        onDragOver(dock.id);
+                      }
+                    }}
+                    onDragLeave={onDragLeave}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const appointmentId = e.dataTransfer.getData("appointmentId");
+                      if (appointmentId && dock.status !== 'maintenance' && dock.occupancy < 100) {
+                        onDrop(appointmentId, dock.id);
+                      }
+                    }}
+                    className={cn(
+                      "flex-1 min-w-[120px] border-r border-slate-100 relative z-10 transition-colors group",
+                      getTimelineColumnColor(dock),
+                      // Feedback visual cuando se arrastra algo encima
+                      dropTargetId === dock.id && "bg-cyan-50/50 ring-2 ring-inset ring-cyan-400"
+                    )}
+                  >
                      {dock.status === 'maintenance' && (<div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIi8+CjxwYXRoIGQ9Ik0wIDBMNCA0Wk00IDBMMCA0WiIgc3Ryb2tlPSIjZTJlOGYwIiBzdHJva2Utd2lkdGg9IjEiLz4KPC9zdmc+')] opacity-50"></div>)}
+                     
+                     {/* Renderizado de citas existentes igual... */}
                      {dock.currentAppointment && (
                         <div onClick={() => onAppointmentClick(dock.currentAppointment!, dock.id, dock.name)} className={cn("absolute left-1 right-1 rounded border p-1.5 shadow-sm text-[10px] flex flex-col justify-start overflow-hidden hover:scale-[1.02] hover:z-20 transition-all cursor-pointer group-hover:shadow-md", getTimelineAppointmentStyle(dock.currentAppointment.status))} style={{ top: `${getTopFromTime(dock.currentAppointment.time)}%`, height: `${getHeightFromDuration(dock.currentAppointment.duration || 60)}%`, minHeight: '28px' }}>
                            <div className="font-bold text-xs truncate text-indigo-950/90 mb-0.5">{dock.currentAppointment.carrier}</div>
@@ -1469,7 +1506,9 @@ function DockTimeline({
                      )}
                   </div>
                ))}
-               <div className="absolute left-0 right-0 border-t-2 border-blue-600 z-30 pointer-events-none shadow-[0_2px_4px_rgba(37,99,235,0.2)]" style={{ top: `${currentPosition}%` }}>
+               
+               {/* Línea de tiempo actual igual... */}
+               <div className="absolute left-0 right-0 border-t-2 border-blue-600 z-30 pointer-events-none" style={{ top: `${currentPosition}%` }}>
                   <div className="absolute -left-16 -top-2.5 w-16 text-[10px] font-bold text-white bg-blue-600 px-1 rounded-r py-0.5 text-center shadow-sm">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                </div>
             </div>
@@ -1480,11 +1519,10 @@ function DockTimeline({
 }
 
 
-// ... (Mantén los imports y tipos iniciales igual)
 
 export function DockManager({ 
-  locationId,         // Viene del padre (DashboardPage)
-  onLocationChange,   // Función para avisar al padre
+  locationId,      
+  onLocationChange,  
   selectedDockId      
 }: DockManagerProps) {
 
@@ -2109,18 +2147,17 @@ const handleSelectLocation = (id: string) => {
           </div>
           
           {/* VISTA CON FONDO CUADRICULADO */}
-<div className="flex-1 overflow-hidden bg-white bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] relative">
+<div className="flex-1 overflow-hidden bg-white relative">
   {!locationId ? (
     <SelectLocationState minimalist={false} />
   ) : viewMode === 'grid' ? (
-    <div className="p-4 flex flex-wrap gap-3 content-start items-start overflow-y-auto h-full bg-slate-50/20 backdrop-blur-[1px]">
-      {/* CAMBIO AQUÍ: Usar docksWithTemporalStatus */}
+    <div className="p-4 flex flex-wrap gap-3 content-start items-start overflow-y-auto h-full">
       {docksWithTemporalStatus.map(dock => (
         <DockSlot 
           key={dock.id} 
           dock={dock} 
           isDragging={!!draggingId} 
-          onDrop={handleDrop} 
+          onDrop={handleDrop} // Esta ya la tenías
           onDragOver={() => setDropTargetId(dock.id)} 
           onDragLeave={() => setDropTargetId(null)} 
           isDropTarget={dropTargetId === dock.id} 
@@ -2129,13 +2166,17 @@ const handleSelectLocation = (id: string) => {
       ))}
     </div>
   ) : (
-    /* CAMBIO AQUÍ: Usar docksWithTemporalStatus */
     <DockTimeline 
       docks={docksWithTemporalStatus} 
       timeFrame={timeFrame} 
       highlightedDockId={highlightedDockId} 
       onAppointmentClick={handleAppointmentClick} 
       currentTime={currentTime} 
+      // --- PASAMOS LAS FUNCIONES AQUÍ ---
+      onDrop={handleDrop} 
+      onDragOver={(id) => setDropTargetId(id)}
+      onDragLeave={() => setDropTargetId(null)}
+      dropTargetId={dropTargetId}
     />
   )}
 </div>

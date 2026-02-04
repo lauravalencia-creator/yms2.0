@@ -1544,22 +1544,24 @@ const handleLocationChange = (value: string) => {
     />
   </PopoverTrigger>
   
-  {/* El PopoverContent debe tener un Z-index alto y ser vertical */}
+{/* ... dentro de PopoverContent del primer archivo ... */}
 <PopoverContent 
-  className="w-[90vw] sm:w-80 p-4 rounded-[2rem] shadow-2xl border-gray-100 bg-white z-[110]" 
+  className="w-[92vw] sm:w-[380px] p-5 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white z-[120]" 
   align="center"
-  sideOffset={8}
+  sideOffset={12}
 >
-  <div className="space-y-4">
-    {/* Título interno */}
-    <div className="px-2 pb-2 border-b border-gray-50 text-center">
-      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+  <div className="space-y-5">
+    {/* Encabezado del menú */}
+    <div className="flex flex-col items-center text-center space-y-1">
+      <div className="w-10 h-1 bg-slate-100 rounded-full mb-2 sm:hidden" /> {/* Indicador táctil para móvil */}
+      <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">
           Gestión de Patio
       </span>
+      <h3 className="text-[#050038] font-black text-xs uppercase tracking-tighter">Acciones Disponibles</h3>
     </div>
     
-    {/* GRILLA DE BOTONES: 2 columnas en móvil, 1 en desktop si prefieres */}
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
+    {/* Grilla de Botones Estilo Mosaico */}
+    <div className="grid grid-cols-2 gap-3">
       {REGISTRO_OPCIONES.map((opt) => (
         <button
           key={opt.id}
@@ -1567,22 +1569,33 @@ const handleLocationChange = (value: string) => {
             onViewChange("registros", opt.id);
           }}
           className={cn(
-            "flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3 p-4 sm:p-3 w-full",
-            "bg-slate-50 hover:bg-orange-50 rounded-2xl transition-all group text-center sm:text-left",
-            "border border-transparent hover:border-orange-200 active:scale-95"
+            "group relative flex flex-col items-center justify-center gap-3 p-5 w-full aspect-square sm:aspect-auto sm:h-24",
+            "bg-white border-2 border-slate-50 rounded-[2rem] transition-all duration-300",
+            "hover:border-[#ff6b00]/30 hover:bg-orange-50/50 hover:shadow-xl hover:shadow-orange-900/5",
+            "active:scale-95" // Efecto de hundimiento al tocar
           )}
         >
-          {/* Contenedor del Icono */}
-          <div className="w-10 h-10 sm:w-8 sm:h-8 rounded-xl bg-white shadow-sm group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
-            <opt.icon size={20} className="sm:w-4 sm:h-4" />
+          {/* Contenedor del Icono con Sombra */}
+          <div className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-[#1e2b58] shadow-inner group-hover:bg-[#ff6b00] group-hover:text-white group-hover:rotate-6 transition-all duration-300">
+            <opt.icon size={24} strokeWidth={2.5} />
           </div>
           
-          {/* Texto del Botón */}
-          <span className="text-[10px] sm:text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter leading-tight">
+          {/* Etiqueta del Botón */}
+          <span className="text-[9px] font-black text-[#1e2b58] uppercase tracking-tighter text-center leading-none px-1 group-hover:text-[#ff6b00]">
             {opt.label}
           </span>
+
+          {/* Badge decorativo pequeño (esquina) */}
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#ff6b00]" />
+          </div>
         </button>
       ))}
+    </div>
+
+    {/* Footer del Popover opcional */}
+    <div className="pt-2 text-center">
+        <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">ControlT YMS • v2.0</p>
     </div>
   </div>
 </PopoverContent>
