@@ -12,6 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+
+
+
 import {
   Download,
   Monitor,
@@ -23,11 +26,506 @@ import {
   Filter,
   Check,
   XCircle,
-  FileText,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  CheckSquare,
+  History,
+  CalendarDays,
+  CalendarPlus,
+  ClipboardList,
+  X,
+  ArrowRight,
+  Plus,
+  AlertTriangle,
+  Edit,
 } from "lucide-react";
 
+export type AppointmentStatus = "pending" | "en_proceso" | "confirmado" | "retrasado" | "completado";
+/* --- TIPOS --- */
+export interface Appointment {
+  idAppointment?: string;
+  id: string;
+  carrier: string;
+  truckId?: string;
+  time: string;
+  type: "Cargue" | "Descargue";
+  status: AppointmentStatus;
+  locationId?: string;
+  dockGroupId?: string;
+  duration?: number;
+  driver?: string;
+  city?: string;
+  department?: string;
+  locationName?: string;
+  zone?: string;
+  date?: string;
+  vehicleType?: string;
+  loadType?: string;
+  operationType?: string;
+  product?: string;
+  nit?: string;
+  quantityOrdered?: number;
+  quantityDelivered?: number;
+  appointmentIdRef?: string;
+  transportCompany?: string;
+  loadDate?: string;
+  loadTime?: string;
+  unloadDate?: string;
+  unloadTime?: string;
+  driverId?: string;
+  driverPhone?: string;
+  driverEmail?: string;
+  merchandiseCode?: string;
+  isReadyForAssignment?: boolean;
+  codigoLocalidad?: string;
+  tipoLocalidad?: string;
+  idTipoProducto?: string;
+  idProducto?: string;
+  descripcionCompany?: string;
+  estadoDocumento?: string;
+  unidadNegocio?: string;
+  canal?: string;
+  tipoOperacion?: string;
+  tipoMercancia?: string;
+  tipoCargue?: string;
+  peso?: string;
+  volumen?: string;
+  litros?: string;
+  codigoArticulo?: string;
+  cantidadPedida?: number;
+  cantidadRecibida?: number;
+  unidadMedida?: string;
+  route?: string;
+  priority?: string;
+  logisticProfile?: string;
+  documento?: string;      
+  tipoCita?: string;       
+  fechaInicial?: string;
+  fechaFinal?: string;
+  idgenerador?: string;
+  generador?: string;
+  tipologiavehiculo?: string;
+  tiempoprogramadocargue?: string;
+  talleres?: string;
+  fechaReagendacion?: string,
+  horaReagendacion?: string,
+  Motivo?: string,
+}
+
+
+interface Dock {
+  id: string;
+  name: string;
+  status: 'available' | 'maintenance' | 'occupied';
+  occupancy: number;
+}
+
+const STYLES = {
+  header: "bg-[#050038] text-white font-bold text-[10px] uppercase px-4 py-3 sticky top-0 z-30 whitespace-nowrap",
+  cell: "px-4 py-2 text-[11px] text-slate-600 text-center border-b transition-colors",
+  cellBold: "px-4 py-2 text-[11px] text-slate-700 font-bold text-center border-b whitespace-nowrap",
+  row: "hover:bg-slate-50 h-12 transition-colors border-none"
+};
+
+
+const DATA_APPOINTMENTS: Appointment[] = [
+  {
+    id: "1", // Campo obligatorio según tu interfaz
+    idAppointment: "APT-1024",
+    time: "08:30 AM",
+    generador: "Logística del Norte",
+    idgenerador: "900.123.456-1",
+    carrier: "Transportes Especiales S.A.",
+    unidadNegocio: "Consumo",
+    status: "en_proceso",
+    locationName: "CEDI - Medellín",
+    documento: "DOC-88210",
+    type: "Cargue",
+    truckId: "KKL-990",
+    loadTime: "07:45 AM",
+    unloadTime: "09:30 AM",
+    talleres: "Taller Central",
+  },
+  {
+    id: "2", // Campo obligatorio
+    idAppointment: "APT-1025",
+    time: "09:00 AM",
+    generador: "Alimentos Globales",
+    idgenerador: "800.555.222-3",
+    carrier: "Express Cargo",
+    unidadNegocio: "Frio",
+    status: "confirmado",
+    locationName: "CEDI - Bogotá",
+    documento: "DOC-88211",
+    type: "Descargue",
+    truckId: "MXC-123",
+    loadTime: "08:50 AM",
+    unloadTime: "10:15 AM",
+    talleres: "N/A",
+  },
+  {
+    id: "3", // Campo obligatorio
+    idAppointment: "APT-1026",
+    time: "10:30 AM",
+    generador: "Industrial S.A.",
+    idgenerador: "860.001.002-5",
+    carrier: "TransLogist",
+    unidadNegocio: "Químicos",
+    status: "pending",
+    locationName: "CEDI - Cali",
+    documento: "DOC-88212",
+    type: "Cargue",
+    truckId: "RTY-456",
+    loadTime: "10:15 AM",
+    unloadTime: "11:45 AM",
+    talleres: "Taller Sur",
+  },
+  {
+    id: "4", // Campo obligatorio
+    idAppointment: "APT-1027",
+    time: "11:00 AM",
+    generador: "Retail Colombia",
+    idgenerador: "901.998.776-4",
+    carrier: "Rápido Quindío",
+    unidadNegocio: "Retail",
+    status: "retrasado",
+    locationName: "CEDI - Barranquilla",
+    documento: "DOC-88213",
+    type: "Descargue",
+    truckId: "GGT-789",
+    loadTime: "11:30 AM",
+    unloadTime: "01:00 PM",
+    talleres: "N/A",
+  }
+];
+/* --- DATOS INICIALES --- */
+const EDIT_DATA: Appointment[] = [
+   { 
+    id: "NOTAPRUEBAABI5002", 
+    documento: "Documento1",
+    carrier: "FERRIAMARILLA S.A.S", 
+    nit: "900.742.771-9",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE", 
+    product: "Insumos Industriales",
+    codigoArticulo: "ART-001",
+    quantityOrdered: 150, 
+    quantityDelivered: 50, 
+    tipoCita: "Cargue",
+    fechaInicial: "2026-01-28",
+    fechaFinal: "2026-01-28",
+    canal: "MODERNO", 
+    unidadNegocio: "Consumo",
+    tipoOperacion: "Nacional",
+    tipoMercancia: "General",
+    estadoDocumento: "Ordenado",
+    tipoCargue: "Pallet",
+    truckId: "TRK-ANT-001", 
+    time: "15:28", 
+    type: "Descargue", 
+    status: "pending", 
+    locationId: "loc-1", 
+    date: "2026-01-28", 
+    peso: "5,000", 
+    operationType: "Descargue", 
+    isReadyForAssignment: false, 
+    zone: "MEDELLIN_ANT", 
+    route: "RUTA SUR-01", 
+    priority: "ALTA", 
+    logisticProfile: "REFRIGERADO"
+  },
+  { 
+    id: "ABI10200", 
+    documento: "Documento2",
+    carrier: "DISTRIBUIDORA NACIONAL",
+    nit: "860.001.002-4",  
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE", 
+    product: "ABARROTES VARIOS", 
+    codigoArticulo: "ART-002",
+    quantityOrdered: 2400, 
+    quantityDelivered: 1200, 
+    tipoCita: "Cargue",
+     fechaInicial: "2026-01-28",
+    fechaFinal: "2026-01-28",
+    estadoDocumento: "Ordenado",
+    canal: "TRADICIONAL",
+    unidadNegocio: "Consumo",
+    tipoOperacion: "Nacional",
+    tipoMercancia: "General",
+    tipoCargue: "Arrume",
+    truckId: "TRK-DC-014", 
+    time: "08:00", 
+    type: "Descargue", 
+    status: "pending",
+    locationId: "loc-1", 
+    date: "2026-01-28", 
+    peso: "3,500", 
+    operationType: "Descargue", 
+    isReadyForAssignment: false, 
+    zone: "BOGOTA_DC", 
+    route: "NORTE-05", 
+    priority: "MEDIA", 
+    logisticProfile: "SECA"
+  },
+];
+
+const DATA_REAGENDADA: Appointment[] = [
+  { 
+    idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  },
+  { 
+     idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  },
+  { 
+       idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  },
+  { 
+        idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  },
+  { 
+      idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  },
+  { 
+        idAppointment: "324250",
+    date: "2026-01-28",
+    time: "16:20", 
+    type: "Cargue",
+    status: "pending", 
+    idgenerador: "GEN-005",
+    generador: "ALPINA S.A.",
+    carrier: "FERRIAMARILLA S.A.S", 
+    truckId: "RTY-112", 
+    idTipoProducto: "Leche en polvo",
+    id: "ABI10205",
+    cantidadPedida: 500,
+    fechaReagendacion: "2026-01-30",
+    horaReagendacion: "10:00",
+    Motivo: "Operación logística interna",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    canal: "MODERNO",
+    tipoOperacion: "Local",
+    unidadNegocio: "Consumo",
+    nit: "900.742.771-9",
+    driverId: "43.555.666",
+    driver: "JUAN QUINTERO",
+    product: "Harina de Maíz",
+    tipologiavehiculo: "SENCILLO",
+    tiempoprogramadocargue: "30 MINUTOS",
+    tipoCargue: "Pallet",
+    talleres: "N/A",
+    route: "SUR-08",
+    priority: "MEDIA",
+    logisticProfile: "SECA"
+  }
+];
+
+const EDIT_DATA_table: Appointment[] = [
+  {
+    id: "inv-1",
+    carrier: "Transportes Norte", // Campo obligatorio añadido
+    type: "Cargue",              // Campo obligatorio añadido (en lugar de tipoCita)
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    generador: "Proveedor Alimentos SAS",
+    date: "2024-05-20",
+    time: "07:00 AM",
+    idAppointment: "APT-5521",
+    status: "pending",
+    driverId: "CR-9920",
+    documento: "FACT-8821",
+    merchandiseCode: "REC-101",
+    appointmentIdRef: "RM-001",
+  },
+  {
+    id: "inv-2",
+    carrier: "Logística Express",
+    type: "Descargue",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    generador: "Distribuidora Global",
+    date: "2024-05-20",
+    time: "09:30 AM",
+    idAppointment: "APT-5522",
+    status: "pending",
+    driverId: "CR-9921",
+    documento: "FACT-8822",
+    merchandiseCode: "REC-102",
+    appointmentIdRef: "RM-002",
+  },
+  {
+    id: "inv-3",
+    carrier: "TransCarga",
+    type: "Cargue",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    generador: "Manufacturas ABC",
+    date: "2024-05-21",
+    time: "11:00 AM",
+    idAppointment: "APT-5523",
+    status: "pending",
+    driverId: "CR-9922",
+    documento: "FACT-8823",
+    merchandiseCode: "REC-103",
+    appointmentIdRef: "RM-003",
+  },
+  {
+    id: "inv-4",
+    carrier: "Rápido Quindío",
+    type: "Descargue",
+    locationName: "CENTRO DE DISTRIBUCIÓN NORTE",
+    generador: "Logística Express",
+    date: "2024-05-21",
+    time: "02:00 PM",
+    idAppointment: "APT-5524",
+    status: "retrasado",
+    driverId: "CR-9923",
+    documento: "FACT-8824",
+    merchandiseCode: "REC-104",
+    appointmentIdRef: "RM-004",
+  }
+];
 /* --- HELPERS VISUALES --- */
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
@@ -132,84 +630,268 @@ export default function MonitoringTables({ locationId }: { locationId: string | 
               <EmptyState />
             ) : (
               <div className="flex-1 overflow-auto custom-scrollbar">
-                {activeTab === "appointments" && (
-                  <Table>
-                    <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-                      <TableRow className="border-none h-10">
-                        {["ID Cita", "Hora Cita", "Proveedor", "Transportadora", "Estado", "Placa", "Entrada", "Salida"].map(h => (
-                          <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 whitespace-nowrap">{h}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(10)].map((_, i) => (
-                        <TableRow key={i} className="hover:bg-blue-50/20 border-b border-slate-50 h-12">
-                          <TableCell className="px-3 font-black text-[#1C1E59] text-[10px] ">APT-{1024 + i}</TableCell>
-                          <TableCell className="px-3 text-slate-500 text-[10px] font-medium"><Clock className="inline w-3 h-3 mr-1" /> 08:30 AM</TableCell>
-                          <TableCell className="px-3 font-bold text-slate-700 text-[10px] uppercase">Logística del Norte</TableCell>
-                          <TableCell className="px-3 text-slate-600 text-[10px]">Transportes Especiales</TableCell>
-                          <TableCell className="px-3"><StatusBadge status={i % 2 === 0 ? "en_proceso" : "confirmado"} /></TableCell>
-                          <TableCell className="px-3"><span className="bg-amber-50 border border-amber-200 text-amber-800 px-2 py-0.5 rounded font-mono font-bold text-[10px]">KKL-99{i}</span></TableCell>
-                          <TableCell className="px-3 text-slate-400 text-[10px] ">07:45 AM</TableCell>
-                          <TableCell className="px-3 text-slate-400 text-[10px] ">09:30 AM</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+               
+               
+{activeTab === "appointments" && (
+  <div className="w-full overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+    <Table>
+      <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+        <TableRow className="border-none h-10">
+          {[
+            "Cita", "Hora de la Cita", "Proveedor", "Nit Proveedor", 
+            "Empresa de Transporte", "Gen", "Estado de la cita", 
+            "Localidad", "Documento", "Flujo", "Placas", 
+            "Entrada", "Salida", "Talleres"
+          ].map((h) => (
+            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-4 whitespace-nowrap text-center">
+              {h}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {DATA_APPOINTMENTS.map((apt) => (
+          <TableRow key={apt.id} className="hover:bg-slate-50 border-b border-slate-100 h-12 transition-colors">
+            
+            {/* Cita */}
+            <TableCell className="px-4 text-center font-bold text-[#1C1E59] text-[10px]">
+              {apt.idAppointment}
+            </TableCell>
 
-                {activeTab === "carriers" && (
-                  <Table>
-                     <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-                        <TableRow className="border-none h-10">
-                          {["Cita", "Localidad", "Estado", "Cliente", "Placa", "T. Localidad", "OnTime", "% C/D"].map(h => (
-                            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 whitespace-nowrap">{h}</TableHead>
-                          ))}
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[...Array(10)].map((_, i) => (
-                          <TableRow key={i} className="hover:bg-blue-50/20 border-b border-slate-50 h-12">
-                            <TableCell className="px-3 font-black text-[#1C1E59] text-[10px]">CITA-{100+i}</TableCell>
-                            <TableCell className="px-3 text-slate-600 text-[10px] font-bold">Planta Bello</TableCell>
-                            <TableCell className="px-3"><StatusBadge status="en_proceso" /></TableCell>
-                            <TableCell className="px-3 font-bold text-[#1C1E59] text-[10px] uppercase">Cliente Principal</TableCell>
-                            <TableCell className="px-3 font-mono font-bold text-[10px]">AAA-123</TableCell>
-                            <TableCell className="px-3 font-mono text-[10px] text-orange-600 font-bold">01:15:00</TableCell>
-                            <TableCell className="px-3 text-center">{i % 2 === 0 ? <Check className="w-3.5 h-3.5 text-emerald-500 mx-auto" /> : <XCircle className="w-3.5 h-3.5 text-rose-500 mx-auto" />}</TableCell>
-                            <TableCell className="px-3"><Badge className="bg-blue-100 text-blue-700 text-[9px] border-none">50%</Badge></TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                  </Table>
-                )}
+            {/* Hora */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
+              <Clock className="inline w-3 h-3 mr-1 text-slate-400 mb-0.5" />
+              {apt.time}
+            </TableCell>
 
-                {activeTab === "inventory" && (
-                  <Table>
-                    <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-                      <TableRow className="border-none h-10">
-                        {["ID Cita", "Proveedor", "Vehículo", "T. Transcurrido", "Acciones"].map(h => (
-                          <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 whitespace-nowrap">{h}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(10)].map((_, i) => (
-                        <TableRow key={i} className="hover:bg-blue-50/20 border-b border-slate-50 h-12">
-                          <TableCell className="px-3 font-black text-[#1C1E59] text-[10px]">DOC-992{i}</TableCell>
-                          <TableCell className="px-3 font-black text-[#1C1E59] text-[10px] uppercase">Logística Integral S.A.</TableCell>
-                          <TableCell className="px-3 text-slate-600 text-[10px] uppercase font-semibold">Tractomula</TableCell>
-                          <TableCell className="px-3 font-mono text-[10px] text-orange-600 font-bold">01:20:00</TableCell>
-                          <TableCell className="px-3">
-                            <Button variant="outline" size="sm" className="h-7 px-3 bg-white border-slate-200 text-[#1C1E59] font-black text-[9px] rounded-lg">
-                              <FileText className="w-3 h-3 mr-1" /> Editar
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+            {/* Proveedor */}
+            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-medium uppercase whitespace-nowrap">
+              {apt.generador}
+            </TableCell>
+
+            {/* Nit */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.idgenerador}
+            </TableCell>
+
+            {/* Empresa Transporte */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
+              {apt.carrier}
+            </TableCell>
+
+            {/* Gen (Unidad Negocio) */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.unidadNegocio}
+            </TableCell>
+
+            {/* Estado (Único con Badge) */}
+            <TableCell className="px-4 text-center">
+              <div className="flex justify-center">
+                <Badge className={cn(
+                  "text-[9px] px-2 py-0.5 font-bold uppercase border shadow-none rounded-md",
+                  apt.status === "en_proceso" && "bg-blue-50 text-blue-700 border-blue-200",
+                  apt.status === "confirmado" && "bg-green-50 text-green-700 border-green-200",
+                  apt.status === "pending" && "bg-amber-50 text-amber-700 border-amber-200",
+                  apt.status === "retrasado" && "bg-red-50 text-red-700 border-red-200"
+                )}>
+                  {apt.status?.replace("_", " ")}
+                </Badge>
+              </div>
+            </TableCell>
+
+            {/* Localidad */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
+              {apt.locationName}
+            </TableCell>
+
+            {/* Documento */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.documento}
+            </TableCell>
+
+            {/* Flujo (Texto simple) */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px] font-bold">
+              {apt.type}
+            </TableCell>
+
+            {/* Placas (Texto simple) */}
+            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-bold uppercase">
+              {apt.truckId}
+            </TableCell>
+
+            {/* Entrada (Sin italic) */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.loadTime}
+            </TableCell>
+
+            {/* Salida (Sin italic) */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.unloadTime}
+            </TableCell>
+
+            {/* Talleres */}
+            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
+              {apt.talleres}
+            </TableCell>
+
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+)}
+
+               {activeTab === "carriers" && (
+  <div className="w-full overflow-x-auto rounded-lg shadow-sm border border-slate-200">
+    <Table>
+      <TableHeader className="bg-[#050038]">
+        <TableRow className="border-none">
+          {/* Mapeo de Cabeceras */}
+          {[
+            "Acciones", "Número de Cita", "Tipo de Cita", "Fecha cita", "Hora cita", 
+            "Estado de Cita", "Localidad", "Documento", "Canal", "Tipo de operación", 
+            "Unidad Negocio", "Identificación Generador", "Generador / Cliente", 
+            "ID Empresa Transporte", "Empresa Transporte", "Placas", "ID Conductor", 
+            "Conductor", "Producto", "Tipología", "Tiempo Prog.", "Tipo Cargue", "Talleres"
+          ].map((h) => (
+            <TableHead key={h} className={STYLES.header}>
+              {h}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+
+      <TableBody>
+        {DATA_REAGENDADA.map((apt) => (
+          <TableRow key={apt.idAppointment} className={STYLES.row}>
+            {/* Acciones */}
+            <TableCell className={STYLES.cell}>
+              <div className="flex justify-center">
+                <Button 
+                  className="h-8 w-8 bg-[#FF6B00] hover:bg-orange-600 text-white rounded-lg shadow-md transition-transform active:scale-95"
+                  size="icon"
+                >
+                  <RefreshCcw className="w-4 h-4" />
+                </Button>
+              </div>
+            </TableCell>
+
+            {/* Datos Principales */}
+            <TableCell className={STYLES.cellBold}>{apt.idAppointment}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.type}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.date}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.time}</TableCell>
+            
+            {/* Estado con Badge */}
+            <TableCell className={STYLES.cell}>
+              <Badge className={cn(
+                "text-[9px] px-2 py-0.5 font-semibold capitalize border shadow-sm",
+                apt.status === "pending" 
+                  ? "bg-amber-50 text-amber-700 border-amber-200" 
+                  : "bg-blue-50 text-blue-700 border-blue-200"
+              )}>
+                {apt.status.replace("_", " ")}
+              </Badge>
+            </TableCell>
+
+            {/* Resto de Columnas (Usando el estilo base) */}
+            <TableCell className={STYLES.cell}>{apt.locationName}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.id}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.canal}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.operationType}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.unidadNegocio}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.idgenerador}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.generador}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.nit}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.carrier}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.truckId || "—"}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.driverId}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.driver}</TableCell>
+            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.product}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.tipologiavehiculo}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.tiempoprogramadocargue}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.tipoCargue || "N/A"}</TableCell>
+            <TableCell className={STYLES.cell}>{apt.talleres}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+)}
+
+               {activeTab === "inventory" && (
+  <div className="w-full overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+    <Table>
+      <TableHeader className="bg-[#050038] sticky top-0 z-30">
+        <TableRow className="border-none h-10">
+          <TableHead className="w-10 text-center">
+            {/* Checkbox Header opcional */}
+          </TableHead>
+          {[
+            "Localidad", "Proveedor", "Fecha Cita", "Hora Cita", 
+            "Tipo de Cita", "Cita", "Estado", "#Credencial", 
+            "Documentos", "#Recepción", "Recibo Maestro", "Editar"
+          ].map((h) => (
+            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 text-center whitespace-nowrap">
+              {h}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {EDIT_DATA_table.map((apt) => (
+          <TableRow key={apt.id} className="hover:bg-slate-50 border-b h-12 transition-colors">
+            {/* Checkbox */}
+            <TableCell className="text-center p-2">
+              <input type="checkbox" className="accent-[#FF6B00] cursor-pointer w-3.5 h-3.5" />
+            </TableCell>
+
+            {/* Datos Centrados y Unificados */}
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center font-medium">{apt.locationName}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-700 text-center font-bold uppercase whitespace-nowrap">{apt.generador}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.date}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.time}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.tipoCita}</TableCell>
+            <TableCell className="px-3 text-[10px] text-[#050038] text-center font-bold">{apt.idAppointment}</TableCell>
+            
+            {/* Estado con Badge */}
+            <TableCell className="px-3">
+              <div className="flex justify-center">
+                <Badge className={cn(
+                  "text-[9px] px-2 py-0.5 font-bold uppercase border shadow-none",
+                  apt.status === "en_proceso" && "bg-blue-50 text-blue-700 border-blue-200",
+                  apt.status === "confirmado" && "bg-green-50 text-green-700 border-green-200",
+                  apt.status === "pending" && "bg-amber-50 text-amber-700 border-amber-200",
+                  apt.status === "retrasado" && "bg-red-50 text-red-700 border-red-200"
+                )}>
+                  {apt.status?.replace("_", " ")}
+                </Badge>
+              </div>
+            </TableCell>
+
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center font-mono">{apt.driverId}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.documento}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.merchandiseCode}</TableCell>
+            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.appointmentIdRef}</TableCell>
+
+            {/* Botón Editar Navy */}
+            <TableCell className="px-3 text-center">
+              <div className="flex justify-center">
+                <Button 
+                  className="h-8 w-8 bg-[#050038] hover:bg-[#0a054d] text-white rounded-lg shadow-md transition-all active:scale-95"
+                  size="icon"
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+)}
+
               </div>
             )}
             {locationId && <TablePagination total={45} />}

@@ -29,6 +29,7 @@ import {
   ArrowRight,
   Plus,
   AlertTriangle,
+  Edit,
 } from "lucide-react";
 
 export type AppointmentStatus = "pending" | "en_proceso" | "confirmado" | "retrasado" | "completado";
@@ -1296,6 +1297,112 @@ export default function ManagementTables({ locationId }: { locationId: string | 
                   </Table>
                 </div>
               )}
+
+
+               {activeTab === "recurrencia" && (
+  <div className="rounded-md border overflow-x-auto">
+    <Table>
+      <TableHeader className="bg-[#050038] sticky top-0 z-30">
+        <TableRow className="border-none h-10">
+          {/* Encabezados */}
+          {[
+            "Localidad",
+            "Identificación Generador / Cliente",
+            "Generador / Cliente",
+            "Identificación Empresa Transporte",
+            "Producto",
+            "Tipologia de Vehiculo",
+            "Fecha Inicio",
+            "Fecha Fin",
+            "Hora de Cita",
+            "Tiempo Programado Cargue/Descargue",
+            "Frecuencia",
+            "Editar",
+            "Eliminar",
+            "Ver en Agenda",
+            "Ver Informe",
+          ].map((h) => (
+            <TableHead 
+              key={h} 
+              className="text-white font-bold text-[9px] uppercase px-2 text-center whitespace-nowrap"
+            >
+              {h}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {DATA_CONFIRMADOS.map((apt) => (
+          <TableRow 
+            key={apt.idAppointment} 
+            className="hover:bg-slate-50 border-b h-12 transition-colors"
+          >
+         
+            {/* Datos Mapeados y Centrados */}
+            <TableCell className="px-2 text-[10px] text-slate-700 font-bold text-center whitespace-nowrap">{apt.locationName}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.idgenerador}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center whitespace-nowrap">{apt.generador}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center whitespace-nowrap">{apt.nit}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center whitespace-nowrap">{apt.carrier}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.tipologiavehiculo}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.date}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.date}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.time}</TableCell>
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center">{apt.tiempoprogramadocargue}</TableCell>
+
+            <TableCell className="px-2 text-[10px] text-slate-600 text-center whitespace-nowrap"></TableCell>
+            <TableCell className="p-2 text-center">
+                  <div className="flex justify-center">
+                             <Button 
+                            className="h-9 w-9 bg-[#FF6B00] hover:bg-orange-600 text-white rounded-xl shadow-lg"
+                            size="icon"
+                            onClick={() => handleOpenFlow(apt)}
+                          >
+                            <Edit className="w-5 h-5" />
+                          </Button>
+                  </div>
+            </TableCell>
+            <TableCell className="p-2 text-center">
+                            <div className="flex justify-center">
+                              <Button 
+                                className="h-8 w-8 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition-colors"
+                                size="icon"
+                                title="Eliminar"
+                          
+                              >
+                                <X className="w-4 h-4" strokeWidth={3} />
+                              </Button>
+                            </div>
+                          </TableCell>
+            <TableCell className="px-3 text-center">
+                          <Button 
+                            className="h-9 w-9 bg-[#FF6B00] hover:bg-orange-600 text-white rounded-xl shadow-lg"
+                            size="icon"
+                            onClick={() => handleOpenFlow(apt)}
+                          >
+                            <CalendarPlus className="w-5 h-5" />
+                          </Button>
+                        </TableCell>
+            <TableCell className="p-2 text-center">
+                  <div className="flex justify-center">
+                             <Button 
+                            className="h-9 w-9 bg-[#FF6B00] hover:bg-orange-600 text-white rounded-xl shadow-lg"
+                            size="icon"
+                            onClick={() => handleOpenFlow(apt)}
+                          >
+                            <FileText className="w-4 h-4" />
+                          </Button>
+                  </div>
+            </TableCell>
+  
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+)}
+
+
 
 
 
