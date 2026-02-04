@@ -899,7 +899,8 @@ function CreateAppointmentModal({
 /* --- COMPONENTE PRINCIPAL --- */
 export default function ManagementTables({ locationId }: { locationId: string | null }) {
   const [activeTab, setActiveTab] = useState("solicitudes");
-  
+   const [isFilterOpen, setIsFilterOpen] = useState(false); // <--- 1. ESTADO NUEVO
+
   // ESTADOS PARA FLUJO DE MODALES
   const [step, setStep] = useState(0); // 0: Cerrado, 1: Paso 1, 2: Paso 2
   const [selectedData, setSelectedData] = useState<any>(null);
@@ -923,6 +924,108 @@ export default function ManagementTables({ locationId }: { locationId: string | 
     setIsRequestOpen(true);
   };
 
+  /* --- COMPONENTE: MODAL DE FILTROS --- */
+function FilterModal({ 
+  isOpen, 
+  onClose 
+}: { 
+  isOpen: boolean; 
+  onClose: () => void; 
+}) {
+  if (!isOpen) return null;
+
+  const labelClass = "text-[11px] font-bold text-slate-600 w-24 shrink-0 pt-2";
+  const inputClass = "flex-1 h-8 px-3 text-[11px] border border-slate-200 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 transition-all uppercase font-medium";
+  const rowClass = "flex gap-4 items-start";
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-[2px] p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-[500px] overflow-hidden animate-in fade-in zoom-in duration-200 border border-slate-200">
+        
+        {/* Header Naranja (Como la imagen) */}
+        <div className="bg-[#FF6B00] px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-white">
+            <Filter className="w-4 h-4" />
+            <span className="font-bold text-sm tracking-tight">Filtros</span>
+          </div>
+          <button onClick={onClose} className="text-white/80 hover:text-white transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Cuerpo del Formulario - Compacto */}
+        <div className="p-5 space-y-3 bg-white">
+          
+          {/* Fila: Fechas */}
+          <div className={rowClass}>
+            <div className="flex flex-1 items-center gap-2">
+              <label className="text-[11px] font-bold text-slate-600 w-20">Fecha inicial</label>
+              <input type="date" className={inputClass} defaultValue="2026-02-04" />
+            </div>
+            <div className="flex flex-1 items-center gap-2">
+              <label className="text-[11px] font-bold text-slate-600 w-16 text-right">Fecha final</label>
+              <input type="date" className={inputClass} defaultValue="2026-02-04" />
+            </div>
+          </div>
+
+          {/* Fila: Cita */}
+          <div className="flex items-center gap-2">
+            <label className="text-[11px] font-bold text-slate-600 w-20">Cita</label>
+            <input type="text" className={inputClass} placeholder="Número de cita" />
+          </div>
+
+          {/* Fila: Orden de Compra */}
+          <div className="flex items-center gap-2">
+            <label className="text-[11px] font-bold text-slate-600 w-20">Orden de compra</label>
+            <input type="text" className={inputClass} placeholder="Documento de referencia" />
+          </div>
+
+          {/* Fila: NITs */}
+          <div className={rowClass}>
+            <div className="flex flex-1 items-center gap-2">
+              <label className="text-[11px] font-bold text-slate-600 w-20">Nit proveedor</label>
+              <input type="text" className={inputClass} />
+            </div>
+            <div className="flex flex-1 items-center gap-2">
+              <label className="text-[11px] font-bold text-slate-600 w-24 text-right">Nit transportista</label>
+              <input type="text" className={inputClass} />
+            </div>
+          </div>
+
+          {/* Fila: Cedi */}
+          <div className="flex items-center gap-2">
+            <label className="text-[11px] font-bold text-slate-600 w-20">Cedi</label>
+            <input type="text" className={inputClass} placeholder="Centro de distribución" />
+          </div>
+
+          {/* Fila: Gen */}
+          <div className="flex items-center gap-2">
+            <label className="text-[11px] font-bold text-slate-600 w-20">Gen</label>
+            <input type="text" className={inputClass} placeholder="Generador" />
+          </div>
+
+        </div>
+
+        {/* Footer con botones */}
+        <div className="bg-slate-50/80 px-4 py-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="h-8 px-4 bg-[#FF6B00] hover:bg-[#e66000] text-white border-none text-[11px] font-bold rounded-md"
+          >
+            Cancelar
+          </Button>
+          <Button 
+            className="h-8 px-6 bg-[#FF6B00] hover:bg-[#e66000] text-white text-[11px] font-bold rounded-md shadow-sm"
+            onClick={onClose}
+          >
+            Buscar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
  return (
     <div className="flex h-full w-full bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden">
@@ -951,6 +1054,8 @@ export default function ManagementTables({ locationId }: { locationId: string | 
         ))}
       </div>
 
+      
+
       {/* --- ÁREA DE CONTENIDO --- */}
       <div className="flex-1 flex flex-col min-w-0">
         
@@ -965,11 +1070,19 @@ export default function ManagementTables({ locationId }: { locationId: string | 
             <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
               <RefreshCcw className="w-3.5 h-3.5"/>
             </Button>
-            <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+            <Button 
+              disabled={!locationId} 
+              variant="ghost" 
+              size="icon" 
+              className={cn("h-8 w-8 transition-colors", isFilterOpen ? "text-[#FF6B00] bg-orange-50" : "text-slate-400")}
+              onClick={() => setIsFilterOpen(true)}
+            >
               <Filter className="w-3.5 h-3.5"/>
             </Button>
           </div>
         </div>
+
+
 
         <div className="flex-1 p-3 bg-slate-50/30 overflow-hidden flex flex-col">
           <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
@@ -1441,7 +1554,10 @@ export default function ManagementTables({ locationId }: { locationId: string | 
           }}
         />
       )}
-
+ <FilterModal 
+        isOpen={isFilterOpen} 
+        onClose={() => setIsFilterOpen(false)} 
+      />
 
     </div>
   );

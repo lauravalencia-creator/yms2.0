@@ -566,7 +566,8 @@ const EmptyState = () => (
 
 /* --- COMPONENTE PRINCIPAL --- */
 export default function MonitoringTables({ locationId }: { locationId: string | null }) {
-  const [activeTab, setActiveTab] = useState("appointments");
+const [activeTab, setActiveTab] = useState("appointments");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const tabs = [
     { id: "appointments", label: "Consulta de Citas", icon: CalendarRange },
@@ -601,6 +602,85 @@ export default function MonitoringTables({ locationId }: { locationId: string | 
         ))}
       </div>
 
+            {/* --- MODAL DE FILTROS --- */}
+{isFilterOpen && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+      
+      {/* Header Naranja */}
+      <div className="bg-[#FF6B00] px-5 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-white">
+          <Filter className="w-4 h-4" />
+          <span className="font-bold text-sm uppercase tracking-wider">Filtros de Búsqueda</span>
+        </div>
+        <button 
+          onClick={() => setIsFilterOpen(false)}
+          className="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Cuerpo del Formulario - Padding reducido */}
+      <div className="p-5 grid grid-cols-2 gap-4">
+        
+        {/* Fechas en una fila */}
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Fecha Inicial</label>
+          <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Fecha Final</label>
+          <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+
+        {/* Campos de ancho completo */}
+        <div className="col-span-2 space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Número de Cita</label>
+          <input type="text" placeholder="Ej: APT-1024" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+
+        <div className="col-span-2 space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Orden de Compra / Documento</label>
+          <input type="text" placeholder="Ingrese el número de documento" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">NIT Proveedor</label>
+          <input type="text" placeholder="Nit sin puntos" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">NIT Transportista</label>
+          <input type="text" placeholder="Nit empresa" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+
+        <div className="col-span-2 space-y-1.5">
+          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Nombre del Proveedor</label>
+          <input type="text" placeholder="Buscar por nombre..." className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
+        </div>
+      </div>
+
+      {/* Footer con Acciones */}
+      <div className="bg-slate-50 px-5 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
+        <Button 
+          variant="ghost" 
+          onClick={() => setIsFilterOpen(false)}
+          className="text-slate-500 text-xs font-bold hover:bg-slate-200 rounded-xl px-6"
+        >
+          CANCELAR
+        </Button>
+        <Button 
+          className="bg-[#FF6B00] hover:bg-orange-600 text-white text-xs font-bold px-8 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-95"
+          onClick={() => setIsFilterOpen(false)}
+        >
+          APLICAR FILTROS
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
       {/* --- ÁREA DE CONTENIDO (DERECHA) --- */}
       <div className="flex-1 flex flex-col min-w-0">
         
@@ -618,9 +698,15 @@ export default function MonitoringTables({ locationId }: { locationId: string | 
             <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
               <Download className="w-3.5 h-3.5"/>
             </Button>
-            <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
-              <Filter className="w-3.5 h-3.5"/>
-            </Button>
+            <Button 
+            disabled={!locationId} 
+            variant="ghost" 
+            size="icon" 
+            className={cn("h-8 w-8 transition-colors", isFilterOpen ? "text-[#FF6B00] bg-orange-50" : "text-slate-400")}
+            onClick={() => setIsFilterOpen(true)}
+          >
+            <Filter className="w-3.5 h-3.5"/>
+          </Button>
           </div>
         </div>
 
