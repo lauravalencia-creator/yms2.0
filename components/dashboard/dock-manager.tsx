@@ -385,7 +385,7 @@ const DocumentDetailView = ({ doc, onBack, onOpenRequest, onOpenTechnical }: any
       <button onClick={onBack} className="text-white p-1 hover:bg-white/10 rounded-lg">
         <ChevronLeft size={20} />
       </button>
-      <span className="text-white font-bold text-sm uppercase italic">Detalle Documento</span>
+      <span className="text-white font-bold text-sm uppercase ">Detalle Documento</span>
       <Button 
         size="sm" 
         onClick={onOpenRequest}
@@ -818,7 +818,7 @@ function CreateAppointmentModal({
             <div className="bg-orange-500 p-1.5 rounded-lg shadow-lg">
               <ClipboardList className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xs font-black uppercase tracking-widest italic">Detalles de la cita</h3>
+            <h3 className="text-xs font-black uppercase tracking-widest ">Detalles de la cita</h3>
           </div>
           <button onClick={onClose} className="hover:bg-white/10 p-2 rounded-full transition-all text-white/70 hover:text-white">
             <X className="w-5 h-5" />
@@ -838,7 +838,7 @@ function CreateAppointmentModal({
             <div className="grid grid-cols-2">
               <div className={cellClass}>
                 <span className={labelClass}>LOCALIDAD:</span>
-                <span className="flex-1 px-4 text-[9px] font-black text-slate-500 flex items-center truncate uppercase italic">{baseItem.locationName}</span>
+                <span className="flex-1 px-4 text-[9px] font-black text-slate-500 flex items-center truncate uppercase ">{baseItem.locationName}</span>
               </div>
               <div className={cellClass}>
                 <span className={labelClass}>NÚMERO DE LA CITA:</span>

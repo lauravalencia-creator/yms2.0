@@ -4,12 +4,15 @@ import { useState } from "react";
 import dynamic from "next/dynamic"; 
 import { LocationFilter, locationsData } from "@/components/dashboard/location-filter"; 
 import { DockManager } from "@/components/dashboard/dock-manager";
-import { TablesSection } from "@/components/dashboard/tables-section";
+
+// --- NUEVAS IMPORTACIONES ---
+import MonitoringTables from "@/components/dashboard/MonitoringTables";
+import ManagementTables from "@/components/dashboard/ManagementTables";
+
 import { AuditHistoryContent } from "@/components/dashboard/audit";
 import { RegisterManagerContent } from "@/components/dashboard/register-manager";
 import { ReportsManagerContent } from "@/components/dashboard/reports";
 import { UploadManagerContent } from "@/components/dashboard/upload-files";
-
 
 const VehicleMap = dynamic(
   () => import('@/components/dashboard/VehicleMap'), 
@@ -24,7 +27,7 @@ export default function DashboardPage() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   
   // Estado para la vista activa
-    const [activeView, setActiveView] = useState<"muelles" | "monitoreo" | "gestion" | "auditoria" | "registros" | "mapa" | "reportes" | "carga">("muelles");
+  const [activeView, setActiveView] = useState<"muelles" | "monitoreo" | "gestion" | "auditoria" | "registros" | "mapa" | "reportes" | "carga">("muelles");
 
   // Estado para el sub-tipo de registro (entrada, salida, etc.)
   const [registerType, setRegisterType] = useState<string>("entrada");
@@ -32,7 +35,6 @@ export default function DashboardPage() {
   // Buscamos el nombre de la localidad para el mapa
   const selectedLocationName = locationsData.find(l => l.id === selectedLocationId)?.name || "SIN LOCALIDAD";
 
-  // 4. Esta es la función que procesa los clics del Navbar
   const handleViewChange = (view: any, subView?: string) => {
     setActiveView(view);
     if (subView) {
@@ -45,7 +47,7 @@ export default function DashboardPage() {
       
        <LocationFilter 
         onFilterChange={setSelectedLocationId}
-        onViewChange={handleViewChange} // <--- CAMBIO: Usar handleViewChange, no setActiveView
+        onViewChange={handleViewChange}
         currentView={activeView}
         selectedLocationId={selectedLocationId}
       />
@@ -63,17 +65,17 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* VISTA 2: MONITOREO */}
+        {/* VISTA 2: MONITOREO (Usando el nuevo componente especializado) */}
         {activeView === "monitoreo" && (
           <div className="h-full p-4 animate-in fade-in zoom-in-95 duration-300">
-            <TablesSection locationId={selectedLocationId} initialSection="monitoreo" />
+            <MonitoringTables locationId={selectedLocationId} />
           </div>
         )}
 
-        {/* VISTA 3: GESTIÓN */}
+        {/* VISTA 3: GESTIÓN (Usando el nuevo componente especializado) */}
         {activeView === "gestion" && (
           <div className="h-full p-4 animate-in fade-in zoom-in-95 duration-300">
-            <TablesSection locationId={selectedLocationId} initialSection="gestion" />
+            <ManagementTables locationId={selectedLocationId} />
           </div>
         )}
 

@@ -42,7 +42,7 @@ export function ReportsManagerContent() {
           <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-orange-100">
             <BarChart3 className="text-[#ff6b00]" size={24} />
           </div>
-          <h3 className="text-xl font-black text-[#1C1E59] uppercase italic tracking-tighter">Reportes Logísticos</h3>
+          <h3 className="text-xl font-black text-[#1C1E59] uppercase tracking-tighter">Reportes Logísticos</h3>
           <p className="text-gray-400 text-[11px] font-medium">Define los parámetros para filtrar los indicadores</p>
         </div>
 

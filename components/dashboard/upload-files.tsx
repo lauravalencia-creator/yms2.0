@@ -83,7 +83,7 @@ export function UploadManagerContent() {
           
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <div className="text-center mb-6">
-                <h3 className="text-xl font-black text-[#1e2b58] uppercase italic tracking-tighter">
+                <h3 className="text-xl font-black text-[#1e2b58] uppercase  tracking-tighter">
                     {TABS_CONFIG[activeTab].label}
                 </h3>
             </div>
@@ -93,7 +93,7 @@ export function UploadManagerContent() {
                 value="documentos" 
                 className="rounded-xl font-black uppercase text-[9px] tracking-widest data-[state=active]:bg-white data-[state=active]:text-[#ff6b00] data-[state=active]:shadow-sm transition-all"
               >
-                Documentos OC / ASN
+                Carga Documentos
               </TabsTrigger>
               <TabsTrigger 
                 value="citas" 
@@ -111,7 +111,7 @@ export function UploadManagerContent() {
                     <CheckCircle2 className="w-10 h-10 text-emerald-500" />
                   </div>
                   <div className="text-center">
-                    <h4 className="text-lg font-black text-[#1e2b58] uppercase italic">¡Carga Exitosa!</h4>
+                    <h4 className="text-lg font-black text-[#1e2b58] uppercase ">¡Carga Exitosa!</h4>
                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Los archivos han sido procesados correctamente.</p>
                   </div>
                   <Button 
