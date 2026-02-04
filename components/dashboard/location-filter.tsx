@@ -1531,7 +1531,7 @@ const handleLocationChange = (value: string) => {
             onClick={() => onViewChange("monitoreo")} 
             isActive={currentView === "monitoreo"}
           />
-          {/* BOTÓN ÚNICO DE REGISTROS (EXPANDIBLE + POPOVER) */}
+      
 
           {/* BOTÓN ÚNICO DE REGISTROS (EXPANDIBLE + POPOVER) */}
 <Popover>
@@ -1545,38 +1545,47 @@ const handleLocationChange = (value: string) => {
   </PopoverTrigger>
   
   {/* El PopoverContent debe tener un Z-index alto y ser vertical */}
-  <PopoverContent 
-    className="w-64 p-2 rounded-2xl shadow-2xl border-gray-100 bg-white z-[110]" 
-    align="center"
-    sideOffset={8}
-  >
-    <div className="flex flex-col gap-1">
-      {/* Título interno del menú */}
-      <div className="px-3 py-2 border-b border-gray-50 mb-1">
-        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-            Gestión de Patio
-        </span>
-      </div>
-      
-      {/* Mapeo de opciones: AQUÍ ES DONDE SE VUELVEN VERTICALES */}
+<PopoverContent 
+  className="w-[90vw] sm:w-80 p-4 rounded-[2rem] shadow-2xl border-gray-100 bg-white z-[110]" 
+  align="center"
+  sideOffset={8}
+>
+  <div className="space-y-4">
+    {/* Título interno */}
+    <div className="px-2 pb-2 border-b border-gray-50 text-center">
+      <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+          Gestión de Patio
+      </span>
+    </div>
+    
+    {/* GRILLA DE BOTONES: 2 columnas en móvil, 1 en desktop si prefieres */}
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-1">
       {REGISTRO_OPCIONES.map((opt) => (
         <button
           key={opt.id}
           onClick={() => {
             onViewChange("registros", opt.id);
           }}
-          className="flex items-center gap-3 p-3 w-full hover:bg-orange-50 rounded-xl transition-colors group text-left"
+          className={cn(
+            "flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-3 p-4 sm:p-3 w-full",
+            "bg-slate-50 hover:bg-orange-50 rounded-2xl transition-all group text-center sm:text-left",
+            "border border-transparent hover:border-orange-200 active:scale-95"
+          )}
         >
-          <div className="w-8 h-8 rounded-lg bg-gray-50 group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
-            <opt.icon size={16} />
+          {/* Contenedor del Icono */}
+          <div className="w-10 h-10 sm:w-8 sm:h-8 rounded-xl bg-white shadow-sm group-hover:bg-[#ff6b00] group-hover:text-white flex items-center justify-center transition-colors">
+            <opt.icon size={20} className="sm:w-4 sm:h-4" />
           </div>
-          <span className="text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter">
+          
+          {/* Texto del Botón */}
+          <span className="text-[10px] sm:text-[11px] font-black text-[#1e2b58] uppercase tracking-tighter leading-tight">
             {opt.label}
           </span>
         </button>
       ))}
     </div>
-  </PopoverContent>
+  </div>
+</PopoverContent>
 </Popover>
 
           {/* BOTÓN MAPA EN EL NAVBAR */}

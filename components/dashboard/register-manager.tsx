@@ -28,11 +28,13 @@ interface RegisterManagerProps {
 
 export function RegisterManagerContent({ locationId, initialOption, onClose }: RegisterManagerProps) {
   const [registroId, setRegistroId] = useState(initialOption || "entrada");
-  const isSalida = registroId === "salida";
+  
+  // AHORA: Tanto entrada como salida activan el formulario completo
+  const esProcesoCompleto = registroId === "entrada" || registroId === "salida";
 
   const [vehicleState, setVehicleState] = useState<"cargado" | "vacio" | "devuelto" | null>(null);
   const [returnReason, setReturnReason] = useState("");
-  const [step, setStep] = useState<'form' | 'scanner' | 'result' | 'tracking-scanner' | 'exit-details'>('form');
+  const [step, setStep] = useState<'form' | 'scanner' | 'result' | 'tracking-scanner' | 'process-details'>('form');
   const [codigo, setCodigo] = useState("");
   const [trackingCodes, setTrackingCodes] = useState<string[]>([]);
   const [newTrackingInput, setNewTrackingInput] = useState("");
@@ -55,7 +57,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
         if (step === 'scanner') {
           setCodigo("QR-8821-AUTO");
           setTrackingCodes(["PKG-7721", "PKG-9902"]);
-          if (isSalida) setStep('exit-details');
+          if (esProcesoCompleto) setStep('process-details');
           else setStep('result');
         } else {
           const newCode = `PKG-${Math.floor(Math.random() * 9000) + 1000}`;
@@ -65,7 +67,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
       }, 2200);
     }
     return () => clearTimeout(timer);
-  }, [step, isSalida]);
+  }, [step, esProcesoCompleto]);
 
   const handleSubmitManual = () => {
     if (codigo) setStep('result');
@@ -73,17 +75,19 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
 
   const isButtonDisabled = () => {
     if (!codigo) return true;
-    if (isSalida) {
+    if (esProcesoCompleto) {
       if (!vehicleState) return true;
       if (vehicleState === "devuelto" && returnReason.trim().length < 5) return true;
     }
     return false;
   };
 
-  // --- COMPONENTE: SELECTOR DE ESTADO ---
+  // --- COMPONENTE: SELECTOR DE ESTADO (Dinámico según entrada/salida) ---
   const VehicleStateSelector = () => (
     <div className="space-y-4 animate-in slide-in-from-top-4 duration-500">
-      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center block">Estado del Vehículo al Salir</label>
+      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center block">
+        Estado del Vehículo al {registroId === 'entrada' ? 'Ingresar' : 'Salir'}
+      </label>
       <div className="grid grid-cols-3 gap-3">
         {[
           { id: 'cargado', label: 'Cargado', icon: ShoppingCart },
@@ -147,7 +151,7 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
               />
            </div>
 
-           {isSalida && <VehicleStateSelector />}
+           {esProcesoCompleto && <VehicleStateSelector />}
 
            <Button 
             onClick={handleSubmitManual} 
@@ -175,8 +179,8 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
     );
   }
 
-  // --- VISTA: DETALLES DE SALIDA (POST-ESCANEO) ---
-  if (step === 'exit-details') {
+  // --- VISTA: DETALLES DE PROCESO (POST-ESCANEO PARA ENTRADA/SALIDA) ---
+  if (step === 'process-details') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] py-4 animate-in fade-in zoom-in-95 duration-300">
         <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-xl p-8 border border-slate-50 flex flex-col gap-6 text-center">
@@ -185,7 +189,9 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
            </div>
            <div>
              <h3 className="text-[#050038] font-black text-xl uppercase tracking-tighter">Cita detectada: {codigo}</h3>
-             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Complete la información de salida</p>
+             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+               Complete la información de {registroId === 'entrada' ? 'entrada' : 'salida'}
+             </p>
            </div>
            
            <VehicleStateSelector />
@@ -195,14 +201,14 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
             disabled={!vehicleState || (vehicleState === "devuelto" && returnReason.trim().length < 5)} 
             className="h-14 rounded-xl bg-[#ff6b00] text-white font-black uppercase text-[10px] tracking-[0.2em] shadow-lg"
            >
-             Finalizar Registro de Salida
+             Finalizar Registro de {registroId === 'entrada' ? 'Entrada' : 'Salida'}
            </Button>
         </div>
       </div>
     );
   }
 
-  // --- VISTA 2: ESCÁNER (Estilos Originales Restaurados) ---
+  // --- VISTA 2: ESCÁNER ---
   if (step === 'scanner' || step === 'tracking-scanner') {
     return (
       <div className="fixed inset-0 bg-[#050038] flex flex-col items-center justify-center z-[200] p-6 overflow-hidden">
@@ -211,10 +217,10 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
           .scan-line { position: absolute; left: 0; width: 100%; height: 4px; background: #ff6b00; box-shadow: 0 0 30px 6px #ff6b00; animation: scanMove 2.5s ease-in-out infinite; z-index: 20; }
         `}</style>
         <div className="text-center mb-10 space-y-2 relative z-10">
-            <h3 className="text-white font-black text-2xl uppercase tracking-tighter">Hardware Activo</h3>
-            <p className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.4em] animate-pulse">
+   
+            <h3 className="text-white font-black text-2xl uppercase tracking-tighter animate-pulse">
                 Leyendo {step === 'scanner' ? 'Documento Principal' : 'Guía de Paquete'}...
-            </p>
+            </h3>
         </div>
         <div className="relative w-64 h-64 bg-black/30 rounded-[3rem] border-2 border-white/10 flex items-center justify-center overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]">
             <div className="absolute top-8 left-8 w-12 h-12 border-t-[6px] border-l-[6px] border-[#ff6b00] rounded-tl-3xl z-30" />
@@ -231,39 +237,32 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
     );
   }
 
-  // --- VISTA 3: RESULTADOS (Rediseñada para Salida) ---
+  // --- VISTA 3: RESULTADOS ---
   const opcionActiva = REGISTRO_OPCIONES.find((opt) => opt.id === registroId) || REGISTRO_OPCIONES[0];
   
-  // Datos para Salida (Completos)
-  const infoSalida = [
+  // Datos para Proceso Completo (Entrada/Salida)
+  const infoDetallada = [
     { label: "ID Cita", val: codigo || "QR-8821-AUTO" },
     { label: "Fecha Cita", val: "29 ENE 2026" },
     { label: "Hora Cita", val: "14:00:00" },
-    
     { label: "Ciudad", val: "Bogotá D.C." },
     { label: "Departamento", val: "Cundinamarca" },
     { label: "Localidad", val: "Fontibón" },
-    
     { label: "Zona Localidad", val: "Zona Franca" },
     { label: "Punto Acceso", val: "Patio A-12" },
     { label: "Tipo Operación", val: opcionActiva.label },
-
     { label: "Empresa Transp.", val: "TransLogistics S.A." },
     { label: "Conductor", val: "Juan Pérez" },
     { label: "ID Conductor", val: "1.023.456.789" },
-    
     { label: "Vehículo", val: "Scania R450" },
     { label: "Placa", val: "JPL-092" },
     { label: "Tipo Carga", val: vehicleState === 'vacio' ? "Vacío" : "Carga General" },
-
-    { label: "Hora Salida", val: "16:45:12" },
-    { label: "Duración Muelle", val: "02h 15m" },
+    { label: registroId === 'entrada' ? "Hora Entrada" : "Hora Salida", val: "16:45:12" },
+    { label: "Muelle Asignado", val: "Muelle 04" },
     { label: "Estado", val: vehicleState?.toUpperCase() || "N/A" },
-
     { label: "Observaciones", val: returnReason || "Sin novedades", fullWidth: true },
   ];
 
-  // Datos para otros procesos (Resumidos)
   const infoBasica = [
     { label: "Código Detectado", val: codigo || "AUTO-SCAN" },
     { label: "Marca de Tiempo", val: "29 ENE 2026 - 16:45:12" },
@@ -292,16 +291,14 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
         </div>
 
         {/* CONTENEDOR DE INFORMACIÓN */}
-        {isSalida ? (
-            /* DISEÑO PARA SALIDA: TARJETA ANCHA CON GRILLA SIN SCROLL */
+        
             <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg p-8 space-y-6">
                  <div className="flex items-center gap-3 border-b border-slate-50 pb-4">
                     <Truck size={18} className="text-[#1C1E59]" />
                     <span className="font-black text-[#1C1E59] text-xs uppercase tracking-widest">Detalle Completo de Operación</span>
                 </div>
-                
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-6">
-                    {infoSalida.map((item, i) => (
+                    {infoDetallada.map((item, i) => (
                         <div key={i} className={cn("flex flex-col gap-1", item.fullWidth && "col-span-2 md:col-span-3")}>
                             <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{item.label}</span>
                             <span className="text-xs font-black text-[#1C1E59] break-words uppercase">{item.val}</span>
@@ -309,24 +306,10 @@ export function RegisterManagerContent({ locationId, initialOption, onClose }: R
                     ))}
                 </div>
             </div>
-        ) : (
-            /* DISEÑO PARA OTROS: LISTA SIMPLE */
-            <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg p-6 space-y-4">
-                 <div className="flex items-center gap-3 border-b border-slate-50 pb-3">
-                    <span className="font-black text-[#1C1E59] text-[10px] uppercase tracking-widest">Información del Registro</span>
-                </div>
-                <div className="space-y-3">
-                    {infoBasica.map((row, i) => (
-                        <div key={i} className="flex justify-between items-center">
-                            <span className="text-slate-400 text-[9px] font-black uppercase tracking-widest">{row.label}</span>
-                            <span className="text-[#1C1E59] font-black text-xs text-right max-w-[60%]">{row.val}</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        )}
+        
+        
 
-        {/* SECCIÓN DE TRACKING (AHORA ABAJO Y ANCHA) */}
+        {/* TRACKING */}
         <div className="bg-white rounded-[2rem] border border-orange-100 shadow-lg p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-orange-50 pb-3">
                 <div className="flex items-center gap-3">

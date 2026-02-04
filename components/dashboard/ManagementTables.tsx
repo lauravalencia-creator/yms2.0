@@ -994,13 +994,13 @@ function FilterModal({
 
           {/* Fila: Cedi */}
           <div className="flex items-center gap-2">
-            <label className="text-[11px] font-bold text-slate-600 w-20">Cedi</label>
+            <label className="text-[11px] font-bold text-slate-600 w-20">Localidad</label>
             <input type="text" className={inputClass} placeholder="Centro de distribución" />
           </div>
 
           {/* Fila: Gen */}
           <div className="flex items-center gap-2">
-            <label className="text-[11px] font-bold text-slate-600 w-20">Gen</label>
+            <label className="text-[11px] font-bold text-slate-600 w-20">Tipo de Producto</label>
             <input type="text" className={inputClass} placeholder="Generador" />
           </div>
 
