@@ -30,6 +30,7 @@ import {
   Plus,
   AlertTriangle,
   Edit,
+  Search, 
 } from "lucide-react";
 
 export type AppointmentStatus = "pending" | "en_proceso" | "confirmado" | "retrasado" | "completado";
@@ -918,6 +919,35 @@ export default function ManagementTables({ locationId }: { locationId: string | 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedItemsForModal, setSelectedItemsForModal] = useState<Appointment[]>([]);
   const [dataFromStep1, setDataFromStep1] = useState<any>(null);
+   const [searchTerm, setSearchTerm] = useState(""); 
+
+  const filteredSolicitudes = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return INITIAL_SOLICITUDES.filter(item => 
+      item.id.toLowerCase().includes(term) || 
+      item.carrier.toLowerCase().includes(term) ||
+      item.product?.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
+
+  const filteredConfirmados = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return DATA_CONFIRMADOS.filter(item => 
+      item.idAppointment?.toLowerCase().includes(term) || 
+      item.generador?.toLowerCase().includes(term) ||
+      item.carrier.toLowerCase().includes(term) ||
+      item.truckId?.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
+
+  const filteredReagendada = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return DATA_REAGENDADA.filter(item => 
+      item.idAppointment?.toLowerCase().includes(term) || 
+      item.generador?.toLowerCase().includes(term) ||
+      item.carrier.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
 
   const handleOpenFlow = (apt: Appointment) => {
     setSelectedItemsForModal([apt]);
@@ -1030,42 +1060,51 @@ function FilterModal({
  return (
     <div className="flex h-full w-full bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden">
       
-      {/* --- BARRA LATERAL IZQUIERDA COMPACTA --- */}
+      {/* Sidebar Izquierda */}
       <div className="w-16 flex flex-col border-r border-slate-100 bg-slate-50/50 py-4 items-center gap-3 shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            title={tab.label}
+            onClick={() => { setActiveTab(tab.id); setSearchTerm(""); }}
             className={cn(
               "relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 group",
-              activeTab === tab.id 
-                ? "bg-[#FF6B00] text-white shadow-md shadow-orange-200" 
-                : "text-slate-400 hover:bg-white hover:text-[#1C1E59]"
+              activeTab === tab.id ? "bg-[#FF6B00] text-white shadow-md shadow-orange-200" : "text-slate-400 hover:bg-white hover:text-[#1C1E59]"
             )}
           >
             <tab.icon className="w-5 h-5" />
-            
-            {/* Indicador lateral activo pegado al borde */}
-            {activeTab === tab.id && (
-              <div className="absolute -left-3 w-1 h-6 bg-[#FF6B00] rounded-r-full" />
-            )}
+            {activeTab === tab.id && <div className="absolute -left-3 w-1 h-6 bg-[#FF6B00] rounded-r-full" />}
           </button>
         ))}
       </div>
 
-      
-
-      {/* --- ÁREA DE CONTENIDO --- */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Toolbar superior */}
-        <div className="h-12 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59] ">
+        {/* TOOLBAR ÚNICO CON BUSCADOR CENTRAL */}
+        <div className="h-14 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0 gap-4">
+          <div className="flex items-center min-w-fit">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">
               {tabs.find(t => t.id === activeTab)?.label}
             </span>
           </div>
+
+          {/* BARRA DE BÚSQUEDA CENTRAL */}
+          <div className="flex-1 max-w-md relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-[#FF6B00] transition-colors" />
+            <input
+              type="text"
+              placeholder="Buscar por placa, documento, proveedor o cita..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={!locationId}
+              className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 pl-9 pr-4 text-[11px] outline-none focus:ring-2 focus:ring-orange-100 focus:border-[#FF6B00] transition-all"
+            />
+            {searchTerm && (
+              <button onClick={() => setSearchTerm("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
           <div className="flex items-center gap-2">
             <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
               <RefreshCcw className="w-3.5 h-3.5"/>

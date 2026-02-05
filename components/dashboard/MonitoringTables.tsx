@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react"; 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +38,7 @@ import {
   ArrowRight,
   Plus,
   AlertTriangle,
+  Search, 
   Edit,
 } from "lucide-react";
 
@@ -566,8 +567,9 @@ const EmptyState = () => (
 
 /* --- COMPONENTE PRINCIPAL --- */
 export default function MonitoringTables({ locationId }: { locationId: string | null }) {
-const [activeTab, setActiveTab] = useState("appointments");
+  const [activeTab, setActiveTab] = useState("appointments");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const tabs = [
     { id: "appointments", label: "Consulta de Citas", icon: CalendarRange },
@@ -575,123 +577,103 @@ const [activeTab, setActiveTab] = useState("appointments");
     { id: "inventory", label: "Editar Información", icon: Package }
   ];
 
+
+  
+   // Lógica de filtrado genérica para las tablas
+const filteredAppointments = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    if (!term) return DATA_APPOINTMENTS;
+    
+    return DATA_APPOINTMENTS.filter((apt) => 
+      apt.idAppointment?.toLowerCase().includes(term) ||
+      apt.generador?.toLowerCase().includes(term) ||
+      apt.truckId?.toLowerCase().includes(term) ||
+      apt.carrier?.toLowerCase().includes(term) ||
+      apt.documento?.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
+
+    const filteredReagendada = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    if (!term) return DATA_REAGENDADA;
+
+    return DATA_REAGENDADA.filter((apt) => 
+      apt.idAppointment?.toLowerCase().includes(term) ||
+      apt.generador?.toLowerCase().includes(term) ||
+      apt.truckId?.toLowerCase().includes(term) ||
+      apt.driver?.toLowerCase().includes(term) ||
+      apt.carrier?.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
+
+   const filteredInventory = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    if (!term) return EDIT_DATA_table;
+
+    return EDIT_DATA_table.filter((apt) => 
+      apt.idAppointment?.toLowerCase().includes(term) ||
+      apt.generador?.toLowerCase().includes(term) ||
+      apt.documento?.toLowerCase().includes(term) ||
+      apt.locationName?.toLowerCase().includes(term)
+    );
+  }, [searchTerm]);
+
   return (
-    <div className="flex h-full w-full bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden">
+     <div className="flex h-full w-full bg-white border border-slate-200 rounded-3xl shadow-lg overflow-hidden">
       
-      {/* --- BARRA LATERAL IZQUIERDA COMPACTA (NAVY STYLE) --- */}
+      {/* Sidebar Izquierda */}
       <div className="w-16 flex flex-col border-r border-slate-100 bg-slate-50/50 py-4 items-center gap-3 shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            title={tab.label}
+            onClick={() => { setActiveTab(tab.id); setSearchTerm(""); }}
             className={cn(
-              "relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 group",
-              activeTab === tab.id 
-                ? "bg-[#1C1E59] text-white shadow-md shadow-indigo-200" 
-                : "text-slate-400 hover:bg-white hover:text-[#1C1E59]"
+              "relative flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300",
+              activeTab === tab.id ? "bg-[#1C1E59] text-white shadow-md" : "text-slate-400 hover:text-[#1C1E59]"
             )}
           >
             <tab.icon className="w-5 h-5" />
-            
-            {/* Indicador lateral activo pegado al borde */}
-            {activeTab === tab.id && (
-              <div className="absolute -left-3 w-1 h-6 bg-[#1C1E59] rounded-r-full" />
-            )}
+            {activeTab === tab.id && <div className="absolute -left-3 w-1 h-6 bg-[#1C1E59] rounded-r-full" />}
           </button>
         ))}
       </div>
 
-            {/* --- MODAL DE FILTROS --- */}
-{isFilterOpen && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-      
-      {/* Header Naranja */}
-      <div className="bg-[#FF6B00] px-5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-white">
-          <Filter className="w-4 h-4" />
-          <span className="font-bold text-sm uppercase tracking-wider">Filtros de Búsqueda</span>
-        </div>
-        <button 
-          onClick={() => setIsFilterOpen(false)}
-          className="text-white/80 hover:text-white hover:bg-white/10 p-1 rounded-full transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Cuerpo del Formulario - Padding reducido */}
-      <div className="p-5 grid grid-cols-2 gap-4">
-        
-        {/* Fechas en una fila */}
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Fecha Inicial</label>
-          <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Fecha Final</label>
-          <input type="date" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-
-        {/* Campos de ancho completo */}
-        <div className="col-span-2 space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Número de Cita</label>
-          <input type="text" placeholder="Ej: APT-1024" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-
-        <div className="col-span-2 space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Orden de Compra / Documento</label>
-          <input type="text" placeholder="Ingrese el número de documento" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">NIT Proveedor</label>
-          <input type="text" placeholder="Nit sin puntos" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-
-        <div className="space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">NIT Transportista</label>
-          <input type="text" placeholder="Nit empresa" className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-
-        <div className="col-span-2 space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-500 uppercase ml-1">Nombre del Proveedor</label>
-          <input type="text" placeholder="Buscar por nombre..." className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-orange-500 outline-none transition-all" />
-        </div>
-      </div>
-
-      {/* Footer con Acciones */}
-      <div className="bg-slate-50 px-5 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
-        <Button 
-          variant="ghost" 
-          onClick={() => setIsFilterOpen(false)}
-          className="text-slate-500 text-xs font-bold hover:bg-slate-200 rounded-xl px-6"
-        >
-          CANCELAR
-        </Button>
-        <Button 
-          className="bg-[#FF6B00] hover:bg-orange-600 text-white text-xs font-bold px-8 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-95"
-          onClick={() => setIsFilterOpen(false)}
-        >
-          APLICAR FILTROS
-        </Button>
-      </div>
-    </div>
-  </div>
-)}
-
-      {/* --- ÁREA DE CONTENIDO (DERECHA) --- */}
+      {/* Contenido Derecha */}
       <div className="flex-1 flex flex-col min-w-0">
         
-        {/* Toolbar superior compacto */}
-        <div className="h-12 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59] ">
+        {/* Toolbar Único y Corregido */}
+        <div className="h-12 border-b border-slate-100 flex items-center justify-between px-6 bg-white shrink-0 gap-4">
+          <div className="flex items-center min-w-fit">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#1C1E59]">
               {tabs.find(t => t.id === activeTab)?.label}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+
+          
+
+           {/* Centro: Buscador (Ahora fuera de contenedores que lo limiten) */}
+          <div className="flex-1 max-w-md relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-[#FF6B00] transition-colors" />
+            <input
+              type="text"
+              placeholder="Buscar por placa, documento, proveedor o cita..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              disabled={!locationId}
+              className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 pl-9 pr-4 text-[11px] outline-none focus:ring-2 focus:ring-orange-100 focus:border-[#FF6B00] transition-all"
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm("")} 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Lado derecho: Botones de Acción */}
+          <div className="flex items-center gap-2 min-w-fit">
             <Button disabled={!locationId} variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
               <RefreshCcw className="w-3.5 h-3.5"/>
             </Button>
@@ -699,278 +681,176 @@ const [activeTab, setActiveTab] = useState("appointments");
               <Download className="w-3.5 h-3.5"/>
             </Button>
             <Button 
-            disabled={!locationId} 
-            variant="ghost" 
-            size="icon" 
-            className={cn("h-8 w-8 transition-colors", isFilterOpen ? "text-[#FF6B00] bg-orange-50" : "text-slate-400")}
-            onClick={() => setIsFilterOpen(true)}
-          >
-            <Filter className="w-3.5 h-3.5"/>
-          </Button>
+              disabled={!locationId} 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setIsFilterOpen(true)} 
+              className={cn("h-8 w-8", isFilterOpen ? "text-[#FF6B00] bg-orange-50" : "text-slate-400")}
+            >
+              <Filter className="w-3.5 h-3.5"/>
+            </Button>
           </div>
         </div>
 
+        {/* Área de Tabla */}
         <div className="flex-1 p-3 bg-slate-50/30 overflow-hidden flex flex-col">
           <div className="flex-1 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-            {!locationId ? (
-              <EmptyState />
-            ) : (
+            {!locationId ? ( <EmptyState /> ) : (
               <div className="flex-1 overflow-auto custom-scrollbar">
                
-               
-{activeTab === "appointments" && (
-  <div className="w-full overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
-    <Table>
-      <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
-        <TableRow className="border-none h-10">
-          {[
-            "Cita", "Hora de la Cita", "Proveedor", "Nit Proveedor", 
-            "Empresa de Transporte", "Gen", "Estado de la cita", 
-            "Localidad", "Documento", "Flujo", "Placas", 
-            "Entrada", "Salida", "Talleres"
-          ].map((h) => (
-            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-4 whitespace-nowrap text-center">
-              {h}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {DATA_APPOINTMENTS.map((apt) => (
-          <TableRow key={apt.id} className="hover:bg-slate-50 border-b border-slate-100 h-12 transition-colors">
-            
-            {/* Cita */}
-            <TableCell className="px-4 text-center font-bold text-[#1C1E59] text-[10px]">
-              {apt.idAppointment}
-            </TableCell>
+                {activeTab === "appointments" && (
+                  <div className="w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-[#1C1E59] sticky top-0 z-30">
+                        <TableRow className="border-none h-10">
+                          {["Cita", "Hora Cita", "Proveedor", "Nit Proveedor", "Transporte", "Tipo de producto", "Estado de la Cita", "Localidad", "Documento", "Flujo", "Placas", "Entrada", "Salida", "Talleres"].map((h) => (
+                            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-4 text-center whitespace-nowrap">{h}</TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredAppointments.map((apt) => (
+                          <TableRow key={apt.id} className="hover:bg-slate-50 border-b h-12">
+                            <TableCell className="px-4 text-center font-bold text-[#1C1E59] text-[10px]">{apt.idAppointment}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap"><Clock className="inline w-3 h-3 mr-1" />{apt.time}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-medium uppercase">{apt.generador}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.idgenerador}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.carrier}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.unidadNegocio}</TableCell>
+                            <TableCell className="px-4 text-center">
+                              <Badge className={cn("text-[9px] font-bold uppercase", apt.status === "en_proceso" ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-green-50 text-green-700")}>{apt.status?.replace("_", " ")}</Badge>
+                            </TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">{apt.locationName}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.documento}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px] font-bold">{apt.type}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-bold uppercase">{apt.truckId}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.loadTime}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.unloadTime}</TableCell>
+                            <TableCell className="px-4 text-center text-slate-600 text-[10px]">{apt.talleres}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
 
-            {/* Hora */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
-              <Clock className="inline w-3 h-3 mr-1 text-slate-400 mb-0.5" />
-              {apt.time}
-            </TableCell>
-
-            {/* Proveedor */}
-            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-medium uppercase whitespace-nowrap">
-              {apt.generador}
-            </TableCell>
-
-            {/* Nit */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.idgenerador}
-            </TableCell>
-
-            {/* Empresa Transporte */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
-              {apt.carrier}
-            </TableCell>
-
-            {/* Gen (Unidad Negocio) */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.unidadNegocio}
-            </TableCell>
-
-            {/* Estado (Único con Badge) */}
-            <TableCell className="px-4 text-center">
-              <div className="flex justify-center">
-                <Badge className={cn(
-                  "text-[9px] px-2 py-0.5 font-bold uppercase border shadow-none rounded-md",
-                  apt.status === "en_proceso" && "bg-blue-50 text-blue-700 border-blue-200",
-                  apt.status === "confirmado" && "bg-green-50 text-green-700 border-green-200",
-                  apt.status === "pending" && "bg-amber-50 text-amber-700 border-amber-200",
-                  apt.status === "retrasado" && "bg-red-50 text-red-700 border-red-200"
-                )}>
-                  {apt.status?.replace("_", " ")}
-                </Badge>
-              </div>
-            </TableCell>
-
-            {/* Localidad */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px] whitespace-nowrap">
-              {apt.locationName}
-            </TableCell>
-
-            {/* Documento */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.documento}
-            </TableCell>
-
-            {/* Flujo (Texto simple) */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px] font-bold">
-              {apt.type}
-            </TableCell>
-
-            {/* Placas (Texto simple) */}
-            <TableCell className="px-4 text-center text-slate-700 text-[10px] font-bold uppercase">
-              {apt.truckId}
-            </TableCell>
-
-            {/* Entrada (Sin italic) */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.loadTime}
-            </TableCell>
-
-            {/* Salida (Sin italic) */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.unloadTime}
-            </TableCell>
-
-            {/* Talleres */}
-            <TableCell className="px-4 text-center text-slate-600 text-[10px]">
-              {apt.talleres}
-            </TableCell>
-
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </div>
-)}
-
-               {activeTab === "carriers" && (
-  <div className="w-full overflow-x-auto rounded-lg shadow-sm border border-slate-200">
-    <Table>
-      <TableHeader className="bg-[#050038]">
-        <TableRow className="border-none">
-          {/* Mapeo de Cabeceras */}
-          {[
-            "Acciones", "Número de Cita", "Tipo de Cita", "Fecha cita", "Hora cita", 
-            "Estado de Cita", "Localidad", "Documento", "Canal", "Tipo de operación", 
-            "Unidad Negocio", "Identificación Generador", "Generador / Cliente", 
-            "ID Empresa Transporte", "Empresa Transporte", "Placas", "ID Conductor", 
-            "Conductor", "Producto", "Tipología", "Tiempo Prog.", "Tipo Cargue", "Talleres"
-          ].map((h) => (
-            <TableHead key={h} className={STYLES.header}>
-              {h}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-
-      <TableBody>
-        {DATA_REAGENDADA.map((apt) => (
-          <TableRow key={apt.idAppointment} className={STYLES.row}>
-            {/* Acciones */}
-            <TableCell className={STYLES.cell}>
-              <div className="flex justify-center">
-                <Button 
-                  className="h-8 w-8 bg-[#FF6B00] hover:bg-orange-600 text-white rounded-lg shadow-md transition-transform active:scale-95"
-                  size="icon"
-                >
-                  <RefreshCcw className="w-4 h-4" />
-                </Button>
-              </div>
-            </TableCell>
-
-            {/* Datos Principales */}
-            <TableCell className={STYLES.cellBold}>{apt.idAppointment}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.type}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.date}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.time}</TableCell>
-            
-            {/* Estado con Badge */}
-            <TableCell className={STYLES.cell}>
-              <Badge className={cn(
-                "text-[9px] px-2 py-0.5 font-semibold capitalize border shadow-sm",
-                apt.status === "pending" 
-                  ? "bg-amber-50 text-amber-700 border-amber-200" 
-                  : "bg-blue-50 text-blue-700 border-blue-200"
-              )}>
-                {apt.status.replace("_", " ")}
-              </Badge>
-            </TableCell>
-
-            {/* Resto de Columnas (Usando el estilo base) */}
-            <TableCell className={STYLES.cell}>{apt.locationName}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.id}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.canal}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.operationType}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.unidadNegocio}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.idgenerador}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.generador}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.nit}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.carrier}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.truckId || "—"}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.driverId}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.driver}</TableCell>
-            <TableCell className={`${STYLES.cell} whitespace-nowrap`}>{apt.product}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.tipologiavehiculo}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.tiempoprogramadocargue}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.tipoCargue || "N/A"}</TableCell>
-            <TableCell className={STYLES.cell}>{apt.talleres}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </div>
-)}
-
-               {activeTab === "inventory" && (
-  <div className="w-full overflow-x-auto rounded-lg border border-slate-200 shadow-sm">
+              {activeTab === "carriers" && (
+  <div className="w-full overflow-x-auto rounded-lg border border-slate-200">
     <Table>
       <TableHeader className="bg-[#050038] sticky top-0 z-30">
-        <TableRow className="border-none h-10">
-          <TableHead className="w-10 text-center">
-            {/* Checkbox Header opcional */}
-          </TableHead>
+        <TableRow className="border-none">
           {[
-            "Localidad", "Proveedor", "Fecha Cita", "Hora Cita", 
-            "Tipo de Cita", "Cita", "Estado", "#Credencial", 
-            "Documentos", "#Recepción", "Recibo Maestro", "Editar"
+            "Cita", 
+            "Tipo", 
+            "Fecha", 
+            "Hora", 
+            "Estado de la Cita", 
+            "Localidad", 
+            "Documento", 
+            "Canal", 
+            "Tipo de Operación", 
+            "Unidad de negocio",
+            "ID Tipo de Producto", 
+            "Generador", 
+            "ID Empresa de Transporte", 
+            "Empresa de Transporte", 
+            "Placas", 
+            "ID Conductor", 
+            "Conductor", 
+            "Producto", 
+            "Tipología", 
+            "Tiempo", 
+            "Cargue", 
+            "Talleres"
           ].map((h) => (
-            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 text-center whitespace-nowrap">
+            <TableHead 
+              key={h} 
+              className={cn(STYLES.header, "text-center")} // Asegura centrado en cabecera
+            >
               {h}
             </TableHead>
           ))}
         </TableRow>
       </TableHeader>
       <TableBody>
-        {EDIT_DATA_table.map((apt) => (
-          <TableRow key={apt.id} className="hover:bg-slate-50 border-b h-12 transition-colors">
-            {/* Checkbox */}
-            <TableCell className="text-center p-2">
-              <input type="checkbox" className="accent-[#FF6B00] cursor-pointer w-3.5 h-3.5" />
-            </TableCell>
-
-            {/* Datos Centrados y Unificados */}
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center font-medium">{apt.locationName}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-700 text-center font-bold uppercase whitespace-nowrap">{apt.generador}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.date}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.time}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.tipoCita}</TableCell>
-            <TableCell className="px-3 text-[10px] text-[#050038] text-center font-bold">{apt.idAppointment}</TableCell>
+        {filteredReagendada.map((apt, idx) => (
+          <TableRow key={idx} className={STYLES.row}>
             
-            {/* Estado con Badge */}
-            <TableCell className="px-3">
+            {/* 1. Cita */}
+            <TableCell className={STYLES.cellBold}>{apt.idAppointment}</TableCell>
+            
+            {/* 2. Tipo */}
+            <TableCell className={STYLES.cell}>{apt.type}</TableCell>
+            
+            {/* 3. Fecha */}
+            <TableCell className={STYLES.cell}>{apt.date}</TableCell>
+            
+            {/* 4. Hora */}
+            <TableCell className={STYLES.cell}>{apt.time}</TableCell>
+            
+            {/* 5. Estado con Badge centrado */}
+            <TableCell className={STYLES.cell}>
               <div className="flex justify-center">
                 <Badge className={cn(
                   "text-[9px] px-2 py-0.5 font-bold uppercase border shadow-none",
-                  apt.status === "en_proceso" && "bg-blue-50 text-blue-700 border-blue-200",
-                  apt.status === "confirmado" && "bg-green-50 text-green-700 border-green-200",
-                  apt.status === "pending" && "bg-amber-50 text-amber-700 border-amber-200",
-                  apt.status === "retrasado" && "bg-red-50 text-red-700 border-red-200"
+                  apt.status === "pending" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-blue-50 text-blue-700 border-blue-200"
                 )}>
-                  {apt.status?.replace("_", " ")}
+                  {apt.status.replace("_", " ")}
                 </Badge>
               </div>
             </TableCell>
 
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center font-mono">{apt.driverId}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.documento}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.merchandiseCode}</TableCell>
-            <TableCell className="px-3 text-[10px] text-slate-600 text-center">{apt.appointmentIdRef}</TableCell>
+            {/* 6. Localidad */}
+            <TableCell className={STYLES.cell}>{apt.locationName}</TableCell>
+            
+            {/* 7. Documento */}
+            <TableCell className={STYLES.cell}>{apt.id}</TableCell>
+            
+            {/* 8. Canal */}
+            <TableCell className={STYLES.cell}>{apt.canal}</TableCell>
+            
+            {/* 9. Tipo Operación */}
+            <TableCell className={STYLES.cell}>{apt.operationType}</TableCell>
+            
+            {/* 10. Unidad Negocio */}
+            <TableCell className={STYLES.cell}>{apt.unidadNegocio}</TableCell>
+            
+            {/* 11. ID Tipo Producto (NIT Gen) */}
+            <TableCell className={STYLES.cell}>{apt.idgenerador}</TableCell>
+            
+            {/* 12. Generador */}
+            <TableCell className={cn(STYLES.cell, "font-medium uppercase")}>{apt.generador}</TableCell>
+            
+            {/* 13. ID Empresa Transp (NIT) */}
+            <TableCell className={STYLES.cell}>{apt.nit}</TableCell>
+            
+            {/* 14. Empresa Transporte */}
+            <TableCell className={STYLES.cell}>{apt.carrier}</TableCell>
+            
+            {/* 15. Placas */}
+            <TableCell className={cn(STYLES.cell, "font-bold uppercase")}>{apt.truckId}</TableCell>
+            
+            {/* 16. ID Conductor */}
+            <TableCell className={STYLES.cell}>{apt.driverId}</TableCell>
+            
+            {/* 17. Conductor */}
+            <TableCell className={STYLES.cell}>{apt.driver}</TableCell>
+            
+            {/* 18. Producto */}
+            <TableCell className={STYLES.cell}>{apt.product}</TableCell>
+            
+            {/* 19. Tipología */}
+            <TableCell className={STYLES.cell}>{apt.tipologiavehiculo}</TableCell>
+            
+            {/* 20. Tiempo */}
+            <TableCell className={STYLES.cell}>{apt.tiempoprogramadocargue}</TableCell>
+            
+            {/* 21. Cargue */}
+            <TableCell className={STYLES.cell}>{apt.tipoCargue}</TableCell>
+            
+            {/* 22. Talleres */}
+            <TableCell className={STYLES.cell}>{apt.talleres}</TableCell>
 
-            {/* Botón Editar Navy */}
-            <TableCell className="px-3 text-center">
-              <div className="flex justify-center">
-                <Button 
-                  className="h-8 w-8 bg-[#050038] hover:bg-[#0a054d] text-white rounded-lg shadow-md transition-all active:scale-95"
-                  size="icon"
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-              </div>
-            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -978,9 +858,42 @@ const [activeTab, setActiveTab] = useState("appointments");
   </div>
 )}
 
+                {activeTab === "inventory" && (
+                  <div className="w-full overflow-x-auto">
+                    <Table>
+                      <TableHeader className="bg-[#050038] sticky top-0 z-30">
+                        <TableRow className="border-none h-10">
+                          <TableHead className="w-10 text-center"></TableHead>
+                          {["Localidad", "Proveedor", "Fecha de la Cita", "Hora de la Cita", "Tipo de Cita", "Cita", "Estado", "#Credencial", "Documento", "#Recepción", "Recibo Maestro", "Editar"].map((h) => (
+                            <TableHead key={h} className="text-white font-bold text-[9px] uppercase px-3 text-center whitespace-nowrap">{h}</TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredInventory.map((apt) => (
+                          <TableRow key={apt.id} className="hover:bg-slate-50 border-b h-12">
+                            <TableCell className="text-center p-2"><input type="checkbox" className="accent-[#FF6B00] w-3.5 h-3.5" /></TableCell>
+                            <TableCell className={STYLES.cell}>{apt.locationName}</TableCell>
+                            <TableCell className={STYLES.cellBold}>{apt.generador}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.date}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.time}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.type}</TableCell>
+                            <TableCell className={STYLES.cellBold}>{apt.idAppointment}</TableCell>
+                            <TableCell className={STYLES.cell}><Badge className="text-[9px] bg-amber-50 text-amber-700">{apt.status}</Badge></TableCell>
+                            <TableCell className={STYLES.cell}>{apt.driverId}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.documento}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.merchandiseCode}</TableCell>
+                            <TableCell className={STYLES.cell}>{apt.appointmentIdRef}</TableCell>
+                            <TableCell className="px-3 text-center"><Button className="h-8 w-8 bg-[#050038] text-white" size="icon"><Edit className="w-4 h-4" /></Button></TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </div>
             )}
-            {locationId && <TablePagination total={45} />}
+            {locationId && <TablePagination total={activeTab === "appointments" ? filteredAppointments.length : activeTab === "carriers" ? filteredReagendada.length : filteredInventory.length} />}
           </div>
         </div>
       </div>

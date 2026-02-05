@@ -370,6 +370,40 @@ const getHeightFromDuration = (durationMinutes: number): number => {
   return (durationMinutes / 1440) * 100;
 };
 
+// --- NUEVO COMPONENTE: VISTA DE LISTA COMPACTA ---
+const DocumentListItem = ({ apt, isSelected, onSelect, onDragStart, onDragEnd }: any) => {
+  return (
+    <div 
+      draggable 
+      onDragStart={(e) => onDragStart(e, apt.id)} 
+      onDragEnd={onDragEnd} 
+      onClick={() => onSelect(apt.id)}
+      className={cn(
+        "group flex items-center gap-3 p-3 mb-2 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md select-none",
+        isSelected 
+          ? "bg-orange-50 border-orange-500 shadow-sm" 
+          : "bg-white border-slate-200 hover:border-orange-300"
+      )}
+    >
+      {/* Checkbox circular estilo radio */}
+      <div className={cn(
+        "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+        isSelected ? "bg-orange-500 border-orange-500" : "border-slate-300 bg-white"
+      )}>
+        {isSelected && <CheckCircle className="w-3 h-3 text-white" />}
+      </div>
+
+      {/* Solo el nombre del documento */}
+      <span className={cn(
+        "text-[10px] font-black uppercase truncate transition-colors",
+        isSelected ? "text-[#1C1E59]" : "text-slate-500 group-hover:text-slate-700"
+      )}>
+        DOC: {apt.id}
+      </span>
+    </div>
+  );
+};
+
 // --- COMPONENTES AUXILIARES (DockSlot, InfoField, Modales) ---
 const InfoField = ({ label, value }: { label: string, value?: string }) => (
   <div>
@@ -1596,6 +1630,8 @@ export function DockManager({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDockIds, setSelectedDockIds] = useState<string[]>([]);
 
+  const [documentViewMode, setDocumentViewMode] = useState<"card" | "list">("card");
+
    // --- LÓGICA DE REDIMENSIÓN ---
   const startResizing = React.useCallback(() => setIsResizing(true), []);
   const stopResizing = React.useCallback(() => setIsResizing(false), []);
@@ -2009,32 +2045,90 @@ const handleSelectLocation = (id: string) => {
                   {filteredLocations.length === 0 && (<div className="text-center py-10 text-slate-400 text-[10px] font-bold uppercase">No se encontraron sedes</div>)}
                </div>
             ) : (
-               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  
-                     {/* HEADER DE SELECCIÓN CON BOTÓN SOLICITAR CITA */}
-                   <div className="flex justify-between items-center mb-3 px-1 h-8">
-                      <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Documentos ({filteredAppointments.length})</span>
-                      {selectedAptIds.length > 0 && (
-                         <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
-                            <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">{selectedAptIds.length} selec.</span>
-                            <Button 
-                              size="sm" 
-                              className="h-6 px-3 text-[9px] font-black bg-orange-500 hover:bg-orange-600 text-white border-none rounded-lg shadow-sm"
-                              onClick={handleRequestMultipleAppointments}
-                            >
-                              SOLICITAR CITA
-                            </Button>
-                         </div>
-                      )}
-                   </div>
-                   {filteredAppointments.length > 0 ? (
-                     filteredAppointments.map(doc => (
-                       <DocumentMaestroCard key={doc.id} apt={doc} isSelected={selectedAptIds.includes(doc.id)} onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)} onDragStart={(e: React.DragEvent, id: string) => { setDraggingId(id); e.dataTransfer.setData("appointmentId", id); }} onDragEnd={() => setDraggingId(null)} />
-                     ))
-                   ) : (
-                     <div className="flex flex-col items-center justify-center py-12 text-slate-300 gap-2"><Package size={32} strokeWidth={1.5} /><p className="text-[10px] font-bold uppercase">No hay documentos pendientes</p></div>
-                   )}
-               </div>
+             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* HEADER: TÍTULO Y CONTROLES DE VISTA */}
+      <div className="flex justify-between items-center mb-3 px-1 h-8">
+         <div className="flex items-center gap-2">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">
+               Docs ({filteredAppointments.length})
+            </span>
+            
+            {/* NUEVO: SWITCH DE VISTAS */}
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+               <button 
+                  onClick={() => setDocumentViewMode('card')}
+                  className={cn(
+                     "p-1 rounded-md transition-all",
+                     documentViewMode === 'card' ? "bg-white text-orange-500 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                  )}
+                  title="Vista Tarjeta"
+               >
+                  <LayoutGrid size={12} />
+               </button>
+               <button 
+                  onClick={() => setDocumentViewMode('list')}
+                  className={cn(
+                     "p-1 rounded-md transition-all",
+                     documentViewMode === 'list' ? "bg-white text-orange-500 shadow-sm" : "text-slate-400 hover:text-slate-600"
+                  )}
+                  title="Vista Lista"
+               >
+                  <ListFilter size={12} />
+               </button>
+            </div>
+         </div>
+
+         {selectedAptIds.length > 0 && (
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
+               <span className="text-[9px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
+                  {selectedAptIds.length}
+               </span>
+               <Button 
+                  size="sm" 
+                  className="h-6 px-3 text-[9px] font-black bg-orange-500 hover:bg-orange-600 text-white border-none rounded-lg shadow-sm"
+                  onClick={handleRequestMultipleAppointments}
+               >
+                  CITA
+               </Button>
+            </div>
+         )}
+      </div>
+
+      {/* RENDERIZADO CONDICIONAL: LISTA O TARJETAS */}
+      <div className="space-y-1 pb-10">
+         {filteredAppointments.length > 0 ? (
+            filteredAppointments.map(doc => (
+               documentViewMode === 'card' ? (
+                  // VISTA TARJETA COMPLETA
+                  <DocumentMaestroCard 
+                     key={doc.id} 
+                     apt={doc} 
+                     isSelected={selectedAptIds.includes(doc.id)} 
+                     onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)} 
+                     onDragStart={(e: React.DragEvent, id: string) => { setDraggingId(id); e.dataTransfer.setData("appointmentId", id); }} 
+                     onDragEnd={() => setDraggingId(null)} 
+                  />
+               ) : (
+                  // VISTA LISTA COMPACTA
+                  <DocumentListItem 
+                     key={doc.id} 
+                     apt={doc} 
+                     isSelected={selectedAptIds.includes(doc.id)} 
+                     onSelect={(id: string) => toggleAptSelection(id, { stopPropagation: () => {} } as any)} 
+                     onDragStart={(e: React.DragEvent, id: string) => { setDraggingId(id); e.dataTransfer.setData("appointmentId", id); }} 
+                     onDragEnd={() => setDraggingId(null)} 
+                  />
+               )
+            ))
+         ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-300 gap-2">
+               <Package size={32} strokeWidth={1.5} />
+               <p className="text-[10px] font-bold uppercase">No hay documentos</p>
+            </div>
+         )}
+      </div>
+   </div>
             )}
           </div>
         </div>
