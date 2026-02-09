@@ -301,12 +301,30 @@ export default function VehicleMap() {
     },
   ];
 
-  const filteredVehicles = useMemo(() => {
-    const q = searchTerm.toLowerCase();
-    return vehiculos.filter(v => 
-      v.placa.toLowerCase().includes(q) || v.cita.toLowerCase().includes(q) || v.oc.toLowerCase().includes(q)
-    );
-  }, [searchTerm]);
+const filteredVehicles = useMemo(() => {
+    const q = searchTerm.toLowerCase().trim();
+    
+    // Si no hay búsqueda, mostrar todos
+    if (!q) return vehiculos;
+
+    return vehiculos.filter((v) => {
+      // Definimos los campos específicos que queremos ignorar en la búsqueda (coordenadas, id, etc)
+      const excludeKeys = ['id', 'lat', 'lng', 'progress'];
+
+      // Obtenemos todos los valores del objeto que NO están en la lista de exclusión
+      return Object.entries(v).some(([key, value]) => {
+        if (excludeKeys.includes(key)) return false;
+
+        // Si el valor es un array (como tracking_codes), buscamos dentro de él
+        if (Array.isArray(value)) {
+          return value.some(item => String(item).toLowerCase().includes(q));
+        }
+
+        // Si es un valor simple (string, número), comparamos
+        return String(value).toLowerCase().includes(q);
+      });
+    });
+  }, [searchTerm, vehiculos]);
 
   return (
     <div className="relative w-full h-full bg-[#f1f5f9] overflow-hidden">
@@ -341,14 +359,14 @@ export default function VehicleMap() {
           </PopoverContent>
         </Popover>
 
-        <div className="relative group w-[450px]">
+        <div className="relative group w-[550px]">
           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#ff6b00]" size={18} />
           <Input 
-            placeholder="BUSCAR: PLACA, CITA, OC..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-14 pl-12 pr-4 bg-white/95 backdrop-blur shadow-2xl rounded-2xl border-none font-black text-[10px] uppercase tracking-widest"
-          />
+          placeholder="BUSCAR POR CUALQUIER DATO (PLACA, CONDUCTOR, OC, PRODUCTO, TRACKING...)" 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="h-14 pl-12 pr-4 bg-white/95 backdrop-blur shadow-2xl rounded-2xl border-none font-black text-[10px] uppercase tracking-widest focus-visible:ring-2 focus-visible:ring-[#ff6b00]"
+        />
         </div>
       </div>
 
