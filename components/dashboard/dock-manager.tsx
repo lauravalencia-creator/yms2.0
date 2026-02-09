@@ -658,10 +658,10 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
           <>
             {/* Otros tipos de productos */}
             <div className="flex flex-col">
-              <span className="text-[7px] font-black text-slate-400 uppercase leading-none mb-1">Otros tipos de productos:</span>
+              <span className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Tipos de productos:</span>
               <div className="flex items-center gap-1">
                 <Boxes size={11} className="text-slate-400 shrink-0" />
-                <span className="text-[9px] font-bold text-slate-600 truncate">
+                <span className="text-[11px] font-bold text-slate-600 truncate">
                   {dock.acceptedProducts || "General / Secos"}
                 </span>
               </div>
@@ -669,10 +669,10 @@ function DockSlot({ dock, onDrop, isDropTarget, onDragOver, onDragLeave, onClick
 
             {/* Horario */}
             <div className="flex flex-col">
-              <span className="text-[7px] font-black text-slate-400 uppercase leading-none mb-1">Horario Operativo:</span>
+              <span className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Horario Operativo:</span>
               <div className="flex items-center gap-1">
                 <Clock size={11} className="text-slate-400 shrink-0" />
-                <span className="text-[9px] font-bold text-slate-600">
+                <span className="text-[11px] font-bold text-slate-600">
                   {dock.startTime || "06:00"} - {dock.endTime || "22:00"}
                 </span>
               </div>
