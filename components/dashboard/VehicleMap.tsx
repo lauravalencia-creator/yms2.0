@@ -94,9 +94,9 @@ function RecenterMap({ coords }: { coords: [number, number] }) {
   return null;
 }
 
-// --- CONTENIDO DEL POPUP AJUSTADO ---
+
+
 function VehiclePopupContent({ vehicle }: { vehicle: any }) {
-  // Obtenemos la configuración de estado para sincronizar el badge del modal
   const statusConfig = getStatusConfig(vehicle.status);
 
   const Field = ({ label, value, icon: Icon, className = "" }: any) => (
@@ -120,11 +120,11 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
     <div className="flex flex-col w-full h-full bg-white font-sans text-left">
       <div className="bg-[#050038] p-4 text-white shrink-0 sticky top-0 z-20 shadow-sm flex justify-between items-start">
         <div className="flex flex-col gap-1">
-            <h3 className="text-base font-black italic uppercase tracking-tighter flex items-center gap-2">
+            <h3 className="text-base font-black  uppercase tracking-tighter flex items-center gap-2">
                Detalles de la Cita <span className="text-[#ff6b00]">#{vehicle.cita}</span>
             </h3>
             <div className="flex items-center gap-3 text-[10px] text-white/70 font-bold uppercase tracking-wider">
-               <span className="flex items-center gap-1"><Anchor size={11} className="text-[#4CCAC8]"/> {vehicle.dock}</span>
+               <span className="flex items-center gap-1"> {vehicle.dock}</span>
                <span className="w-px h-3 bg-white/20"></span>
                <span className="flex items-center gap-1"><FileText size={11} /> {vehicle.oc}</span>
             </div>
@@ -133,7 +133,6 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
             <Badge className={cn("text-[9px] font-black border-none px-2 py-0.5", vehicle.type === 'carga' ? "bg-cyan-500" : "bg-[#ff6b00]")}>
                 {vehicle.type.toUpperCase()}
             </Badge>
-            {/* BADGE SINCRONIZADO CON EL COLOR DEL PIN */}
             <Badge className={cn("text-[9px] font-black border-none px-2 py-0.5 text-white shadow-sm", statusConfig.bgClass)}>
                 {statusConfig.text}
             </Badge>
@@ -150,6 +149,8 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
           <Field label="Recibo Maestro" value={vehicle.receipt} icon={FileText} />
           <Field label="Usuario Solicitante" value={vehicle.request_user} icon={User} />
           <Field label="Documento" value={vehicle.oc} icon={FileText} className="col-span-2" />
+          
+        
 
           <SectionTitle>Actores</SectionTitle>
           <Field label="Generador / Cliente" value={vehicle.client} icon={Building2} className="col-span-2" />
@@ -167,13 +168,30 @@ function VehiclePopupContent({ vehicle }: { vehicle: any }) {
           <Field label="Tipo Producto" value={vehicle.product_type} icon={Box} />
           <Field label="Peso Total" value={vehicle.weight} icon={Scale} />
           <Field label="Litros Totales" value={vehicle.liters} icon={Droplets} />
-          <Field label="Cant. Solicitada" value={vehicle.qty_req} icon={ArrowRightLeft} />
+           <Field label="Cant. Solicitada" value={vehicle.qty_req} icon={ArrowRightLeft} />
           <Field label="Cant. Entregada" value={vehicle.qty_del} icon={CheckCircle2} />
+
+            {/* SECCIÓN NUEVA: CÓDIGOS DE SEGUIMIENTO */}
+          <SectionTitle>Monitoreo y Seguimiento</SectionTitle>
+          <div className="col-span-full flex flex-wrap gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100">
+            {vehicle.tracking_codes && vehicle.tracking_codes.length > 0 ? (
+                vehicle.tracking_codes.map((code: string, index: number) => (
+                    <div key={index} className="flex items-center gap-2 bg-white border border-slate-200 px-2 py-1 rounded shadow-sm group hover:border-[#ff6b00] transition-colors">
+                        <Timer size={10} className="text-slate-400 group-hover:text-[#ff6b00]" />
+                        <span className="text-[10px] font-black text-[#050038] tracking-tighter">{code}</span>
+                    </div>
+                ))
+            ) : (
+                <span className="text-[10px] font-bold text-slate-400  px-2">Sin códigos registrados</span>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
+
 
 export default function VehicleMap() {
   const [activeLoc, setActiveLoc] = useState(LOCATIONS[0]);
